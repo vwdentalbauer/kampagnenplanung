@@ -1,0 +1,3842 @@
+[
+  {
+    "id": "c002",
+    "quartal": "Q1",
+    "kw": 1,
+    "weekStart": "2026-12-29",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "Content-Transfer (Text & Bild!) & Überarbeitung \nStep 1: Übertragung\nStep: Vollständige Überarbeitung",
+    "ziel": "Übertragen der Inhalte auf die neue Website",
+    "kategorie": "CI",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c003",
+    "quartal": "Q1",
+    "kw": 1,
+    "weekStart": "2026-12-29",
+    "zielgruppe": "Alle",
+    "kanal": "SEO",
+    "details": "Metadatenüberarbeitung, Anpassung der Inhalte",
+    "ziel": "Sicherstellung Suchmaschinen Rankings",
+    "kategorie": "CI",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c004",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "LinkedIn: infotage Fachdental",
+    "ziel": "Info Fachdental München",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c005",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story Instagram: infotage Fachdental + Freitickets",
+    "ziel": "Info Fachdental München",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c006",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "IG + FB: Neue Behandlungseinheite Berliner Charité",
+    "ziel": "Portfoliovielfalt zeigen & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV",
+      "Planung"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c007",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "PM",
+    "details": "Pressemitteilung Go Live auf Shop",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c008",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "OEMUS",
+    "details": "Exclusive Go Live Story Online & Offline",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c009",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Bestandskunden",
+    "kanal": "Paketbeilagen",
+    "details": "Give-Away: Glückskekse + Flyer, sobald alle Kunden auf dem neuen Shop sind",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Nina",
+    "owners": [
+      "Nina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c010",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "neuer PLULINE Katalog",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c011",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel IG: Glove dolls & PLULINE",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c012",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Neuer Webshop Go Live: LinkedIn, IG + FB",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c013",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Intern/SAP",
+    "details": "Änderung Logos",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c014",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Versand an alle NL-Abonenten & Angelegte Shopnutzer\nOhne bereits informierte",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c015",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Google My Business",
+    "details": "Logos Hinzufügen",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c016",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "YouTube",
+    "details": "Alte Webiste Tutorials löschen",
+    "ziel": "Shop Go Live",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c017",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "live vor Ort: infotage FACHDENTAL",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c018",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Stories: Schleswig-Holsteinischer Zahnärztetag",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c019",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Post Pressemitteilung Go Live (LinkedIn)",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Valeska/Michaela",
+    "owners": [
+      "Valeska",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c020",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Intern",
+    "kanal": "E-Mail",
+    "details": "Info über Social Media Posts - Aufforderung zum Liken",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Valeska",
+    "owners": [
+      "Valeska"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c021",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "PM",
+    "details": "Versand an Verteiler",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c022",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel Teil 1 + Teil 2: Weltfrauentag Tulpen Aktion",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c023",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Austausch aller Headbanner auf neues Logo",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c024",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Autausch Logos/ Assets etc.",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c025",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Start der Kampagne",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c026",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Ads Kampagne für den neuen Shop",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c027",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Bestandskunden",
+    "kanal": "Messe",
+    "details": "München",
+    "ziel": "Awareness",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c028",
+    "quartal": "Q1",
+    "kw": 11,
+    "weekStart": "2026-03-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "IG: Glückskekse + Pakete verlassen des Lager",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c029",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Rückblick infotage FACHDENTAL München",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c030",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Landingpage",
+    "details": "Im Deals Bereich",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Axel/ Ivana",
+    "owners": [
+      "Axel",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c031",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Teaster Post - nur \"Hero Deals\" bewerben, keine konkreten Produkte -Link auf Homepage",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Michaela/ Ivana",
+    "owners": [
+      "Michaela",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c032",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Shopbanner",
+    "details": "Link zu Deals Page",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c033",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Product Teaser",
+    "details": "Produkte auf MIZ LP anpassen",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c034",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Meta Ads",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c035",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Ads Kampagne für den neuen Shop (Meta + LinkedIn)",
+    "ziel": "Shop Go Live",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c036",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Link zu Deals Page",
+    "ziel": "Salespush",
+    "kategorie": "Hero Kampagne",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c037",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Glückskekse verlassen GLS Lager",
+    "ziel": "Salespush",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Michaela/ Ivana",
+    "owners": [
+      "Michaela",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c038",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Welttag der Zahngesundheit (World Oral Health Day) : Video Handschuh Herz + Zahn",
+    "ziel": "Awareness",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Michaela/ Ivana",
+    "owners": [
+      "Michaela",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c039",
+    "quartal": "Q1",
+    "kw": 12,
+    "weekStart": "2026-03-16",
+    "zielgruppe": "Alle",
+    "kanal": "Hersteller",
+    "details": "Paket neues Logo schnüren für Hersteller",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Valeska/Axel",
+    "owners": [
+      "Valeska",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c040",
+    "quartal": "Q1",
+    "kw": 13,
+    "weekStart": "2026-03-22",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Unboxing Glückskekse I",
+    "ziel": "Salespush",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Michaela/ Ivana",
+    "owners": [
+      "Michaela",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c041",
+    "quartal": "Q1",
+    "kw": 13,
+    "weekStart": "2026-03-22",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "LinkedIn: Beitrag zu Salesforce Summit Event",
+    "ziel": "Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Michaela/ Ivana",
+    "owners": [
+      "Michaela",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c042",
+    "quartal": "Q1",
+    "kw": 13,
+    "weekStart": "2026-03-22",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: PLU°LINE Mundspiegel + Ostereier",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c043",
+    "quartal": "Q2",
+    "kw": 14,
+    "weekStart": "2026-03-30",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: Ultradent Einheit Charité Berlin",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Planung"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c044",
+    "quartal": "Q2",
+    "kw": 14,
+    "weekStart": "2026-03-30",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Frohe Ostern",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c045",
+    "quartal": "Q2",
+    "kw": 14,
+    "weekStart": "2026-03-30",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Social Media Challenge o. Umfrage \"welche Funktion ist für euch die nützlichste?\"",
+    "ziel": "Image stärken & Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c046",
+    "quartal": "Q2",
+    "kw": 15,
+    "weekStart": "2026-04-06",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Weltgesundheitstag",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c047",
+    "quartal": "Q2",
+    "kw": 15,
+    "weekStart": "2026-04-06",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: neuer PLU°LINE Katalog print + digital",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c048",
+    "quartal": "Q2",
+    "kw": 15,
+    "weekStart": "2026-04-06",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "* Ostermaßnahmen: Budgetkürzungen + Kampagnenpausen → weniger Umsatz April, höherer ROAS\n* Feste Länderbudgets statt flexibel → bessere Planbarkeit, geringere Rentabilität\n* CH-Kampagnen pausiert → deutlicher negativer Impact April\n* DE Relaunch + technische Probleme → kurzfristig Umsatzrückgang, langfristig positiv\n* Neue Kanäle/Märkte (Microsoft Ads, DK) → +10% / +5% Umsatz mittelfristig",
+    "ziel": "SEA-Optimierungen in Tracking, Remarketing-Setup und Merchant-Center-Qualität",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c049",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH - Carousel: Neuer PLU°LINE Katalog digital",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c050",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH - Story: Neuer PLU°LINE Katalog digital",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c051",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: \" Diese Gewinne wollt ihr nicht verpassen\" - Gewinnspiel Preise von Ninja zeigen",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c052",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Röntgen Schulung in Gütersloh mit Dürr Dental",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c053",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Fränkischer Zahnärztetag",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c054",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: 50. Jahrestagung südbadische Zahnärzt:innen in Rust",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c055",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: \"Heute schon an die Ä1 gedacht?\"",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c056",
+    "quartal": "Q2",
+    "kw": 16,
+    "weekStart": "2026-04-13",
+    "zielgruppe": "MIZ Kunden",
+    "kanal": "TeMa",
+    "details": "Reaktivierungskampagne",
+    "ziel": "Reaktivierung ehemaliger MIZ Kunden\nInformation über neuen Webshop\nSammlung von Verlustgründen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Rux",
+    "owners": [
+      "Rux"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c057",
+    "quartal": "Q2",
+    "kw": 17,
+    "weekStart": "2026-04-20",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Danke für euren Besuch! Fränkischer Zahnärztetag",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c058",
+    "quartal": "Q2",
+    "kw": 17,
+    "weekStart": "2026-04-20",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Blick hinter die Kulissen - dema dent Lager",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c059",
+    "quartal": "Q2",
+    "kw": 17,
+    "weekStart": "2026-04-20",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Welttag des Labors: Video von die Zahntechnikerin + PLU°LINE Sortiment auch für Labor",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c060",
+    "quartal": "Q2",
+    "kw": 17,
+    "weekStart": "2026-04-20",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: SprintRay SprintRACE in Hockenheim",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c061",
+    "quartal": "Q2",
+    "kw": 18,
+    "weekStart": "2026-04-27",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Quiz \"Wie sicher arbeitest du wirklich?\" zum Welttag der Sicherheit und Gesundheit am Arbeitsplatz",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c062",
+    "quartal": "Q2",
+    "kw": 18,
+    "weekStart": "2026-04-27",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Polierbürstchen - so bereitet ihr sie richtig auf: Mülleimer",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c063",
+    "quartal": "Q2",
+    "kw": 18,
+    "weekStart": "2026-04-27",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Gründung Praxis Dr. Kern Teil 1",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c064",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: 1x1 PZR mit Elke Schilling in Gütersloh",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c065",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Bekanntgabe Gewinner Glückskeks-Gewinnspiel",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c066",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Welttag der Handhygiene",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c067",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH Reel: Wir sind auf der Dental Bern",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c068",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: Trend Kinderfotos",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c069",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Story Sprint Ray + Link zur Demo",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c070",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "MIZ Kunden",
+    "kanal": "TeMa",
+    "details": "Reaktivierungskampagne",
+    "ziel": "Reaktivierung ehemaliger MIZ Kunden\nInformation über neuen Webshop\nSammlung von Verlustgründen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Rux",
+    "owners": [
+      "Rux"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c071",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "Alle",
+    "details": "Dental-Deals",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c072",
+    "quartal": "Q2",
+    "kw": 19,
+    "weekStart": "2026-05-04",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "* Go-Live Microsoft Ads & Google Ads (DK)  \n* Etablierung flexibler Budgetallokation zwischen Google und Microsoft  \n* Konsolidierung der Non-Brand PMax-Kampagnen inkl. Umstellung auf Target ROAS  \n* Optimierung der Kampagnenstruktur zur Steigerung der Algorithmus-Effizienz  \n* Stabilisierung der Merchant Center Datenfeeds (DE & DK)  \n* Berücksichtigung nachlaufender Umsätze in der Performancebewertung  \n* Migration des Conversion-Trackings auf MCC-Ebene  \n* Erstellung von Best-Practice Ausschlusslisten für Suchkampagnen  \n* Kompensation von Umsatzverlusten durch gezielte Kampagnensteuerung  \n* Fokus auf nachhaltige Profitabilitäts- und ROAS-Steigerung",
+    "ziel": "Maximierung von Umsatz und Profitabilität durch skalierbare Kampagnenstrukturen, optimierte Budgetallokation und verbesserte Datenbasis",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c073",
+    "quartal": "Q1",
+    "kw": 2,
+    "weekStart": "2026-01-05",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Step 1: Optmierung aller bestehender Kampagnen hinsichtlich Budget und Performance\nStep 2: Restrukturierung bestehender Kampagnen inkl. Planung weiterer Kampagenen",
+    "ziel": "MIZ Push / Vorbereitung für weiter db Portfolio Kampagnen",
+    "kategorie": "",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c074",
+    "quartal": "Q2",
+    "kw": 20,
+    "weekStart": "2026-05-11",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Story Sprint Ray + Link zur Demo",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c075",
+    "quartal": "Q2",
+    "kw": 20,
+    "weekStart": "2026-05-11",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Dental Deals",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c076",
+    "quartal": "Q2",
+    "kw": 20,
+    "weekStart": "2026-05-11",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Praxis Dr. Kern Teil 2 - wurde wieder gelöscht",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c077",
+    "quartal": "Q2",
+    "kw": 20,
+    "weekStart": "2026-05-11",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Carousel \"Das Depot mit Herz\"",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c078",
+    "quartal": "Q2",
+    "kw": 20,
+    "weekStart": "2026-05-11",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Praxiseröffnung POLARDENT München",
+    "ziel": "Portfoliovielfalt zeigen & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c079",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: Persönliche Schutzausrüstung",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c080",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "PLP MIZ \n• SEO Text (Keywords)\n• SEO Meta Daten (Headlines) \n• FAQ",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c081",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Reel Neuer PLU°LINE Katalog",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c082",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: \"Happy Bergfest\" - Mundspiegel + Ätzgel",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c083",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Software",
+    "details": "Tippspielsoftware (Kunden & HR)",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel/ Ivana",
+    "owners": [
+      "Axel",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c084",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Story Sprint Ray + Link zur Demo",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c085",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Praxis Dr. Kern Teil 3? (Feedback Alina noch offen)",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c086",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Landingpage",
+    "details": "Tippspiel incl. Teilnahmebedingungen!\ndentalbauer.de/wmtippspiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c087",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "Gewinne",
+    "details": "Auswahl Gewinne",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Nina",
+    "owners": [
+      "Nina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c088",
+    "quartal": "Q2",
+    "kw": 21,
+    "weekStart": "2026-05-18",
+    "zielgruppe": "Alle",
+    "kanal": "SEO",
+    "details": "Hauptproduktgruppen an Axel",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Axel / Sophia",
+    "owners": [
+      "Axel",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c089",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Collab-Post Reel: \"Polardent -Sponsoring Davra Cup\"",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c090",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH Carousel: 5 Gründe für deinen Besuch auf der Dental Bern",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c091",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: \"Unsere ZFAs\" - Superheld:in, Zahnfee, Therapeut:in (Wertschätzung)",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c092",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Story Sprint Ray + Link zur Demo",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV"
+    ],
+    "verantwortung": "Ufuk/ Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c093",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "E-Mail",
+    "details": "Interne Kommunikationsmail:\n- Kundentippspiel\n- Mitarbeiter Tippspiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Valeska/Katharina",
+    "owners": [
+      "Valeska",
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c094",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "WM 2026",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c095",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Bewerbung Tippspiel (Post/ Story)",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c096",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Paid Kampagne?",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel/ Ivana",
+    "owners": [
+      "Axel",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c097",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Banner",
+    "details": "Haupt-LP / Material LP/ Aktionsseite",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Axel/ Ivana",
+    "owners": [
+      "Axel",
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c098",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Praxis Dr. Kern Teil 3 - Rundgangvideo",
+    "ziel": "Existenzgründer ansprechen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c099",
+    "quartal": "Q2",
+    "kw": 22,
+    "weekStart": "2026-05-25",
+    "zielgruppe": "Alle",
+    "kanal": "Printanzeige",
+    "details": "Anzeige auf WM Planer dzw",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c100",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "MIZ Kunden",
+    "kanal": "TeMa",
+    "details": "Reaktivierungskampagne",
+    "ziel": "Reaktivierung ehemaliger MIZ Kunden\nInformation über neuen Webshop\nSammlung von Verlustgründen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Rux",
+    "owners": [
+      "Rux"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c101",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Übergabe Gewinne Glückskeks Gewinnspiel",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c102",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Ankündigung WM-Tippspiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c103",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "WhatsApp Status Slides für Mitarbeitende zum Teilen im WA Status",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c104",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: Intern. Kindertag - Kinderprophylaxe (Content zum Teilen für Praxen)",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c105",
+    "quartal": "Q2",
+    "kw": 26,
+    "weekStart": "2026-06-22",
+    "zielgruppe": "Alle",
+    "kanal": "Print",
+    "details": "Hygiene A-Z",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung"
+    ],
+    "verantwortung": "Katharina/Nina/Sophia",
+    "owners": [
+      "Katharina",
+      "Nina",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c106",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Print",
+    "details": "Checkliste Belastungsprobe",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung"
+    ],
+    "verantwortung": "Katharina/Nina/Sophia",
+    "owners": [
+      "Katharina",
+      "Nina",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c107",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Print",
+    "details": "Hygieneplan",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Katharina/Nina/Sophia",
+    "owners": [
+      "Katharina",
+      "Nina",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c108",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: \"Ich liebe meinen Zanharzt-Tag\" - Erdbeere in Zahnform",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c109",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Storys Aufbau",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ufuk/Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c110",
+    "quartal": "Q2",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Landingpage",
+    "details": "Landingpage \n• Druckluft und Filtertausch \n• Praxisbegehung \n• Wasserprobenentnahme \n• Hygiene A-Z \n• Hygieneplan PSA \n• Pluline Seite anpassen \n• Webinare / Seminare \n* MELAG Brand Page",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Axel / Sophia / Katharina",
+    "owners": [
+      "Ivana",
+      "Axel",
+      "Sophia",
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c111",
+    "quartal": "Q2",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH: Stories live von der Messe vor Ort",
+    "ziel": "Messe Bern Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ufuk/Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c112",
+    "quartal": "",
+    "kw": 23,
+    "weekStart": "2026-06-01",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Collab-Reel: Praxis Polardent Oshibori + Link zum Shop",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c113",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Praxis Dr. Kern Teil 4",
+    "ziel": "Existenzgründer ansprechen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c114",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH Reel: Das war die Dental Bern 2026",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ufuk/Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c115",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH Story: Danke für 500 Follower",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Ufuk/Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c116",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Reminder 1 - WM Tipp-Spiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c117",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel (Collab) Übergabe Gewinne Glückskeks Gewinnspiel Praxis Dr. Quast",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c118",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel: WM Tipp-Spiel (Feedpost)",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c119",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Reminder 2 WM Tipp-Spiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c120",
+    "quartal": "",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Umfrage + Reminder: Habt ihr schon getippt? Wie geht das erste Deutschland-Spiel aus?",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c121",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Newsletter Hygiene Thema 1",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c122",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Banner",
+    "details": "Banner Kategorie und Shop (alle 3 Wochen austasuchen)  parallel NL",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Axel",
+    "owners": [
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c123",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "Banner Geräteseite Kleingeräte",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "EV"
+    ],
+    "verantwortung": "Katharina / Axel",
+    "owners": [
+      "Katharina",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c124",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Paid Anzeige 1",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c125",
+    "quartal": "Q2",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Reminder",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c126",
+    "quartal": "Q2",
+    "kw": 24,
+    "weekStart": "2026-06-08",
+    "zielgruppe": "Alle",
+    "kanal": "Printanzeige",
+    "details": "Titelkopfanzeige in dzw - QR zum Tippspiel + Gewinne",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c127",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "PDP MIZ (Sophia erstellt Prio Produkte Pluline)",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Axel / Sophia",
+    "owners": [
+      "Ivana",
+      "Axel",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c128",
+    "quartal": "Q2",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "PLP EV \n• SEO u. Meta Daten prüfen\n• SEO Text prüfen \n• Verlinkungen ggf. Produkte aktualsieren \n• Banner einfügen",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "EV"
+    ],
+    "verantwortung": "Ivana/ Axel / Katharina",
+    "owners": [
+      "Ivana",
+      "Axel",
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c129",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: \"Wir brauchen einen neuen Slogan für dental bauer\" + ggf. Melag 75 Jahre gratulieren?",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c130",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Praxis Zahnverliebt oder Dr. Kern letztes Video",
+    "ziel": "Existenzgründer ansprechen/Testimonials",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c131",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Stories: Dental Summer Timmendorfer Strand",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c132",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel/Carousel: Übergabe Hauptgewinn Glückskeks Gewinnspiel (Ninja Praxis Dr. Duckwitz)",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c133",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "CH Carousel: Neuer Slogan für nächste Messe",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ufuk/Michaela",
+    "owners": [
+      "Ufuk",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c134",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "ggf. Stories: Cerec Master/Digital Summit München",
+    "ziel": "Image stärken und Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c135",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Lookbook Stories Praxis Dr. Roppelt",
+    "ziel": "Portfoliovielfalt zeigen & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c136",
+    "quartal": "",
+    "kw": 25,
+    "weekStart": "2026-06-15",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Habt ihr schon eure WM-Tipps abgegeben? 2. DE-Spiel",
+    "ziel": "WM 2026",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c137",
+    "quartal": "Q2",
+    "kw": 26,
+    "weekStart": "2026-06-22",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Newsletter Hygiene Thema 2",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c138",
+    "quartal": "Q2",
+    "kw": 26,
+    "weekStart": "2026-06-22",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Paid Anzeige 2",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c140",
+    "quartal": "Q3",
+    "kw": 27,
+    "weekStart": "2026-06-29",
+    "zielgruppe": "Alle",
+    "kanal": "Website",
+    "details": "PDP EV",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "EV"
+    ],
+    "verantwortung": "Ivana/ Axel / Katharina",
+    "owners": [
+      "Ivana",
+      "Axel",
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c141",
+    "quartal": "Q3",
+    "kw": 27,
+    "weekStart": "2026-06-29",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Service post - wir begleiten einen Servicetechniker",
+    "ziel": "Portfoliovielfalt zeigen & Image stärken",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c142",
+    "quartal": "Q3",
+    "kw": 28,
+    "weekStart": "2026-07-06",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Newsletter Hygiene Thema 3",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c143",
+    "quartal": "Q3",
+    "kw": 28,
+    "weekStart": "2026-07-06",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Paid Anzeige 3",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c144",
+    "quartal": "Q3",
+    "kw": 28,
+    "weekStart": "2026-07-06",
+    "zielgruppe": "Alle",
+    "kanal": "PR",
+    "details": "PR",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi",
+      "DSO"
+    ],
+    "verantwortung": "Katharina / Sophia",
+    "owners": [
+      "Katharina",
+      "Sophia"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c146",
+    "quartal": "Q3",
+    "kw": 28,
+    "weekStart": "2026-07-06",
+    "zielgruppe": "Alle",
+    "kanal": "Alle",
+    "details": "Dental-Deals",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c148",
+    "quartal": "Q1",
+    "kw": 3,
+    "weekStart": "2026-01-12",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel-Post: „Neues Jahr als ZFA\" zum Start in den Praxisalltag",
+    "ziel": "Image stärken & Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c149",
+    "quartal": "Q1",
+    "kw": 3,
+    "weekStart": "2026-01-12",
+    "zielgruppe": "Bestandskunden",
+    "kanal": "Paketbeilagen",
+    "details": "Handwärmer",
+    "ziel": "Kundenbindung",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Nina",
+    "owners": [
+      "Nina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c150",
+    "quartal": "Q3",
+    "kw": 30,
+    "weekStart": "2026-07-20",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Paid Anzeige 4",
+    "ziel": "Hygiene-Kampagne",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Ivana/ Axel",
+    "owners": [
+      "Ivana",
+      "Axel"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c157",
+    "quartal": "Q3",
+    "kw": 36,
+    "weekStart": "2026-08-31",
+    "zielgruppe": "Alle",
+    "kanal": "Alle",
+    "details": "Hero Deals",
+    "ziel": "Sales Push",
+    "kategorie": "",
+    "bereiche": [
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c161",
+    "quartal": "Q1",
+    "kw": 4,
+    "weekStart": "2026-01-19",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel (in Kooperation mit Praxis „Zahnkunst\"): Das Geheimnis beliebter Zahnärzt:innen",
+    "ziel": "Image stärken & Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c162",
+    "quartal": "Q1",
+    "kw": 4,
+    "weekStart": "2026-01-19",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Umfrage zu gewünschten Themen und Inhalten",
+    "ziel": "Content-Präferenzen der Follower",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c163",
+    "quartal": "Q1",
+    "kw": 4,
+    "weekStart": "2026-01-19",
+    "zielgruppe": "Alle",
+    "kanal": "Telefonanlage",
+    "details": "Umstellung der Bandansage, Neu Definition der Mitarbeiter für e-shop Anfragen",
+    "ziel": "Bessere Steuerung der Kundenanfragen, schnellere Bearbeitung am Telefon",
+    "kategorie": "db Kampagnen",
+    "bereiche": [],
+    "verantwortung": "Kathrin",
+    "owners": [
+      "Kathrin"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c174",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "DENSTPLY SIRONA | 01-2026",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c175",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Bestandskunden",
+    "kanal": "Newsletter",
+    "details": "Testkunden: Ankündigung neuer Shop, Vorteile für Praxisalltag (>50 Kunden)",
+    "ziel": "Praxistest neuer Shop",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c176",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Webinarankündigung Existenzgründung",
+    "ziel": "Anmeldungen & Awareness",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c177",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Carousel-Post: 01.02. Ändere Passworttag",
+    "ziel": "Kundenbindung",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c178",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Intern",
+    "kanal": "Umfrage",
+    "details": "Umfrage zu Social Media Aktivitäten (db intern)",
+    "ziel": "Neue Ideen, Wünsche, Anmerkungen, \"Was machen wir nicht\"",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "TS",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c179",
+    "quartal": "Q1",
+    "kw": 5,
+    "weekStart": "2026-01-26",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Herzlich willkommen! ♥",
+    "ziel": "DE new shop #1",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c184",
+    "quartal": "Q1",
+    "kw": 6,
+    "weekStart": "2026-02-02",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Handwärmer gegen Zähneklappern",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c185",
+    "quartal": "Q1",
+    "kw": 6,
+    "weekStart": "2026-02-02",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "YOUNG INNO. | 01-2026",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c186",
+    "quartal": "Q1",
+    "kw": 6,
+    "weekStart": "2026-02-02",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Reporting basiert auf „Conv. value (nach Conv.-Zeit)“\nNon-Brand/Brand/Produkt operativ getrennt\nBrand-Umsätze korrekt zugeordnet\nWochenenden im Non-Brand-SEA ausgeschlossen\nBudget auf profitablere Wochentage fokussiert\nProdukttitel optimiert\nBessere Zuordnung von Suchbegriffen & Produkten durch Google\nGesamtes Produktportfolio in PMAX beworben",
+    "ziel": "SEA-Optimierung als Kosten und Produktlistings",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c187",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Exklusive Preview: Testen Sie unseren neuen Online-Shop!",
+    "ziel": "DE new shop #3",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c188",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "08.02.: Tag der Zahnschmerzen - Carousel zum Hintergrund und \"Danke an alle ZFAS\"",
+    "ziel": "Image stärken & Beziehung aufbauen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c189",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Webinar Herr Schlitt \"Das richtige Praxiskonzept\"",
+    "ziel": "Webinar Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c190",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Junges Netzrwek von dentagen",
+    "ziel": "Existenzgründer ansprechen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c191",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Bestandskunden",
+    "kanal": "Newsletter",
+    "details": "Testkunden II : Ankündigung neuer Shop, Vorteile für Praxisalltag (>150 Kunden)",
+    "ziel": "Praxistest neuer Shop",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "MIZ",
+      "Exi"
+    ],
+    "verantwortung": "Ivana",
+    "owners": [
+      "Ivana"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c192",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Preisvergleicher",
+    "details": "Aera: Go Live 10 Featured Produkte für Cross-selling -> Pluline mit extra Datenfeed",
+    "ziel": "MIZ & Eigenmarkenpush",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ruxandra",
+    "owners": [
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c193",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Exklusive Preview: Testen Sie unseren neuen Online-Shop!",
+    "ziel": "DE new shop #2",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c194",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "SHOFU Produktübersicht (Labor)",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c195",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Preisvergleicher",
+    "details": "Aera: Datenfeedoptimierung allgemein",
+    "ziel": "MIZ & Eigenmarkenpush",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ruxandra",
+    "owners": [
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c196",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "Preisvergleicher",
+    "details": "Wawibox: Masterdatenfeed überarbeitung, Zusätzliche Atribute, Firmenbeschreibung, Hinzufügen von Eigenmarkenbeschreibung",
+    "ziel": "MIZ & Eigenmarkenpush",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ruxandra",
+    "owners": [
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c197",
+    "quartal": "Q1",
+    "kw": 7,
+    "weekStart": "2026-02-09",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Wechsel zu POAs (Bidding Strategie)",
+    "ziel": "Effiziente Verwendung des Budgets",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c198",
+    "quartal": "Q1",
+    "kw": 8,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Fortbildungen in Hamm (03.03. und 04.03)",
+    "ziel": "Training Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c199",
+    "quartal": "Q1",
+    "kw": 8,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Erster Praxisbesuch (mit Praxis Zahnkunst)",
+    "ziel": "Existenzgründer & ZÄ ansprechen",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c200",
+    "quartal": "Q1",
+    "kw": 8,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Webinare \"Abgeber-Webinar\" (20.2.) und Expertengespräch Existenzgr. (21.2.)",
+    "ziel": "Webinar Push",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c201",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "Exklusive Preview: Testen Sie unseren neuen Online-Shop!",
+    "ziel": "DE new shop #4",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c202",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Reel: Ankündigung Infotage Fachdental MUC + Tickets",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV",
+      "Planung",
+      "Exi"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c203",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-23",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "infotage FACHDENTAL München 2026",
+    "ziel": "Info Fachdental München",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c204",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-23",
+    "zielgruppe": "MIZ Kunden",
+    "kanal": "TeMa",
+    "details": "Pluline Kamapgne zum Abverkauft von Auslaufartikeln",
+    "ziel": "Sales/ Abverkauf",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "EV",
+      "Planung"
+    ],
+    "verantwortung": "Valeska",
+    "owners": [
+      "Valeska"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c205",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-23",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Messe Bundeswehr Papenburg",
+    "ziel": "Kundenbindung & Image stärken",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c206",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Social Media",
+    "details": "Story: Mythos oder Fakt",
+    "ziel": "Community Interaktion & Image stärke",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ"
+    ],
+    "verantwortung": "Ivana/ Michaela",
+    "owners": [
+      "Ivana",
+      "Michaela"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c207",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-16",
+    "zielgruppe": "Alle",
+    "kanal": "Newsletter",
+    "details": "SHOFU | 01-2026",
+    "ziel": "",
+    "kategorie": "",
+    "bereiche": [],
+    "verantwortung": "",
+    "owners": [],
+    "status": "geplant"
+  },
+  {
+    "id": "c208",
+    "quartal": "Q1",
+    "kw": 9,
+    "weekStart": "2026-02-23",
+    "zielgruppe": "Alle",
+    "kanal": "Prinanzeige",
+    "details": "OEMUS Dentalzeitung: Planung",
+    "ziel": "Aufmerksamkeit",
+    "kategorie": "Abverkauf/ Aktionen",
+    "bereiche": [
+      "Planung"
+    ],
+    "verantwortung": "Katharina",
+    "owners": [
+      "Katharina"
+    ],
+    "status": "geplant"
+  },
+  {
+    "id": "c209",
+    "quartal": "Q1",
+    "kw": 10,
+    "weekStart": "2026-03-02",
+    "zielgruppe": "Alle",
+    "kanal": "SEA",
+    "details": "Remarketing-Listen nach Segment und Zeitraum finalisiert \nHochwertige Datensignale für den Google-Algorithmus zur besseren Gebotsanpassung auf Nutzerebene\nGezieltere Ausrichtung von Remarketing-Kampagnen auf definierte Nutzergruppen\nBranchen­einstellung in Google Analytics 4 von „Gesundheit“ auf „Wirtschaft & Industrie“ geändert (Umgehung von Remarketing-Einschränkungen)\nNutzer-ID-Tracking in Google Analytics 4 aktiviert für geräte- und kanalübergreifendes Remarketing\nGA4-Conversions als Backup- und Kontrollmechanismus in Google Ads integriert (bessere Überwachung von Tracking-Fehlern)\nVersand- und Rückgaberichtlinien im Google Merchant Center hinterlegt → mehr Transparenz und Vertrauen für Nutzer\nAllgemeiner Qualitätsfaktor im Google Merchant Center beeinflusst positiv die Klickpreise in Google Ads Auktionen",
+    "ziel": "SEA-Optimierungen in Tracking, Remarketing-Setup und Merchant-Center-Qualität",
+    "kategorie": "db Kampagnen",
+    "bereiche": [
+      "Brand",
+      "MIZ",
+      "EV"
+    ],
+    "verantwortung": "Axel/ Ruxandra",
+    "owners": [
+      "Axel",
+      "Ruxandra"
+    ],
+    "status": "geplant"
+  }
+]
