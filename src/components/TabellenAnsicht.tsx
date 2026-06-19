@@ -24,20 +24,19 @@ type SpaltenKey =
   | "datum"
   | "kampagne"
   | "kanal"
-  | "ziel"
   | "bereiche"
   | "verantwortung"
   | "status";
 
-const SPALTEN: Record<SpaltenKey, { label: string; breite: number }> = {
-  kw: { label: "KW", breite: 70 },
-  datum: { label: "Datum", breite: 118 },
-  kampagne: { label: "Kampagne", breite: 340 },
-  kanal: { label: "Kanal", breite: 130 },
-  ziel: { label: "Ziel", breite: 200 },
-  bereiche: { label: "Bereiche", breite: 140 },
-  verantwortung: { label: "Verantwortung", breite: 160 },
-  status: { label: "Status", breite: 120 },
+// breite = null bedeutet flexibel (füllt den verbleibenden Platz → responsiv).
+const SPALTEN: Record<SpaltenKey, { label: string; breite: number | null }> = {
+  kw: { label: "KW", breite: 60 },
+  datum: { label: "Datum", breite: 110 },
+  kampagne: { label: "Kampagne", breite: null },
+  kanal: { label: "Kanal", breite: 120 },
+  bereiche: { label: "Bereiche", breite: 130 },
+  verantwortung: { label: "Verantwortung", breite: 150 },
+  status: { label: "Status", breite: 112 },
 };
 
 const STANDARD_REIHENFOLGE: SpaltenKey[] = [
@@ -45,7 +44,6 @@ const STANDARD_REIHENFOLGE: SpaltenKey[] = [
   "datum",
   "kampagne",
   "kanal",
-  "ziel",
   "bereiche",
   "verantwortung",
   "status",
@@ -179,12 +177,6 @@ export function TabellenAnsicht({
         ) : (
           <span className="px-1.5">{k.kanal}</span>
         );
-      case "ziel":
-        return darfBearbeiten ? (
-          <EditableCell value={k.ziel} onCommit={(v) => onUpdate(k, { ziel: v })} />
-        ) : (
-          <span className="px-1.5 text-slate-600">{k.ziel}</span>
-        );
       case "bereiche":
         return (
           <div className="flex flex-wrap gap-1 px-1.5">
@@ -235,13 +227,16 @@ export function TabellenAnsicht({
       )}
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="w-full table-fixed border-collapse text-sm">
+        {/* table-fixed + w-full: Spalten füllen exakt die Breite (responsiv).
+            min-w sorgt dafür, dass es auf sehr schmalen Screens scrollbar bleibt. */}
+        <table className="w-full min-w-[680px] table-fixed border-collapse text-sm">
           <colgroup>
-            <col style={{ width: 40 }} />
-            {reihenfolge.map((key) => (
-              <col key={key} style={{ width: SPALTEN[key].breite }} />
-            ))}
-            {darfBearbeiten && <col style={{ width: 80 }} />}
+            <col style={{ width: 36 }} />
+            {reihenfolge.map((key) => {
+              const b = SPALTEN[key].breite;
+              return <col key={key} style={b ? { width: b } : undefined} />;
+            })}
+            {darfBearbeiten && <col style={{ width: 72 }} />}
           </colgroup>
 
           <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-500">
