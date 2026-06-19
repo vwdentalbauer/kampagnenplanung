@@ -12,7 +12,7 @@ import { KampagneEditor } from "./components/KampagneEditor";
 type Ansicht = "tabelle" | "woche" | "ziel";
 
 export default function App() {
-  const { nutzer, setRolle, darfBearbeiten, istAdmin } = useAuth();
+  const { nutzer, setRolle, darfBearbeiten, istAdmin, abmelden } = useAuth();
   const { kampagnen, geladen, speichern, loeschen, zuruecksetzen } = useKampagnen();
 
   const [ansicht, setAnsicht] = useState<Ansicht>("woche");
@@ -78,21 +78,29 @@ export default function App() {
           </p>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          {/* Rollen-Umschalter (Demo). Später: echte Anmeldung via Supabase. */}
-          <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-            <span className="text-slate-400">Rolle</span>
-            <select
-              value={nutzer.rolle}
-              onChange={(e) => setRolle(e.target.value as Rolle)}
-              className="bg-transparent font-medium focus:outline-none"
-            >
-              {(Object.keys(ROLLEN_LABELS) as Rolle[]).map((r) => (
-                <option key={r} value={r}>
-                  {ROLLEN_LABELS[r]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <span className="text-slate-500">{nutzer.name}</span>
+          {istAdmin && (
+            <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
+              <span className="text-slate-400 text-xs">Rolle</span>
+              <select
+                value={nutzer.rolle}
+                onChange={(e) => setRolle(e.target.value as Rolle)}
+                className="bg-transparent text-sm font-medium focus:outline-none"
+              >
+                {(Object.keys(ROLLEN_LABELS) as Rolle[]).map((r) => (
+                  <option key={r} value={r}>
+                    {ROLLEN_LABELS[r]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button
+            onClick={abmelden}
+            className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 hover:bg-slate-50"
+          >
+            Abmelden
+          </button>
         </div>
       </header>
 
