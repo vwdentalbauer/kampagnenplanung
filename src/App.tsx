@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
+import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { FilterBar, LEERER_FILTER, type Filter } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
@@ -24,12 +25,18 @@ export default function App() {
 
   const gefiltert = useMemo(() => {
     const s = filter.suche.toLowerCase();
+    const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
+    const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
     return kampagnen.filter((k) => {
       if (filter.quartal && k.quartal !== filter.quartal) return false;
       if (filter.status && k.status !== filter.status) return false;
       if (filter.kanal && k.kanal !== filter.kanal) return false;
       if (filter.ziel && k.ziel !== filter.ziel) return false;
       if (filter.owner && !k.owners.includes(filter.owner)) return false;
+      if (kwVon != null && (k.kw == null || k.kw < kwVon)) return false;
+      if (kwBis != null && (k.kw == null || k.kw > kwBis)) return false;
+      if (filter.datumVon && (!k.weekStart || k.weekStart < filter.datumVon)) return false;
+      if (filter.datumBis && (!k.weekStart || k.weekStart > filter.datumBis)) return false;
       if (s && !`${k.details} ${k.ziel} ${k.kanal} ${k.verantwortung}`.toLowerCase().includes(s))
         return false;
       return true;
@@ -55,7 +62,23 @@ export default function App() {
   const onDelete = (id: string) => {
     if (confirm("Kampagne wirklich löschen?")) loeschen(id);
   };
-  const onStatus = (k: Kampagne, status: Status) => speichern({ ...k, status });
+
+  // Inline-Änderung aus der Tabelle. Bei Datum/Verantwortung werden
+  // abgeleitete Felder (KW, Quartal, owners) automatisch mitgepflegt.
+  const onUpdate = (k: Kampagne, patch: Partial<Kampagne>) => {
+    const next = { ...k, ...patch };
+    if (patch.weekStart !== undefined) {
+      next.kw = kwAusDatum(next.weekStart) ?? next.kw;
+      next.quartal = quartalAusDatum(next.weekStart) ?? next.quartal;
+    }
+    if (patch.verantwortung !== undefined) {
+      next.owners = patch.verantwortung
+        .split(/[/,]/)
+        .map((o) => o.trim())
+        .filter(Boolean);
+    }
+    speichern(next);
+  };
 
   const tab = (id: Ansicht, label: string) => (
     <button
@@ -166,7 +189,7 @@ export default function App() {
           darfBearbeiten={darfBearbeiten}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
           onDelete={onDelete}
-          onStatus={onStatus}
+          onUpdate={onUpdate}
         />
       ) : ansicht === "woche" ? (
         <WochenAnsicht
