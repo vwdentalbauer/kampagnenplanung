@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { Kampagne, Status } from "../types";
 import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
@@ -29,17 +29,32 @@ type SpaltenKey =
   | "verantwortung"
   | "status";
 
-// breite = null bedeutet flexibel (füllt den verbleibenden Platz → responsiv).
-const SPALTEN: Record<SpaltenKey, { label: string; breite: number | null }> = {
-  kw: { label: "KW", breite: 60 },
-  datum: { label: "Datum", breite: 110 },
-  kampagne: { label: "Kampagne", breite: 190 },
-  details: { label: "Details", breite: null },
-  kanal: { label: "Kanal", breite: 120 },
-  bereiche: { label: "Bereiche", breite: 130 },
-  verantwortung: { label: "Verantwortung", breite: 150 },
-  status: { label: "Status", breite: 112 },
+// Default-Breiten (px). Per Drag am Spaltenrand individuell anpassbar.
+const SPALTEN: Record<SpaltenKey, { label: string; breite: number }> = {
+  kw: { label: "KW", breite: 56 },
+  datum: { label: "Datum", breite: 104 },
+  kampagne: { label: "Kampagne", breite: 180 },
+  details: { label: "Details", breite: 300 },
+  kanal: { label: "Kanal", breite: 110 },
+  bereiche: { label: "Bereiche", breite: 120 },
+  verantwortung: { label: "Verantwortung", breite: 140 },
+  status: { label: "Status", breite: 104 },
 };
+
+const BREITEN_KEY = "kampagnen.spaltenbreiten.v1";
+
+function ladeBreiten(): Record<SpaltenKey, number> {
+  const standard = Object.fromEntries(
+    (Object.keys(SPALTEN) as SpaltenKey[]).map((k) => [k, SPALTEN[k].breite]),
+  ) as Record<SpaltenKey, number>;
+  try {
+    const raw = localStorage.getItem(BREITEN_KEY);
+    if (!raw) return standard;
+    return { ...standard, ...(JSON.parse(raw) as Record<SpaltenKey, number>) };
+  } catch {
+    return standard;
+  }
+}
 
 const STANDARD_REIHENFOLGE: SpaltenKey[] = [
   "kw",
@@ -107,6 +122,7 @@ export function TabellenAnsicht({
   onBulkDelete,
 }: Props) {
   const [reihenfolge, setReihenfolge] = useState<SpaltenKey[]>(ladeReihenfolge);
+  const [breiten, setBreiten] = useState<Record<SpaltenKey, number>>(ladeBreiten);
   const [auswahl, setAuswahl] = useState<Set<string>>(new Set());
   const [dragKey, setDragKey] = useState<SpaltenKey | null>(null);
   const [sort, setSort] = useState<SortZustand>({ key: null, dir: "asc" });
@@ -115,6 +131,30 @@ export function TabellenAnsicht({
   useEffect(() => {
     localStorage.setItem(SPALTEN_KEY, JSON.stringify(reihenfolge));
   }, [reihenfolge]);
+
+  useEffect(() => {
+    localStorage.setItem(BREITEN_KEY, JSON.stringify(breiten));
+  }, [breiten]);
+
+  // Spaltenbreite per Drag am rechten Rand des Spaltenkopfs anpassen.
+  const startResize = (key: SpaltenKey, e: ReactMouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startBreite = breiten[key];
+    const move = (ev: MouseEvent) => {
+      const neu = Math.max(56, startBreite + (ev.clientX - startX));
+      setBreiten((b) => ({ ...b, [key]: neu }));
+    };
+    const ende = () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", ende);
+      document.body.style.cursor = "";
+    };
+    document.body.style.cursor = "col-resize";
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", ende);
+  };
 
   // Vorlagen für die Details-Spalte (eindeutige, nicht-leere Texte).
   const vorlagen = useMemo(() => {
@@ -283,15 +323,22 @@ export function TabellenAnsicht({
       )}
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        {/* table-fixed + w-full: Spalten füllen exakt die Breite (responsiv).
-            min-w sorgt dafür, dass es auf sehr schmalen Screens scrollbar bleibt. */}
-        <table className="w-full min-w-[860px] table-fixed border-collapse text-sm">
+        {/* table-fixed mit expliziter Gesamtbreite: Spaltenbreiten sind exakt
+            steuerbar (per Drag am Rand) und bei Bedarf horizontal scrollbar. */}
+        <table
+          className="table-fixed border-collapse text-sm"
+          style={{
+            width:
+              36 +
+              reihenfolge.reduce((s, k) => s + breiten[k], 0) +
+              (darfBearbeiten ? 72 : 0),
+          }}
+        >
           <colgroup>
             <col style={{ width: 36 }} />
-            {reihenfolge.map((key) => {
-              const b = SPALTEN[key].breite;
-              return <col key={key} style={b ? { width: b } : undefined} />;
-            })}
+            {reihenfolge.map((key) => (
+              <col key={key} style={{ width: breiten[key] }} />
+            ))}
             {darfBearbeiten && <col style={{ width: 72 }} />}
           </colgroup>
 
@@ -314,7 +361,7 @@ export function TabellenAnsicht({
                     key={key}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => onDrop(key)}
-                    className={`px-2 py-2 ${dragKey === key ? "opacity-40" : ""}`}
+                    className={`relative px-2 py-2 ${dragKey === key ? "opacity-40" : ""}`}
                   >
                     <div className="flex items-center gap-1">
                       {/* Drag-Griff zum Verschieben */}
@@ -331,7 +378,7 @@ export function TabellenAnsicht({
                       <button
                         onClick={() => sortBy(key)}
                         title="Auf-/absteigend sortieren"
-                        className="flex items-center gap-0.5 uppercase tracking-wide hover:text-slate-700"
+                        className="flex items-center gap-0.5 truncate uppercase tracking-wide hover:text-slate-700"
                       >
                         {SPALTEN[key].label}
                         <span className={`text-[10px] ${aktiv ? "text-marke-dark" : "text-slate-300"}`}>
@@ -339,6 +386,12 @@ export function TabellenAnsicht({
                         </span>
                       </button>
                     </div>
+                    {/* Griff zum Breite-Ändern (rechter Rand) */}
+                    <span
+                      onMouseDown={(e) => startResize(key, e)}
+                      title="Spaltenbreite ziehen"
+                      className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize select-none hover:bg-marke/40"
+                    />
                   </th>
                 );
               })}

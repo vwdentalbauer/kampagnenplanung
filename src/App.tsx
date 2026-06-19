@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
-import { kwAusDatum, quartalAusDatum } from "./lib/date";
+import { kwAusDatum, quartalAusDatum, cutoffVorletzteWoche } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { FilterBar, LEERER_FILTER, LEER, type Filter } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
@@ -110,6 +110,29 @@ export default function App() {
     if (ids.length) loeschenViele(ids);
   };
 
+  // Alle (offenen) Einträge bis einschließlich vorletzter Woche auf „Erledigt".
+  const vergangeneErledigt = () => {
+    const cutoff = cutoffVorletzteWoche();
+    const betroffen = kampagnen.filter(
+      (k) =>
+        k.weekStart &&
+        k.weekStart < cutoff &&
+        k.status !== "erledigt" &&
+        k.status !== "abgesagt",
+    );
+    if (!betroffen.length) {
+      alert("Keine offenen Einträge bis zur vorletzten Woche gefunden.");
+      return;
+    }
+    if (
+      confirm(
+        `${betroffen.length} Eintrag/Einträge bis einschließlich vorletzter Woche auf „Erledigt" setzen?\n(Abgesagte bleiben unverändert.)`,
+      )
+    ) {
+      speichernViele(betroffen.map((k) => ({ ...k, status: "erledigt" as Status })));
+    }
+  };
+
   const tab = (id: Ansicht, label: string) => (
     <button
       onClick={() => setAnsicht(id)}
@@ -178,6 +201,15 @@ export default function App() {
           {tab("ziel", "🎯 Nach Ziel")}
         </div>
         <div className="flex items-center gap-2">
+          {darfBearbeiten && (
+            <button
+              onClick={vergangeneErledigt}
+              title="Alle offenen Einträge bis einschließlich vorletzter Woche auf Erledigt setzen"
+              className="rounded border border-emerald-300 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50"
+            >
+              ✓ Vergangene → Erledigt
+            </button>
+          )}
           {istAdmin && (
             <button
               onClick={() => {
@@ -194,7 +226,7 @@ export default function App() {
               onClick={() => setEditor({ offen: true, kampagne: null })}
               className="rounded-md bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
             >
-              + Neue Kampagne
+              + Neuer Eintrag
             </button>
           )}
         </div>

@@ -72,7 +72,7 @@ export function KampagneEditor({ kampagne, onSave, onClose }: Props) {
       >
         <div className="flex items-center justify-between border-b px-5 py-3">
           <h2 className="text-lg font-semibold">
-            {kampagne ? "Kampagne bearbeiten" : "Neue Kampagne"}
+            {kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
           </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
             ✕

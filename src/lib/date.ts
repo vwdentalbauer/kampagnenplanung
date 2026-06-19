@@ -1,4 +1,13 @@
-import { getISOWeek, parseISO, startOfISOWeek, format } from "date-fns";
+import { getISOWeek, parseISO, startOfISOWeek, subWeeks, format } from "date-fns";
+
+/**
+ * Stichtag „bis einschließlich vorletzte Woche": der Montag der letzten Woche.
+ * Alle Einträge mit weekStart < diesem Datum liegen in der vorletzten Woche
+ * oder früher.
+ */
+export function cutoffVorletzteWoche(heute = new Date()): string {
+  return format(subWeeks(startOfISOWeek(heute), 1), "yyyy-MM-dd");
+}
 
 /** Kalenderwoche aus einem ISO-Datum. */
 export function kwAusDatum(iso: string | null): number | null {
