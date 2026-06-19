@@ -240,6 +240,7 @@ export default function App() {
       <footer className="mt-10 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
         Demo-Stand · Daten liegen lokal im Browser · Nutzerverwaltung &amp; gemeinsame
         Datenbank folgen über Supabase
+        <div className="mt-1 text-slate-300">Version vom {__BUILD_TIME__}</div>
       </footer>
     </div>
   );
