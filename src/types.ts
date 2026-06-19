@@ -17,6 +17,9 @@ export interface Kampagne {
   weekStart: string | null;
   zielgruppe: string;
   kanal: string;
+  /** Kurzer Kampagnen-Name/Titel (für die Übersicht). */
+  kampagne: string;
+  /** Ausführliche Beschreibung/Maßnahme (= Excel-Spalte M „Details"). */
   details: string;
   /** Übergeordnetes Ziel (für die Auswertung „nach Ziel“). */
   ziel: string;

@@ -4,7 +4,7 @@ import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
-import { FilterBar, LEERER_FILTER, type Filter } from "./components/FilterBar";
+import { FilterBar, LEERER_FILTER, LEER, type Filter } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { WochenAnsicht } from "./components/WochenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
@@ -38,14 +38,23 @@ export default function App() {
     return kampagnen.filter((k) => {
       if (filter.quartal && k.quartal !== filter.quartal) return false;
       if (filter.status && k.status !== filter.status) return false;
-      if (filter.kanal && k.kanal !== filter.kanal) return false;
+      // Kanal / Kampagne / Verantwortlich: „(leer)" filtert leere Felder.
+      if (filter.kanal === LEER ? k.kanal.trim() !== "" : filter.kanal && k.kanal !== filter.kanal)
+        return false;
+      if (
+        filter.kampagne === LEER
+          ? k.kampagne.trim() !== ""
+          : filter.kampagne && k.kampagne !== filter.kampagne
+      )
+        return false;
+      if (filter.owner === LEER ? k.owners.length > 0 : filter.owner && !k.owners.includes(filter.owner))
+        return false;
       if (filter.ziel && k.ziel !== filter.ziel) return false;
-      if (filter.owner && !k.owners.includes(filter.owner)) return false;
       if (kwVon != null && (k.kw == null || k.kw < kwVon)) return false;
       if (kwBis != null && (k.kw == null || k.kw > kwBis)) return false;
       if (filter.datumVon && (!k.weekStart || k.weekStart < filter.datumVon)) return false;
       if (filter.datumBis && (!k.weekStart || k.weekStart > filter.datumBis)) return false;
-      if (s && !`${k.details} ${k.ziel} ${k.kanal} ${k.verantwortung}`.toLowerCase().includes(s))
+      if (s && !`${k.kampagne} ${k.details} ${k.kanal} ${k.verantwortung}`.toLowerCase().includes(s))
         return false;
       return true;
     });
@@ -196,6 +205,7 @@ export default function App() {
           filter={filter}
           setFilter={setFilter}
           kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          kampagnen={eindeutigeWerte(kampagnen, "kampagne")}
           ziele={eindeutigeWerte(kampagnen, "ziel")}
           owners={owners}
           quartale={eindeutigeWerte(kampagnen, "quartal")}

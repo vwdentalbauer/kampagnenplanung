@@ -23,6 +23,7 @@ function leereKampagne(): Kampagne {
     weekStart: null,
     zielgruppe: "Alle",
     kanal: "",
+    kampagne: "",
     details: "",
     ziel: "",
     kategorie: "db Kampagnen",
@@ -80,10 +81,18 @@ export function KampagneEditor({ kampagne, onSave, onClose }: Props) {
 
         <div className="grid grid-cols-2 gap-4 p-5">
           <div className="col-span-2">
+            <label className={label}>Kampagne (Kurztitel)</label>
+            <input
+              className={input}
+              value={form.kampagne}
+              onChange={(e) => set("kampagne", e.target.value)}
+            />
+          </div>
+          <div className="col-span-2">
             <label className={label}>Details / Maßnahme</label>
             <textarea
               className={input}
-              rows={2}
+              rows={3}
               value={form.details}
               onChange={(e) => set("details", e.target.value)}
             />

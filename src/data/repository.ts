@@ -21,18 +21,32 @@ export interface KampagnenRepository {
 
 const STORAGE_KEY = "kampagnen.v1";
 
+/** Erste Zeile eines Textes als Kurztitel (für das neue Feld „kampagne"). */
+function ersteZeile(text: string): string {
+  const z = (text ?? "").split("\n")[0].trim();
+  return z.length > 80 ? z.slice(0, 80) + "…" : z;
+}
+
+/** Sorgt dafür, dass jeder Datensatz das Feld „kampagne" hat (Migration). */
+function normalisieren(daten: Kampagne[]): Kampagne[] {
+  return daten.map((k) => ({
+    ...k,
+    kampagne: k.kampagne ?? ersteZeile(k.details),
+  }));
+}
+
 export class LocalStorageRepository implements KampagnenRepository {
   private load(): Kampagne[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const data = seed as unknown as Kampagne[];
+      const data = normalisieren(seed as unknown as Kampagne[]);
       this.save(data);
       return data;
     }
     try {
-      return JSON.parse(raw) as Kampagne[];
+      return normalisieren(JSON.parse(raw) as Kampagne[]);
     } catch {
-      return seed as unknown as Kampagne[];
+      return normalisieren(seed as unknown as Kampagne[]);
     }
   }
 
@@ -72,7 +86,7 @@ export class LocalStorageRepository implements KampagnenRepository {
   }
 
   async zuruecksetzen(): Promise<Kampagne[]> {
-    const data = seed as unknown as Kampagne[];
+    const data = normalisieren(seed as unknown as Kampagne[]);
     this.save(data);
     return data;
   }
