@@ -43,3 +43,13 @@ export function formatDatum(iso: string | null): string {
     return iso;
   }
 }
+
+/** Kurzer Wochentag (Mo, Di, …) zu einem ISO-Datum. */
+export function wochentagKurz(iso: string | null): string {
+  if (!iso) return "";
+  try {
+    return ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][parseISO(iso).getDay()];
+  } catch {
+    return "";
+  }
+}

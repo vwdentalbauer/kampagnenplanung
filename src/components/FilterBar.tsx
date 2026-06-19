@@ -1,6 +1,6 @@
 import type { Status } from "../types";
 import { STATUS_LABELS } from "../constants";
-import { aktiveAnzahl, LEER, LEERER_FILTER, type Filter } from "../lib/filter";
+import { aktiveAnzahl, LEERER_FILTER, type Filter } from "../lib/filter";
 import { MultiSelect } from "./MultiSelect";
 
 interface Props {
@@ -70,18 +70,14 @@ export function FilterBar({
           onChange={(v) => upd({ owners: v })}
           withEmpty
         />
+        <MultiSelect
+          label="Kampagnen"
+          options={kampagnen}
+          selected={filter.kampagnen}
+          onChange={(v) => upd({ kampagnen: v })}
+          withEmpty
+        />
 
-        <select
-          className={einzelStil(!!filter.kampagne)}
-          value={filter.kampagne}
-          onChange={(e) => upd({ kampagne: e.target.value })}
-        >
-          <option value="">Alle Kampagnen</option>
-          <option value={LEER}>(leer)</option>
-          {kampagnen.map((k) => (
-            <option key={k}>{k}</option>
-          ))}
-        </select>
         <select
           className={einzelStil(!!filter.ziel)}
           value={filter.ziel}

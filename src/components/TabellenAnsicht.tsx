@@ -6,6 +6,7 @@ import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
+import { wochentagKurz } from "../lib/date";
 
 interface Props {
   kampagnen: Kampagne[];
@@ -125,7 +126,8 @@ export function TabellenAnsicht({
   const [breiten, setBreiten] = useState<Record<SpaltenKey, number>>(ladeBreiten);
   const [auswahl, setAuswahl] = useState<Set<string>>(new Set());
   const [dragKey, setDragKey] = useState<SpaltenKey | null>(null);
-  const [sort, setSort] = useState<SortZustand>({ key: null, dir: "asc" });
+  // Standard: nach KW sortiert – so „startet" die Tabelle ohne Filter mit KW.
+  const [sort, setSort] = useState<SortZustand>({ key: "kw", dir: "asc" });
   const selectAllRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -243,14 +245,21 @@ export function TabellenAnsicht({
           </>
         );
       case "datum":
-        return darfBearbeiten ? (
-          <EditableCell
-            type="date"
-            value={k.weekStart ?? ""}
-            onCommit={(v) => onUpdate(k, { weekStart: v || null })}
-          />
-        ) : (
-          <span className="px-1.5 text-slate-500">{k.weekStart ?? "—"}</span>
+        return (
+          <div>
+            {darfBearbeiten ? (
+              <EditableCell
+                type="date"
+                value={k.weekStart ?? ""}
+                onCommit={(v) => onUpdate(k, { weekStart: v || null })}
+              />
+            ) : (
+              <span className="px-1.5 text-slate-500">{k.weekStart ?? "—"}</span>
+            )}
+            {k.weekStart && (
+              <div className="px-1.5 text-xs text-slate-400">{wochentagKurz(k.weekStart)}</div>
+            )}
+          </div>
         );
       case "kampagne":
         return darfBearbeiten ? (
@@ -311,7 +320,7 @@ export function TabellenAnsicht({
   const spaltenAnzahl = reihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       {darfBearbeiten && ausgewaehlteSichtbar.length > 0 && (
         <BulkBar
           anzahl={ausgewaehlteSichtbar.length}
@@ -322,7 +331,7 @@ export function TabellenAnsicht({
         />
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-slate-200 bg-white">
         {/* table-fixed mit expliziter Gesamtbreite: Spaltenbreiten sind exakt
             steuerbar (per Drag am Rand) und bei Bedarf horizontal scrollbar. */}
         <table
@@ -342,9 +351,9 @@ export function TabellenAnsicht({
             {darfBearbeiten && <col style={{ width: 72 }} />}
           </colgroup>
 
-          <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-500">
+          <thead className="sticky top-0 z-20 text-left text-xs uppercase tracking-wide text-slate-500 shadow-sm">
             <tr>
-              <th className="px-2 py-2">
+              <th className="sticky top-0 bg-slate-100 px-2 py-2">
                 <input
                   ref={selectAllRef}
                   type="checkbox"
@@ -361,7 +370,7 @@ export function TabellenAnsicht({
                     key={key}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => onDrop(key)}
-                    className={`relative px-2 py-2 ${dragKey === key ? "opacity-40" : ""}`}
+                    className={`relative bg-slate-100 px-2 py-2 ${dragKey === key ? "opacity-40" : ""}`}
                   >
                     <div className="flex items-center gap-1">
                       {/* Drag-Griff zum Verschieben */}
@@ -395,17 +404,23 @@ export function TabellenAnsicht({
                   </th>
                 );
               })}
-              {darfBearbeiten && <th className="px-3 py-2"></th>}
+              {darfBearbeiten && <th className="bg-slate-100 px-3 py-2"></th>}
             </tr>
           </thead>
 
           <tbody>
-            {sortiert.map((k) => {
+            {sortiert.map((k, i) => {
               const gewaehlt = auswahl.has(k.id);
+              // Trennlinie, wenn eine neue KW beginnt (nur bei Sortierung nach KW/Datum sinnvoll).
+              const nachZeit = sort.key === "kw" || sort.key === "datum";
+              const neueWoche = nachZeit && (i === 0 || sortiert[i - 1].kw !== k.kw);
+              const rand = neueWoche
+                ? "border-t-2 border-marke/50"
+                : "border-t border-slate-100";
               return (
                 <tr
                   key={k.id}
-                  className={`border-t border-slate-100 align-top ${
+                  className={`${rand} align-top ${
                     gewaehlt ? "bg-marke/5" : "hover:bg-slate-50/60"
                   }`}
                 >
