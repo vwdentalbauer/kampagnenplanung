@@ -24,7 +24,7 @@ export function BulkBar({ anzahl, kanaele, onApply, onDelete, onClear }: Props) 
     "rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:border-marke focus:outline-none";
 
   return (
-    <div className="sticky top-0 z-10 mb-2 flex flex-wrap items-center gap-3 rounded-lg border border-marke bg-marke/10 px-3 py-2">
+    <div className="mb-2 flex flex-wrap items-center gap-3 rounded-lg border border-marke bg-marke/10 px-3 py-2">
       <span className="text-sm font-semibold text-marke-dark">{anzahl} ausgewählt</span>
 
       {/* Status setzen */}

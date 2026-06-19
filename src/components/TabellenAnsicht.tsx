@@ -320,7 +320,7 @@ export function TabellenAnsicht({
   const spaltenAnzahl = reihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div>
       {darfBearbeiten && ausgewaehlteSichtbar.length > 0 && (
         <BulkBar
           anzahl={ausgewaehlteSichtbar.length}
@@ -331,7 +331,10 @@ export function TabellenAnsicht({
         />
       )}
 
-      <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-slate-200 bg-white">
+      {/* Kein vertikaler Scroll-Container -> der thead bleibt beim normalen
+          Seiten-Scrollen oben kleben, alles darüber scrollt mit weg.
+          w-fit/min-w-full lässt breite Tabellen über die Seite scrollen. */}
+      <div className="w-fit min-w-full rounded-lg border border-slate-200 bg-white">
         {/* table-fixed mit expliziter Gesamtbreite: Spaltenbreiten sind exakt
             steuerbar (per Drag am Rand) und bei Bedarf horizontal scrollbar. */}
         <table

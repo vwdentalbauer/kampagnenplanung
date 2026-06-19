@@ -143,7 +143,7 @@ export default function App() {
   );
 
   return (
-    <div className="mx-auto flex h-screen max-w-7xl flex-col p-4 sm:p-6">
+    <div className="mx-auto max-w-7xl p-4 sm:p-6">
       <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Kampagnenplanung 2026</h1>
@@ -258,38 +258,32 @@ export default function App() {
         />
       </div>
 
-      <main className="flex min-h-0 flex-1 flex-col">
-        {!geladen ? (
-          <p className="py-10 text-center text-slate-400">Lädt…</p>
-        ) : ansicht === "tabelle" ? (
-          <TabellenAnsicht
-            kampagnen={gefiltert}
-            darfBearbeiten={darfBearbeiten}
-            kanaele={eindeutigeWerte(kampagnen, "kanal")}
-            onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-            onBulkUpdate={onBulkUpdate}
-            onBulkDelete={onBulkDelete}
-          />
-        ) : ansicht === "woche" ? (
-          <div className="min-h-0 flex-1 overflow-auto pr-1">
-            <WochenAnsicht
-              kampagnen={gefiltert}
-              darfBearbeiten={darfBearbeiten}
-              onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-            />
-          </div>
-        ) : (
-          <div className="min-h-0 flex-1 overflow-auto pr-1">
-            <ZielAnsicht
-              kampagnen={gefiltert}
-              darfBearbeiten={darfBearbeiten}
-              onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-            />
-          </div>
-        )}
-      </main>
+      {!geladen ? (
+        <p className="py-10 text-center text-slate-400">Lädt…</p>
+      ) : ansicht === "tabelle" ? (
+        <TabellenAnsicht
+          kampagnen={gefiltert}
+          darfBearbeiten={darfBearbeiten}
+          kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onBulkUpdate={onBulkUpdate}
+          onBulkDelete={onBulkDelete}
+        />
+      ) : ansicht === "woche" ? (
+        <WochenAnsicht
+          kampagnen={gefiltert}
+          darfBearbeiten={darfBearbeiten}
+          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+        />
+      ) : (
+        <ZielAnsicht
+          kampagnen={gefiltert}
+          darfBearbeiten={darfBearbeiten}
+          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+        />
+      )}
 
       {editor.offen && (
         <KampagneEditor
@@ -302,7 +296,7 @@ export default function App() {
         />
       )}
 
-      <footer className="mt-3 flex-none border-t border-slate-200 pt-3 text-center text-xs text-slate-400">
+      <footer className="mt-10 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
         Demo-Stand · Daten liegen lokal im Browser · Nutzerverwaltung &amp; gemeinsame
         Datenbank folgen über Supabase
         <div className="mt-1 text-slate-300">Version vom {__BUILD_TIME__}</div>
