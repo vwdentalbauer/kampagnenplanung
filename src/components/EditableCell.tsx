@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 interface Props {
   value: string;
@@ -7,6 +7,8 @@ interface Props {
   type?: "text" | "number" | "date";
   placeholder?: string;
   className?: string;
+  /** Autovervollständigung: Vorschläge aus vorhandenen Werten. */
+  vorschlaege?: string[];
 }
 
 /**
@@ -20,8 +22,10 @@ export function EditableCell({
   type = "text",
   placeholder,
   className = "",
+  vorschlaege,
 }: Props) {
   const [wert, setWert] = useState(value);
+  const listId = useId();
 
   useEffect(() => {
     setWert(value);
@@ -48,19 +52,29 @@ export function EditableCell({
   }
 
   return (
-    <input
-      type={type}
-      className={`${basis} ${className}`}
-      value={wert}
-      placeholder={placeholder}
-      onChange={(e) => setWert(e.target.value)}
-      onBlur={speichern}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          (e.target as HTMLInputElement).blur();
-        }
-      }}
-    />
+    <>
+      <input
+        type={type}
+        list={vorschlaege ? listId : undefined}
+        className={`${basis} ${className}`}
+        value={wert}
+        placeholder={placeholder}
+        onChange={(e) => setWert(e.target.value)}
+        onBlur={speichern}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+      />
+      {vorschlaege && (
+        <datalist id={listId}>
+          {vorschlaege.map((v) => (
+            <option key={v} value={v} />
+          ))}
+        </datalist>
+      )}
+    </>
   );
 }

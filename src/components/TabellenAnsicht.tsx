@@ -165,6 +165,13 @@ export function TabellenAnsicht({
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
 
+  // Vorschläge (Autocomplete) für die Kampagne-Spalte.
+  const kampagneVorschlaege = useMemo(() => {
+    const set = new Set<string>();
+    kampagnen.forEach((k) => k.kampagne.trim() && set.add(k.kampagne.trim()));
+    return [...set].sort((a, b) => a.localeCompare(b, "de"));
+  }, [kampagnen]);
+
   // Sortierte Liste für die Anzeige.
   const sortiert = useMemo(() => {
     if (!sort.key) return kampagnen;
@@ -263,7 +270,11 @@ export function TabellenAnsicht({
         );
       case "kampagne":
         return darfBearbeiten ? (
-          <EditableCell value={k.kampagne} onCommit={(v) => onUpdate(k, { kampagne: v })} />
+          <EditableCell
+            value={k.kampagne}
+            vorschlaege={kampagneVorschlaege}
+            onCommit={(v) => onUpdate(k, { kampagne: v })}
+          />
         ) : (
           <span className="px-1.5 font-medium">{k.kampagne}</span>
         );

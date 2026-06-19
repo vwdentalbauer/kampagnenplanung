@@ -40,15 +40,22 @@ export function FilterBar({
 
   return (
     <div className="space-y-2">
-      {/* Zeile 1: Suche & Kategorien */}
+      {/* Zeile 1: Suche & Kategorien (umbricht bei Bedarf in zwei Zeilen) */}
       <div className="flex flex-wrap items-center gap-2">
         <input
-          className={`${sel} min-w-48 flex-1 border-slate-300 bg-white`}
-          placeholder="Suche in Kampagne, Details, Kanal…"
+          className={`${sel} w-56 border-slate-300 bg-white`}
+          placeholder="Suche…"
           value={filter.suche}
           onChange={(e) => upd({ suche: e.target.value })}
         />
-
+        <MultiSelect
+          label="Kampagnen"
+          options={kampagnen}
+          selected={filter.kampagnen}
+          onChange={(v) => upd({ kampagnen: v })}
+          withEmpty
+          suchbar
+        />
         <MultiSelect
           label="Status"
           options={status}
@@ -62,6 +69,7 @@ export function FilterBar({
           selected={filter.kanaele}
           onChange={(v) => upd({ kanaele: v })}
           withEmpty
+          suchbar
         />
         <MultiSelect
           label="Verantwortliche"
@@ -69,13 +77,7 @@ export function FilterBar({
           selected={filter.owners}
           onChange={(v) => upd({ owners: v })}
           withEmpty
-        />
-        <MultiSelect
-          label="Kampagnen"
-          options={kampagnen}
-          selected={filter.kampagnen}
-          onChange={(v) => upd({ kampagnen: v })}
-          withEmpty
+          suchbar
         />
 
         <select

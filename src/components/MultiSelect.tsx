@@ -7,11 +7,21 @@ interface Props {
   selected: string[];
   onChange: (vals: string[]) => void;
   withEmpty?: boolean; // zusätzliche Option „(leer)"
+  suchbar?: boolean; // Suchfeld im Dropdown (für lange Listen)
   anzeige?: (v: string) => string; // Label-Umwandlung (z.B. Status)
 }
 
-export function MultiSelect({ label, options, selected, onChange, withEmpty, anzeige }: Props) {
+export function MultiSelect({
+  label,
+  options,
+  selected,
+  onChange,
+  withEmpty,
+  suchbar,
+  anzeige,
+}: Props) {
   const [offen, setOffen] = useState(false);
+  const [suche, setSuche] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +44,9 @@ export function MultiSelect({ label, options, selected, onChange, withEmpty, anz
       ? labelText(selected[0])
       : `${label}: ${selected.length}`;
 
-  const alle: string[] = withEmpty ? [LEER, ...options] : options;
+  const basis: string[] = withEmpty ? [LEER, ...options] : options;
+  const q = suche.trim().toLowerCase();
+  const alle = q ? basis.filter((v) => labelText(v).toLowerCase().includes(q)) : basis;
 
   return (
     <div ref={ref} className="relative">
@@ -52,7 +64,16 @@ export function MultiSelect({ label, options, selected, onChange, withEmpty, anz
       </button>
 
       {offen && (
-        <div className="absolute z-20 mt-1 max-h-72 w-56 overflow-auto rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-60 overflow-auto rounded-lg border border-slate-200 bg-white p-1 shadow-xl">
+          {suchbar && (
+            <input
+              autoFocus
+              value={suche}
+              onChange={(e) => setSuche(e.target.value)}
+              placeholder={label}
+              className="mb-1 w-full rounded border border-slate-200 px-2 py-1 text-sm text-slate-600 placeholder:text-slate-400 focus:border-marke focus:outline-none"
+            />
+          )}
           <div className="flex items-center justify-between px-2 py-1 text-xs text-slate-400">
             <span>{label}</span>
             {aktiv && (
@@ -61,9 +82,7 @@ export function MultiSelect({ label, options, selected, onChange, withEmpty, anz
               </button>
             )}
           </div>
-          {alle.length === 0 && (
-            <p className="px-2 py-2 text-xs text-slate-400">Keine Werte</p>
-          )}
+          {alle.length === 0 && <p className="px-2 py-2 text-xs text-slate-400">Keine Treffer</p>}
           {alle.map((v) => (
             <label
               key={v}
