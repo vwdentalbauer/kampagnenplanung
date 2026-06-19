@@ -11,6 +11,9 @@ import { kwAusDatum, quartalAusDatum } from "../lib/date";
 
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
+  kanaele: string[];
+  zielgruppen: string[];
+  verantwortliche: string[];
   onSave: (k: Kampagne) => void;
   onClose: () => void;
 }
@@ -34,7 +37,14 @@ function leereKampagne(): Kampagne {
   };
 }
 
-export function KampagneEditor({ kampagne, onSave, onClose }: Props) {
+export function KampagneEditor({
+  kampagne,
+  kanaele,
+  zielgruppen,
+  verantwortliche,
+  onSave,
+  onClose,
+}: Props) {
   const [form, setForm] = useState<Kampagne>(kampagne ?? leereKampagne());
 
   const set = <K extends keyof Kampagne>(feld: K, wert: Kampagne[K]) =>
@@ -137,17 +147,29 @@ export function KampagneEditor({ kampagne, onSave, onClose }: Props) {
             <label className={label}>Kanal</label>
             <input
               className={input}
+              list="dl-kanal"
               value={form.kanal}
               onChange={(e) => set("kanal", e.target.value)}
             />
+            <datalist id="dl-kanal">
+              {kanaele.map((k) => (
+                <option key={k} value={k} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className={label}>Zielgruppe</label>
             <input
               className={input}
+              list="dl-zielgruppe"
               value={form.zielgruppe}
               onChange={(e) => set("zielgruppe", e.target.value)}
             />
+            <datalist id="dl-zielgruppe">
+              {zielgruppen.map((z) => (
+                <option key={z} value={z} />
+              ))}
+            </datalist>
           </div>
 
           <div className="col-span-2">
@@ -220,9 +242,15 @@ export function KampagneEditor({ kampagne, onSave, onClose }: Props) {
             <label className={label}>Verantwortung (mit / oder , trennen)</label>
             <input
               className={input}
+              list="dl-verantwortung"
               value={form.verantwortung}
               onChange={(e) => set("verantwortung", e.target.value)}
             />
+            <datalist id="dl-verantwortung">
+              {verantwortliche.map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
           </div>
         </div>
 

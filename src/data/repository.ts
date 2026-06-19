@@ -16,6 +16,8 @@ export interface KampagnenRepository {
   loeschen(id: string): Promise<void>;
   /** Mehrere Kampagnen auf einmal löschen. */
   loeschenViele(ids: string[]): Promise<void>;
+  /** Kompletten Datenbestand ersetzen (z.B. Excel-Import). */
+  ersetzeAlle(ks: Kampagne[]): Promise<Kampagne[]>;
   zuruecksetzen(): Promise<Kampagne[]>;
 }
 
@@ -83,6 +85,12 @@ export class LocalStorageRepository implements KampagnenRepository {
   async loeschenViele(ids: string[]): Promise<void> {
     const set = new Set(ids);
     this.save(this.load().filter((d) => !set.has(d.id)));
+  }
+
+  async ersetzeAlle(ks: Kampagne[]): Promise<Kampagne[]> {
+    const data = normalisieren(ks);
+    this.save(data);
+    return data;
   }
 
   async zuruecksetzen(): Promise<Kampagne[]> {

@@ -51,6 +51,10 @@ export function useKampagnen() {
     setKampagnen(await repository.zuruecksetzen());
   }, []);
 
+  const ersetzeAlle = useCallback(async (ks: Kampagne[]) => {
+    setKampagnen(await repository.ersetzeAlle(ks));
+  }, []);
+
   return {
     kampagnen,
     geladen,
@@ -58,6 +62,7 @@ export function useKampagnen() {
     speichernViele,
     loeschen,
     loeschenViele,
+    ersetzeAlle,
     zuruecksetzen,
   };
 }

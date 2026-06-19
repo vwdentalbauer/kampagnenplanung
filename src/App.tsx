@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { getISOWeek } from "date-fns";
 import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
-import { kwAusDatum, quartalAusDatum, cutoffVorletzteWoche } from "./lib/date";
+import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
-import { FilterBar, LEERER_FILTER, LEER, type Filter } from "./components/FilterBar";
+import { LEERER_FILTER, passt, facette, type Filter } from "./lib/filter";
+import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { WochenAnsicht } from "./components/WochenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
@@ -21,6 +23,7 @@ export default function App() {
     speichernViele,
     loeschen,
     loeschenViele,
+    ersetzeAlle,
     zuruecksetzen,
   } = useKampagnen();
 
@@ -30,37 +33,28 @@ export default function App() {
     offen: false,
     kampagne: null,
   });
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const gefiltert = useMemo(() => {
-    const s = filter.suche.toLowerCase();
-    const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
-    const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
-    return kampagnen.filter((k) => {
-      if (filter.quartal && k.quartal !== filter.quartal) return false;
-      if (filter.status && k.status !== filter.status) return false;
-      // Kanal / Kampagne / Verantwortlich: „(leer)" filtert leere Felder.
-      if (filter.kanal === LEER ? k.kanal.trim() !== "" : filter.kanal && k.kanal !== filter.kanal)
-        return false;
-      if (
-        filter.kampagne === LEER
-          ? k.kampagne.trim() !== ""
-          : filter.kampagne && k.kampagne !== filter.kampagne
-      )
-        return false;
-      if (filter.owner === LEER ? k.owners.length > 0 : filter.owner && !k.owners.includes(filter.owner))
-        return false;
-      if (filter.ziel && k.ziel !== filter.ziel) return false;
-      if (kwVon != null && (k.kw == null || k.kw < kwVon)) return false;
-      if (kwBis != null && (k.kw == null || k.kw > kwBis)) return false;
-      if (filter.datumVon && (!k.weekStart || k.weekStart < filter.datumVon)) return false;
-      if (filter.datumBis && (!k.weekStart || k.weekStart > filter.datumBis)) return false;
-      if (s && !`${k.kampagne} ${k.details} ${k.kanal} ${k.verantwortung}`.toLowerCase().includes(s))
-        return false;
-      return true;
-    });
-  }, [kampagnen, filter]);
+  const aktuelleKw = getISOWeek(new Date());
+  const gefiltert = useMemo(() => kampagnen.filter((k) => passt(k, filter)), [kampagnen, filter]);
 
-  const owners = useMemo(() => {
+  // Von den übrigen Filtern abhängige Auswahlwerte (Faceted Search).
+  const facetten = useMemo(
+    () => ({
+      quartale: facette(kampagnen, filter, "quartale"),
+      status: facette(kampagnen, filter, "status") as Status[],
+      kanaele: facette(kampagnen, filter, "kanaele"),
+      owners: facette(kampagnen, filter, "owners"),
+      kampagnen: facette(kampagnen, filter, "kampagne"),
+      ziele: facette(kampagnen, filter, "ziel"),
+    }),
+    [kampagnen, filter],
+  );
+
+  // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
+  const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
+  const alleZielgruppen = useMemo(() => eindeutigeWerte(kampagnen, "zielgruppe"), [kampagnen]);
+  const alleOwners = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
@@ -110,26 +104,30 @@ export default function App() {
     if (ids.length) loeschenViele(ids);
   };
 
-  // Alle (offenen) Einträge bis einschließlich vorletzter Woche auf „Erledigt".
-  const vergangeneErledigt = () => {
-    const cutoff = cutoffVorletzteWoche();
-    const betroffen = kampagnen.filter(
-      (k) =>
-        k.weekStart &&
-        k.weekStart < cutoff &&
-        k.status !== "erledigt" &&
-        k.status !== "abgesagt",
-    );
-    if (!betroffen.length) {
-      alert("Keine offenen Einträge bis zur vorletzten Woche gefunden.");
-      return;
-    }
-    if (
-      confirm(
-        `${betroffen.length} Eintrag/Einträge bis einschließlich vorletzter Woche auf „Erledigt" setzen?\n(Abgesagte bleiben unverändert.)`,
-      )
-    ) {
-      speichernViele(betroffen.map((k) => ({ ...k, status: "erledigt" as Status })));
+  // Excel-Export (xlsx wird nur bei Bedarf nachgeladen).
+  const onExport = async () => {
+    const { exportExcel } = await import("./lib/excel");
+    exportExcel(kampagnen);
+  };
+
+  // Excel-Import (ersetzt den Bestand).
+  const onImport = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { importExcel } = await import("./lib/excel");
+      const ks = await importExcel(file);
+      if (!ks.length) {
+        alert("Keine Daten in der Datei gefunden.");
+      } else if (
+        confirm(`${ks.length} Einträge importieren?\nDer aktuelle Bestand wird ersetzt.`)
+      ) {
+        await ersetzeAlle(ks);
+      }
+    } catch (err) {
+      alert("Import fehlgeschlagen: " + (err as Error).message);
+    } finally {
+      e.target.value = "";
     }
   };
 
@@ -201,25 +199,39 @@ export default function App() {
           {tab("ziel", "🎯 Nach Ziel")}
         </div>
         <div className="flex items-center gap-2">
-          {darfBearbeiten && (
-            <button
-              onClick={vergangeneErledigt}
-              title="Alle offenen Einträge bis einschließlich vorletzter Woche auf Erledigt setzen"
-              className="rounded border border-emerald-300 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50"
-            >
-              ✓ Vergangene → Erledigt
-            </button>
-          )}
+          <button
+            onClick={onExport}
+            title="Alle Einträge als Excel im Originalformat exportieren"
+            className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
+          >
+            ⬇ Excel-Export
+          </button>
           {istAdmin && (
-            <button
-              onClick={() => {
-                if (confirm("Alle lokalen Änderungen verwerfen und Originaldaten laden?"))
-                  zuruecksetzen();
-              }}
-              className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100"
-            >
-              Daten zurücksetzen
-            </button>
+            <>
+              <button
+                onClick={() => fileRef.current?.click()}
+                title="Excel-Datei importieren (ersetzt den Bestand)"
+                className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
+              >
+                ⬆ Excel-Import
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={onImport}
+              />
+              <button
+                onClick={() => {
+                  if (confirm("Alle lokalen Änderungen verwerfen und Originaldaten laden?"))
+                    zuruecksetzen();
+                }}
+                className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100"
+              >
+                Daten zurücksetzen
+              </button>
+            </>
           )}
           {darfBearbeiten && (
             <button
@@ -236,11 +248,13 @@ export default function App() {
         <FilterBar
           filter={filter}
           setFilter={setFilter}
-          kanaele={eindeutigeWerte(kampagnen, "kanal")}
-          kampagnen={eindeutigeWerte(kampagnen, "kampagne")}
-          ziele={eindeutigeWerte(kampagnen, "ziel")}
-          owners={owners}
-          quartale={eindeutigeWerte(kampagnen, "quartal")}
+          quartale={facetten.quartale}
+          status={facetten.status}
+          kanaele={facetten.kanaele}
+          owners={facetten.owners}
+          kampagnen={facetten.kampagnen}
+          ziele={facetten.ziele}
+          aktuelleKw={aktuelleKw}
         />
       </div>
 
@@ -274,6 +288,9 @@ export default function App() {
       {editor.offen && (
         <KampagneEditor
           kampagne={editor.kampagne}
+          kanaele={alleKanaele}
+          zielgruppen={alleZielgruppen}
+          verantwortliche={alleOwners}
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}
         />
