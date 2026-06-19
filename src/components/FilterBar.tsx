@@ -48,7 +48,7 @@ export function FilterBar({ filter, setFilter, kanaele, ziele, owners, quartale 
       <div className="flex flex-wrap items-center gap-2">
         <input
           className={`${sel} min-w-48 flex-1`}
-          placeholder="Suche in Details, Ziel, Kanal…"
+          placeholder="Suche in Kampagne, Ziel, Kanal…"
           value={filter.suche}
           onChange={(e) => upd({ suche: e.target.value })}
         />

@@ -11,7 +11,11 @@ import seed from "./seed.json";
 export interface KampagnenRepository {
   alle(): Promise<Kampagne[]>;
   speichern(k: Kampagne): Promise<void>;
+  /** Mehrere Kampagnen auf einmal speichern (Bulk-Bearbeitung). */
+  speichernViele(ks: Kampagne[]): Promise<void>;
   loeschen(id: string): Promise<void>;
+  /** Mehrere Kampagnen auf einmal löschen. */
+  loeschenViele(ids: string[]): Promise<void>;
   zuruecksetzen(): Promise<Kampagne[]>;
 }
 
@@ -48,8 +52,23 @@ export class LocalStorageRepository implements KampagnenRepository {
     this.save(data);
   }
 
+  async speichernViele(ks: Kampagne[]): Promise<void> {
+    const data = this.load();
+    for (const k of ks) {
+      const idx = data.findIndex((d) => d.id === k.id);
+      if (idx >= 0) data[idx] = k;
+      else data.unshift(k);
+    }
+    this.save(data);
+  }
+
   async loeschen(id: string): Promise<void> {
     this.save(this.load().filter((d) => d.id !== id));
+  }
+
+  async loeschenViele(ids: string[]): Promise<void> {
+    const set = new Set(ids);
+    this.save(this.load().filter((d) => !set.has(d.id)));
   }
 
   async zuruecksetzen(): Promise<Kampagne[]> {

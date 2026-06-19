@@ -23,9 +23,25 @@ export function useKampagnen() {
     [neuLaden],
   );
 
+  const speichernViele = useCallback(
+    async (ks: Kampagne[]) => {
+      await repository.speichernViele(ks);
+      await neuLaden();
+    },
+    [neuLaden],
+  );
+
   const loeschen = useCallback(
     async (id: string) => {
       await repository.loeschen(id);
+      await neuLaden();
+    },
+    [neuLaden],
+  );
+
+  const loeschenViele = useCallback(
+    async (ids: string[]) => {
+      await repository.loeschenViele(ids);
       await neuLaden();
     },
     [neuLaden],
@@ -35,7 +51,15 @@ export function useKampagnen() {
     setKampagnen(await repository.zuruecksetzen());
   }, []);
 
-  return { kampagnen, geladen, speichern, loeschen, zuruecksetzen };
+  return {
+    kampagnen,
+    geladen,
+    speichern,
+    speichernViele,
+    loeschen,
+    loeschenViele,
+    zuruecksetzen,
+  };
 }
 
 /** Eindeutige, sortierte Werte einer Spalte – für Filter-Dropdowns. */

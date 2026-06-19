@@ -14,9 +14,17 @@ type Ansicht = "tabelle" | "woche" | "ziel";
 
 export default function App() {
   const { nutzer, setRolle, darfBearbeiten, istAdmin, abmelden } = useAuth();
-  const { kampagnen, geladen, speichern, loeschen, zuruecksetzen } = useKampagnen();
+  const {
+    kampagnen,
+    geladen,
+    speichern,
+    speichernViele,
+    loeschen,
+    loeschenViele,
+    zuruecksetzen,
+  } = useKampagnen();
 
-  const [ansicht, setAnsicht] = useState<Ansicht>("woche");
+  const [ansicht, setAnsicht] = useState<Ansicht>("tabelle");
   const [filter, setFilter] = useState<Filter>(LEERER_FILTER);
   const [editor, setEditor] = useState<{ offen: boolean; kampagne: Kampagne | null }>({
     offen: false,
@@ -63,9 +71,8 @@ export default function App() {
     if (confirm("Kampagne wirklich löschen?")) loeschen(id);
   };
 
-  // Inline-Änderung aus der Tabelle. Bei Datum/Verantwortung werden
-  // abgeleitete Felder (KW, Quartal, owners) automatisch mitgepflegt.
-  const onUpdate = (k: Kampagne, patch: Partial<Kampagne>) => {
+  // Wendet einen Patch an und pflegt abgeleitete Felder (KW, Quartal, owners) mit.
+  const mitPatch = (k: Kampagne, patch: Partial<Kampagne>): Kampagne => {
     const next = { ...k, ...patch };
     if (patch.weekStart !== undefined) {
       next.kw = kwAusDatum(next.weekStart) ?? next.kw;
@@ -77,7 +84,21 @@ export default function App() {
         .map((o) => o.trim())
         .filter(Boolean);
     }
-    speichern(next);
+    return next;
+  };
+
+  // Inline-Änderung aus der Tabelle.
+  const onUpdate = (k: Kampagne, patch: Partial<Kampagne>) => speichern(mitPatch(k, patch));
+
+  // Mehrfachbearbeitung: Patch auf alle ausgewählten Kampagnen anwenden.
+  const onBulkUpdate = (ids: string[], patch: Partial<Kampagne>) => {
+    const idSet = new Set(ids);
+    const updates = kampagnen.filter((k) => idSet.has(k.id)).map((k) => mitPatch(k, patch));
+    if (updates.length) speichernViele(updates);
+  };
+
+  const onBulkDelete = (ids: string[]) => {
+    if (ids.length) loeschenViele(ids);
   };
 
   const tab = (id: Ansicht, label: string) => (
@@ -143,9 +164,9 @@ export default function App() {
       {/* Steuerleiste */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
+          {tab("tabelle", "📋 Tabelle")}
           {tab("woche", "📅 Nach Woche")}
           {tab("ziel", "🎯 Nach Ziel")}
-          {tab("tabelle", "📋 Tabelle")}
         </div>
         <div className="flex items-center gap-2">
           {istAdmin && (
@@ -187,9 +208,12 @@ export default function App() {
         <TabellenAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
+          kanaele={eindeutigeWerte(kampagnen, "kanal")}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
           onDelete={onDelete}
           onUpdate={onUpdate}
+          onBulkUpdate={onBulkUpdate}
+          onBulkDelete={onBulkDelete}
         />
       ) : ansicht === "woche" ? (
         <WochenAnsicht

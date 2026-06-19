@@ -27,3 +27,25 @@ export function TrashIcon({ className = "h-4 w-4" }: IconProps) {
     </svg>
   );
 }
+
+export function ChevronIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+/** Sechs-Punkte-Griff zum Verschieben (Drag & Drop). */
+export function GripIcon({ className = "h-3.5 w-3.5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="7" cy="5" r="1.5" />
+      <circle cx="13" cy="5" r="1.5" />
+      <circle cx="7" cy="10" r="1.5" />
+      <circle cx="13" cy="10" r="1.5" />
+      <circle cx="7" cy="15" r="1.5" />
+      <circle cx="13" cy="15" r="1.5" />
+    </svg>
+  );
+}
