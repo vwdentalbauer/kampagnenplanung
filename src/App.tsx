@@ -3,15 +3,17 @@ import { getISOWeek } from "date-fns";
 import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
-import { kwAusDatum, quartalAusDatum } from "./lib/date";
+import { kwAusDatum, quartalAusDatum, formatDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
+import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
 import { VeranstaltungenAnsicht } from "./components/VeranstaltungenAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
+import { VeranstaltungEditor } from "./components/VeranstaltungEditor";
 import { Logo } from "./components/Logo";
 
 type Ansicht = "tabelle" | "ziel" | "event";
@@ -29,8 +31,13 @@ export default function App() {
     zuruecksetzen,
   } = useKampagnen();
   const { epics, setZeitraum } = useEpics();
+  const { events, speichern: speichernEvent, loeschen: loeschenEvent } = useVeranstaltungen();
 
   const [ansicht, setAnsicht] = useState<Ansicht>("tabelle");
+  const [eventEditor, setEventEditor] = useState<{ offen: boolean; kategorie: string | null }>({
+    offen: false,
+    kategorie: null,
+  });
   // Beim Login standardmäßig „ab aktueller Woche" filtern (vergangene Wochen
   // ausgeblendet, wie ein Filter von dieser KW bis Jahresende).
   const [filter, setFilter] = useState<Filter>(() => ({
@@ -79,8 +86,18 @@ export default function App() {
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
   const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
-  const alleVeranstaltungen = useMemo(() => eindeutigeWerte(kampagnen, "veranstaltung"), [kampagnen]);
-  const alleEventOrte = useMemo(() => eindeutigeWerte(kampagnen, "eventOrt"), [kampagnen]);
+  // Angelegte Veranstaltungen als Liste (für Auswahl im Eintrag + Editor).
+  const veranstaltungenListe = useMemo<Veranstaltung[]>(
+    () =>
+      Object.entries(events)
+        .map(([kategorie, m]) => ({ kategorie, ...m }))
+        .sort((a, b) => a.kategorie.localeCompare(b.kategorie, "de")),
+    [events],
+  );
+  const eventOrte = useMemo(
+    () => [...new Set(Object.values(events).map((m) => m.ort).filter(Boolean))].sort(),
+    [events],
+  );
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -99,6 +116,12 @@ export default function App() {
   };
   const onDelete = (id: string) => {
     if (confirm("Kampagne wirklich löschen?")) loeschen(id);
+  };
+
+  // Veranstaltungen (Events)
+  const onSaveEvent = (v: Veranstaltung, vorher?: string) => {
+    speichernEvent(v, vorher);
+    setEventEditor({ offen: false, kategorie: null });
   };
 
   // Wendet einen Patch an und pflegt abgeleitete Felder (KW, Quartal, owners) mit.
@@ -265,6 +288,14 @@ export default function App() {
           )}
           {darfBearbeiten && (
             <button
+              onClick={() => setEventEditor({ offen: true, kategorie: null })}
+              className="rounded-md border border-marke px-3 py-1.5 text-sm font-medium text-marke-dark hover:bg-marke/10"
+            >
+              + Neue Veranstaltung
+            </button>
+          )}
+          {darfBearbeiten && (
+            <button
               onClick={() => setEditor({ offen: true, kampagne: null })}
               className="rounded-md bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
             >
@@ -296,16 +327,37 @@ export default function App() {
       {!geladen ? (
         <p className="py-10 text-center text-slate-400">Lädt…</p>
       ) : ansicht === "tabelle" ? (
-        <TabellenAnsicht
-          kampagnen={gefiltert}
-          darfBearbeiten={darfBearbeiten}
-          kanaele={eindeutigeWerte(kampagnen, "kanal")}
-          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
-          onBulkUpdate={onBulkUpdate}
-          onBulkDelete={onBulkDelete}
-        />
+        <>
+          {/* Veranstaltungen abgesetzt über den Einträgen */}
+          {veranstaltungenListe.length > 0 && (
+            <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-marke/30 bg-marke/5 px-3 py-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-marke-dark">
+                🎟 Veranstaltungen
+              </span>
+              {veranstaltungenListe.map((v) => (
+                <button
+                  key={v.kategorie}
+                  onClick={() => setAnsicht("event")}
+                  title="Im Reiter Veranstaltungen ansehen"
+                  className="rounded-full border border-marke/40 bg-white px-2 py-0.5 text-xs text-slate-600 hover:bg-marke/10"
+                >
+                  {v.kategorie}
+                  {v.start ? ` · ${formatDatum(v.start)}` : ""}
+                </button>
+              ))}
+            </div>
+          )}
+          <TabellenAnsicht
+            kampagnen={gefiltert}
+            darfBearbeiten={darfBearbeiten}
+            kanaele={eindeutigeWerte(kampagnen, "kanal")}
+            onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+            onBulkUpdate={onBulkUpdate}
+            onBulkDelete={onBulkDelete}
+          />
+        </>
       ) : ansicht === "ziel" ? (
         <ZielAnsicht
           kampagnen={gefiltert}
@@ -324,6 +376,8 @@ export default function App() {
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
           kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          events={events}
+          onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
           onDelete={onDelete}
           onUpdate={onUpdate}
@@ -339,10 +393,24 @@ export default function App() {
           subKanaele={alleSubKanaele}
           kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
-          veranstaltungen={alleVeranstaltungen}
-          eventOrte={alleEventOrte}
+          veranstaltungen={veranstaltungenListe}
+          onNeueVeranstaltung={() => setEventEditor({ offen: true, kategorie: null })}
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}
+        />
+      )}
+
+      {eventEditor.offen && (
+        <VeranstaltungEditor
+          veranstaltung={
+            eventEditor.kategorie
+              ? { kategorie: eventEditor.kategorie, ...events[eventEditor.kategorie] }
+              : null
+          }
+          orte={eventOrte}
+          onSave={onSaveEvent}
+          onDelete={loeschenEvent}
+          onClose={() => setEventEditor({ offen: false, kategorie: null })}
         />
       )}
 

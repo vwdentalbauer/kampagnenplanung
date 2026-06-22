@@ -27,10 +27,6 @@ const KOPF = [
   "„db 4+1“",
   ...BEREICHE,
   "Veranstaltung",
-  "Event-Typ",
-  "Veranstaltungsdatum",
-  "Veranstaltungsdatum bis",
-  "Veranstaltungsort",
   "Verantwortung",
   "Status",
   "Kampagne",
@@ -72,10 +68,6 @@ export function exportExcel(kampagnen: Kampagne[]) {
       "„db 4+1“": k.kategorie,
       ...bereiche,
       Veranstaltung: k.veranstaltung,
-      "Event-Typ": k.eventTyp,
-      Veranstaltungsdatum: iso(k.eventDatum),
-      "Veranstaltungsdatum bis": iso(k.eventDatumBis),
-      Veranstaltungsort: k.eventOrt,
       Verantwortung: k.verantwortung,
       Status: STATUS_LABELS[k.status],
       Kampagne: k.kampagne,
@@ -138,10 +130,6 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cStatus = idx("Status");
   const cKampagne = idx("Kampagne");
   const cVeranstaltung = idx("Veranstaltung");
-  const cEventTyp = idx("Event-Typ");
-  const cEventDatum = idx("Veranstaltungsdatum");
-  const cEventDatumBis = idx("Veranstaltungsdatum bis");
-  const cEventOrt = idx("Veranstaltungsort");
   const bereichIdx = BEREICHE.map((b) => idx(b));
 
   const get = (row: unknown[], i: number): string =>
@@ -181,10 +169,6 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       kategorie: get(row, cKat),
       bereiche,
       veranstaltung: get(row, cVeranstaltung),
-      eventTyp: get(row, cEventTyp),
-      eventDatum: zuIso(cEventDatum >= 0 ? row[cEventDatum] : null),
-      eventDatumBis: zuIso(cEventDatumBis >= 0 ? row[cEventDatumBis] : null),
-      eventOrt: get(row, cEventOrt),
       verantwortung: verant,
       owners,
       status: STATUS_VON_LABEL[statusLabel] ?? "geplant",

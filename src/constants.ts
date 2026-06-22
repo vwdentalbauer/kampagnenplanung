@@ -29,7 +29,7 @@ export const ROLLEN_LABELS: Record<Rolle, string> = {
   admin: "Admin",
 };
 
-/** Die „db 4+1“-Marken/Bereiche aus der Excel (Spalten Brand–DSO) + „Events". */
+/** Die „db 4+1“-Marken/Bereiche aus der Excel (Spalten Brand–DSO). */
 export const BEREICHE = [
   "Brand",
   "MIZ",
@@ -38,7 +38,6 @@ export const BEREICHE = [
   "Planung",
   "Exi",
   "DSO",
-  "Events",
 ] as const;
 
 /** Auswahl der Event-Typen (Sparte „Events"). */

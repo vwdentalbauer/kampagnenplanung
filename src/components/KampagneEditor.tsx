@@ -2,13 +2,13 @@ import { useState } from "react";
 import type { Kampagne } from "../types";
 import {
   BEREICHE,
-  EVENT_TYPEN,
   KATEGORIEN,
   QUARTALE,
   STATUS_LABELS,
   STATUS_REIHENFOLGE,
 } from "../constants";
-import { kwAusDatum, quartalAusDatum } from "../lib/date";
+import { kwAusDatum, quartalAusDatum, formatDatum } from "../lib/date";
+import type { Veranstaltung } from "../data/useVeranstaltungen";
 
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
@@ -16,8 +16,8 @@ interface Props {
   subKanaele: string[];
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
-  veranstaltungen: string[];
-  eventOrte: string[];
+  veranstaltungen: Veranstaltung[]; // angelegte Events zur Auswahl
+  onNeueVeranstaltung: () => void; // „+ neue Veranstaltung" aus dem Eintrag heraus
   onSave: (k: Kampagne) => void;
   onClose: () => void;
 }
@@ -38,10 +38,6 @@ function leereKampagne(): Kampagne {
     kategorie: "db Kampagnen",
     bereiche: [],
     veranstaltung: "",
-    eventTyp: "",
-    eventDatum: null,
-    eventDatumBis: null,
-    eventOrt: "",
     verantwortung: "",
     owners: [],
     status: "geplant",
@@ -55,12 +51,14 @@ export function KampagneEditor({
   kampagnen,
   verantwortliche,
   veranstaltungen,
-  eventOrte,
+  onNeueVeranstaltung,
   onSave,
   onClose,
 }: Props) {
   const [form, setForm] = useState<Kampagne>(kampagne ?? leereKampagne());
   const [versucht, setVersucht] = useState(false);
+  const [eventAn, setEventAn] = useState<boolean>(() => !!(kampagne?.veranstaltung));
+  const gewaehltesEvent = veranstaltungen.find((v) => v.kategorie === form.veranstaltung);
 
   const set = <K extends keyof Kampagne>(feld: K, wert: Kampagne[K]) =>
     setForm((f) => ({ ...f, [feld]: wert }));
@@ -283,76 +281,72 @@ export function KampagneEditor({
             </div>
           </div>
 
-          {/* Eventfelder – nur wenn Sparte „Events" gewählt ist */}
-          {form.bereiche.includes("Events") && (
-            <div className="col-span-2 grid grid-cols-2 gap-4 rounded-lg border border-marke/30 bg-marke/5 p-3">
-              <div className="col-span-2 text-xs font-semibold uppercase tracking-wide text-marke-dark">
-                Veranstaltung
+          {/* Veranstaltung (Event) verknüpfen */}
+          <div className="col-span-2 rounded-lg border border-marke/30 bg-marke/5 p-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                className="accent-marke"
+                checked={eventAn}
+                onChange={(e) => {
+                  setEventAn(e.target.checked);
+                  if (!e.target.checked) set("veranstaltung", "");
+                }}
+              />
+              Event – gehört zu einer Veranstaltung
+            </label>
+
+            {eventAn && (
+              <div className="mt-2 space-y-2">
+                {veranstaltungen.length === 0 ? (
+                  <p className="text-xs text-slate-500">
+                    Noch keine Veranstaltung angelegt.{" "}
+                    <button
+                      type="button"
+                      onClick={onNeueVeranstaltung}
+                      className="font-medium text-marke-dark hover:underline"
+                    >
+                      + Neue Veranstaltung anlegen
+                    </button>
+                  </p>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <select
+                        className={input}
+                        value={form.veranstaltung}
+                        onChange={(e) => set("veranstaltung", e.target.value)}
+                      >
+                        <option value="">– Veranstaltung wählen –</option>
+                        {veranstaltungen.map((v) => (
+                          <option key={v.kategorie} value={v.kategorie}>
+                            {v.kategorie}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={onNeueVeranstaltung}
+                        className="whitespace-nowrap rounded border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+                      >
+                        + Neu
+                      </button>
+                    </div>
+                    {gewaehltesEvent && (
+                      <p className="text-xs text-slate-500">
+                        {gewaehltesEvent.typ && <>{gewaehltesEvent.typ} · </>}
+                        {gewaehltesEvent.ort && <>📍 {gewaehltesEvent.ort} · </>}
+                        {gewaehltesEvent.start ? `📅 ${formatDatum(gewaehltesEvent.start)}` : ""}
+                        {gewaehltesEvent.ende && gewaehltesEvent.ende !== gewaehltesEvent.start
+                          ? ` – ${formatDatum(gewaehltesEvent.ende)}`
+                          : ""}
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
-              <div className="col-span-2">
-                <label className={label}>Kategorie (z.B. Infotage Fachdental, IDS, Zahnärztetag)</label>
-                <input
-                  className={input}
-                  list="dl-veranstaltung"
-                  placeholder="Kategorie wählen oder neu eingeben…"
-                  value={form.veranstaltung}
-                  onChange={(e) => set("veranstaltung", e.target.value)}
-                />
-                <datalist id="dl-veranstaltung">
-                  {veranstaltungen.map((v) => (
-                    <option key={v} value={v} />
-                  ))}
-                </datalist>
-              </div>
-              <div>
-                <label className={label}>Typ</label>
-                <select
-                  className={input}
-                  value={form.eventTyp}
-                  onChange={(e) => set("eventTyp", e.target.value)}
-                >
-                  <option value="">– wählen –</option>
-                  {EVENT_TYPEN.map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={label}>Veranstaltungsdatum (von – bis)</label>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="date"
-                    className={input}
-                    value={form.eventDatum ?? ""}
-                    onChange={(e) => set("eventDatum", e.target.value || null)}
-                  />
-                  <span className="text-slate-400">–</span>
-                  <input
-                    type="date"
-                    className={input}
-                    min={form.eventDatum ?? undefined}
-                    value={form.eventDatumBis ?? ""}
-                    onChange={(e) => set("eventDatumBis", e.target.value || null)}
-                  />
-                </div>
-                <p className="mt-0.5 text-xs text-slate-400">„bis" nur bei mehrtägigen Events</p>
-              </div>
-              <div className="col-span-2">
-                <label className={label}>Veranstaltungsort</label>
-                <input
-                  className={input}
-                  list="dl-eventort"
-                  value={form.eventOrt}
-                  onChange={(e) => set("eventOrt", e.target.value)}
-                />
-                <datalist id="dl-eventort">
-                  {eventOrte.map((o) => (
-                    <option key={o} value={o} />
-                  ))}
-                </datalist>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-2 border-t px-5 py-3">
