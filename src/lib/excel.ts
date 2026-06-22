@@ -18,6 +18,7 @@ const KOPF = [
   "SA",
   "SO",
   "Zeitraum/ Startdatum",
+  "Enddatum",
   "Zielgruppe",
   "Kanal",
   "Details",
@@ -56,6 +57,7 @@ export function exportExcel(kampagnen: Kampagne[]) {
       "Start KW": k.kw ? `KW ${k.kw}` : "",
       ...tage,
       "Zeitraum/ Startdatum": iso(k.weekStart),
+      Enddatum: iso(k.endDatum),
       Zielgruppe: k.zielgruppe,
       Kanal: k.kanal,
       Details: k.details,
@@ -113,6 +115,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cKw = idx("Start KW");
   const cMo = idx("MO");
   const cStart = idx("Zeitraum/ Startdatum");
+  const cEnde = idx("Enddatum");
   const cZg = idx("Zielgruppe");
   const cKanal = idx("Kanal");
   const cDetails = idx("Details");
@@ -150,6 +153,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       quartal: get(row, cQuartal),
       kw: kwMatch ? Number(kwMatch[1]) : null,
       weekStart,
+      endDatum: zuIso(cEnde >= 0 ? row[cEnde] : null),
       zielgruppe: get(row, cZg) || "Alle",
       kanal,
       kampagne,

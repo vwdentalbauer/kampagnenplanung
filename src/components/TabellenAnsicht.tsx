@@ -6,7 +6,7 @@ import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
-import { wochentagKurz } from "../lib/date";
+import { wochentagKurz, kwAusDatum, formatDatum } from "../lib/date";
 
 interface Props {
   kampagnen: Kampagne[];
@@ -263,8 +263,13 @@ export function TabellenAnsicht({
             ) : (
               <span className="px-1.5 text-slate-500">{k.weekStart ?? "—"}</span>
             )}
-            {k.weekStart && (
+            {k.weekStart && !k.endDatum && (
               <div className="px-1.5 text-xs text-slate-400">{wochentagKurz(k.weekStart)}</div>
+            )}
+            {k.endDatum && (
+              <div className="px-1.5 text-[11px] font-medium text-marke-light">
+                läuft bis {formatDatum(k.endDatum)}
+              </div>
             )}
           </div>
         );
@@ -330,11 +335,24 @@ export function TabellenAnsicht({
 
   const spaltenAnzahl = reihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
 
-  // Heutiges Datum (lokal) für die Überfällig-Markierung.
+  // Heutiges Datum (lokal) für Überfällig-Markierung und „aktuelle Woche".
   const jetzt = new Date();
   const heute = `${jetzt.getFullYear()}-${String(jetzt.getMonth() + 1).padStart(2, "0")}-${String(
     jetzt.getDate(),
   ).padStart(2, "0")}`;
+  const aktuelleKw = kwAusDatum(heute) ?? 0;
+
+  // Beim ersten Laden zur aktuellen Woche scrollen.
+  const heuteRowRef = useRef<HTMLTableRowElement | null>(null);
+  const gescrollt = useRef(false);
+  const aktuelleWocheIndex =
+    sort.key === "kw" ? sortiert.findIndex((k) => k.kw != null && k.kw >= aktuelleKw) : -1;
+  useEffect(() => {
+    if (!gescrollt.current && heuteRowRef.current) {
+      heuteRowRef.current.scrollIntoView({ block: "start" });
+      gescrollt.current = true;
+    }
+  }, [sortiert]);
 
   return (
     <div>
@@ -434,22 +452,38 @@ export function TabellenAnsicht({
               // Trennlinie, wenn eine neue KW beginnt (nur bei Sortierung nach KW/Datum sinnvoll).
               const nachZeit = sort.key === "kw" || sort.key === "datum";
               const neueWoche = nachZeit && (i === 0 || sortiert[i - 1].kw !== k.kw);
-              // Überfällig: liegt in der Vergangenheit und ist nicht erledigt.
-              const ueberfaellig = !!k.weekStart && k.weekStart < heute && k.status !== "erledigt";
+              // Laufende Kampagne (Zeitraum) vs. Einzeltermin.
+              const laufend = !!k.endDatum;
+              // Überfällig: (effektives) Ende liegt in der Vergangenheit und nicht erledigt.
+              const effEnde = k.endDatum ?? k.weekStart;
+              const ueberfaellig = !!effEnde && effEnde < heute && k.status !== "erledigt";
               const rand = neueWoche
                 ? "border-t-2 border-marke/50"
                 : "border-t border-slate-100";
-              const ueberfRand = ueberfaellig ? "border-l-4 border-l-rose-400" : "";
+              const linkerRand = ueberfaellig
+                ? "border-l-4 border-l-rose-400"
+                : laufend
+                  ? "border-l-4 border-l-marke-light"
+                  : "";
               const bg = gewaehlt
                 ? "bg-marke/5"
                 : ueberfaellig
                   ? "bg-rose-50 hover:bg-rose-100/70"
-                  : "hover:bg-slate-50/60";
+                  : laufend
+                    ? "bg-marke-light/[0.07] hover:bg-marke-light/15"
+                    : "hover:bg-slate-50/60";
               return (
                 <tr
                   key={k.id}
-                  title={ueberfaellig ? "Überfällig – liegt in der Vergangenheit und ist nicht erledigt" : undefined}
-                  className={`${rand} ${ueberfRand} align-top ${bg}`}
+                  ref={i === aktuelleWocheIndex ? heuteRowRef : undefined}
+                  title={
+                    ueberfaellig
+                      ? "Überfällig – nicht erledigt und Zeitpunkt liegt in der Vergangenheit"
+                      : laufend
+                        ? "Laufende Kampagne (Zeitraum)"
+                        : undefined
+                  }
+                  className={`${rand} ${linkerRand} scroll-mt-24 align-top ${bg}`}
                 >
                   <td className="px-2 py-2">
                     <input

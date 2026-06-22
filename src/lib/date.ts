@@ -1,4 +1,4 @@
-import { getISOWeek, parseISO, startOfISOWeek, subWeeks, format } from "date-fns";
+import { getISOWeek, parseISO, startOfISOWeek, subWeeks, addWeeks, isAfter, format } from "date-fns";
 
 /**
  * Stichtag „bis einschließlich vorletzte Woche": der Montag der letzten Woche.
@@ -41,6 +41,26 @@ export function formatDatum(iso: string | null): string {
     return format(parseISO(iso), "dd.MM.yyyy");
   } catch {
     return iso;
+  }
+}
+
+/** Liste der ISO-Kalenderwochen, die ein Zeitraum [start..ende] berührt. */
+export function kwsImZeitraum(startIso: string | null, endeIso: string | null): number[] {
+  if (!startIso) return [];
+  try {
+    let cursor = startOfISOWeek(parseISO(startIso));
+    const ende = endeIso ? parseISO(endeIso) : parseISO(startIso);
+    const out: number[] = [];
+    // Sicherheitslimit, falls Datenbereich unsinnig groß
+    for (let i = 0; i < 60; i++) {
+      out.push(getISOWeek(cursor));
+      const next = addWeeks(cursor, 1);
+      if (isAfter(next, ende)) break;
+      cursor = next;
+    }
+    return out;
+  } catch {
+    return [];
   }
 }
 

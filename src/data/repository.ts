@@ -34,6 +34,7 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
   return daten.map((k) => ({
     ...k,
     kampagne: k.kampagne ?? ersteZeile(k.details),
+    endDatum: k.endDatum ?? null,
     // Kategorie umbenannt: „Hero Kampagne" -> „WKZ".
     kategorie: k.kategorie === "Hero Kampagne" ? "WKZ" : k.kategorie,
   }));

@@ -15,6 +15,8 @@ export interface Kampagne {
   kw: number | null;
   /** Montag der Woche bzw. konkretes Startdatum (ISO yyyy-mm-dd). */
   weekStart: string | null;
+  /** Optionales Enddatum für laufende Kampagnen (ISO). null = Einzeltermin. */
+  endDatum: string | null;
   zielgruppe: string;
   kanal: string;
   /** Kurzer Kampagnen-Name/Titel (für die Übersicht). */

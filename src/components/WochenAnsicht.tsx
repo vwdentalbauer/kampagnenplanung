@@ -1,5 +1,6 @@
 import type { Kampagne } from "../types";
 import { KampagneZeile } from "./KampagneZeile";
+import { kwsImZeitraum } from "../lib/date";
 
 interface Props {
   kampagnen: Kampagne[];
@@ -7,15 +8,24 @@ interface Props {
   onEdit: (k: Kampagne) => void;
 }
 
-/** Gruppiert nach Kalenderwoche – für den wöchentlichen Jour fixe. */
+/** Gruppiert nach Kalenderwoche – für den wöchentlichen Jour fixe.
+ *  Laufende Kampagnen (mit Enddatum) erscheinen in JEDER Woche ihres Zeitraums. */
 export function WochenAnsicht({ kampagnen, darfBearbeiten, onEdit }: Props) {
   const gruppen = new Map<number, Kampagne[]>();
   const ohneKw: Kampagne[] = [];
   for (const k of kampagnen) {
-    if (k.kw == null) ohneKw.push(k);
-    else {
-      if (!gruppen.has(k.kw)) gruppen.set(k.kw, []);
-      gruppen.get(k.kw)!.push(k);
+    let weeks: number[];
+    if (k.endDatum) weeks = [...new Set(kwsImZeitraum(k.weekStart, k.endDatum))];
+    else if (k.kw != null) weeks = [k.kw];
+    else weeks = [];
+
+    if (weeks.length === 0) {
+      ohneKw.push(k);
+      continue;
+    }
+    for (const w of weeks) {
+      if (!gruppen.has(w)) gruppen.set(w, []);
+      gruppen.get(w)!.push(k);
     }
   }
   const kws = [...gruppen.keys()].sort((a, b) => a - b);
@@ -35,7 +45,12 @@ export function WochenAnsicht({ kampagnen, darfBearbeiten, onEdit }: Props) {
             </header>
             <div className="space-y-2 p-3">
               {liste.map((k) => (
-                <KampagneZeile key={k.id} k={k} darfBearbeiten={darfBearbeiten} onEdit={onEdit} />
+                <KampagneZeile
+                  key={`${k.id}-${kw}`}
+                  k={k}
+                  darfBearbeiten={darfBearbeiten}
+                  onEdit={onEdit}
+                />
               ))}
             </div>
           </section>

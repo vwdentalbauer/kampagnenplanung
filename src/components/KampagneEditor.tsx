@@ -24,6 +24,7 @@ function leereKampagne(): Kampagne {
     quartal: "Q1",
     kw: null,
     weekStart: null,
+    endDatum: null,
     zielgruppe: "Alle",
     kanal: "",
     kampagne: "",
@@ -134,6 +135,17 @@ export function KampagneEditor({
               onChange={(e) => datumGeaendert(e.target.value)}
             />
           </div>
+          <div>
+            <label className={label}>Enddatum (nur bei laufenden Kampagnen)</label>
+            <input
+              type="date"
+              className={input}
+              value={form.endDatum ?? ""}
+              min={form.weekStart ?? undefined}
+              onChange={(e) => set("endDatum", e.target.value || null)}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className={label}>Quartal</label>
@@ -157,6 +169,7 @@ export function KampagneEditor({
               />
             </div>
           </div>
+          <div className="hidden sm:block" />
 
           <div>
             <label className={label}>Kanal</label>
