@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Kampagne } from "../types";
 import {
   BEREICHE,
+  EVENT_TYPEN,
   KATEGORIEN,
   QUARTALE,
   STATUS_LABELS,
@@ -16,6 +17,7 @@ interface Props {
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
   veranstaltungen: string[];
+  eventOrte: string[];
   onSave: (k: Kampagne) => void;
   onClose: () => void;
 }
@@ -36,6 +38,9 @@ function leereKampagne(): Kampagne {
     kategorie: "db Kampagnen",
     bereiche: [],
     veranstaltung: "",
+    eventTyp: "",
+    eventDatum: null,
+    eventOrt: "",
     verantwortung: "",
     owners: [],
     status: "geplant",
@@ -49,6 +54,7 @@ export function KampagneEditor({
   kampagnen,
   verantwortliche,
   veranstaltungen,
+  eventOrte,
   onSave,
   onClose,
 }: Props) {
@@ -251,22 +257,6 @@ export function KampagneEditor({
           </div>
 
           <div className="col-span-2">
-            <label className={label}>Veranstaltung (optional)</label>
-            <input
-              className={input}
-              list="dl-veranstaltung"
-              placeholder="Veranstaltung wählen oder neu eingeben…"
-              value={form.veranstaltung}
-              onChange={(e) => set("veranstaltung", e.target.value)}
-            />
-            <datalist id="dl-veranstaltung">
-              {veranstaltungen.map((v) => (
-                <option key={v} value={v} />
-              ))}
-            </datalist>
-          </div>
-
-          <div className="col-span-2">
             <label className={label}>Sparten/ Bereich</label>
             <div className="flex flex-wrap gap-2">
               {BEREICHE.map((b) => {
@@ -291,6 +281,66 @@ export function KampagneEditor({
               })}
             </div>
           </div>
+
+          {/* Eventfelder – nur wenn Sparte „Events" gewählt ist */}
+          {form.bereiche.includes("Events") && (
+            <div className="col-span-2 grid grid-cols-2 gap-4 rounded-lg border border-marke/30 bg-marke/5 p-3">
+              <div className="col-span-2 text-xs font-semibold uppercase tracking-wide text-marke-dark">
+                Veranstaltung
+              </div>
+              <div className="col-span-2">
+                <label className={label}>Kategorie (z.B. Infotage Fachdental, IDS, Zahnärztetag)</label>
+                <input
+                  className={input}
+                  list="dl-veranstaltung"
+                  placeholder="Kategorie wählen oder neu eingeben…"
+                  value={form.veranstaltung}
+                  onChange={(e) => set("veranstaltung", e.target.value)}
+                />
+                <datalist id="dl-veranstaltung">
+                  {veranstaltungen.map((v) => (
+                    <option key={v} value={v} />
+                  ))}
+                </datalist>
+              </div>
+              <div>
+                <label className={label}>Typ</label>
+                <select
+                  className={input}
+                  value={form.eventTyp}
+                  onChange={(e) => set("eventTyp", e.target.value)}
+                >
+                  <option value="">– wählen –</option>
+                  {EVENT_TYPEN.map((t) => (
+                    <option key={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={label}>Veranstaltungsdatum</label>
+                <input
+                  type="date"
+                  className={input}
+                  value={form.eventDatum ?? ""}
+                  onChange={(e) => set("eventDatum", e.target.value || null)}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className={label}>Veranstaltungsort</label>
+                <input
+                  className={input}
+                  list="dl-eventort"
+                  value={form.eventOrt}
+                  onChange={(e) => set("eventOrt", e.target.value)}
+                />
+                <datalist id="dl-eventort">
+                  {eventOrte.map((o) => (
+                    <option key={o} value={o} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-2 border-t px-5 py-3">

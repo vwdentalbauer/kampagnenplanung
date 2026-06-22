@@ -31,8 +31,14 @@ export interface Kampagne {
   kategorie: string;
   /** Betroffene Marken/Bereiche (Brand, MIZ, EV, TS, Planung, Exi, DSO). */
   bereiche: string[];
-  /** Zugeordnete Veranstaltung (optional). */
+  /** Zugeordnete Veranstaltung / Event-Kategorie (z.B. „Infotage Fachdental"). */
   veranstaltung: string;
+  /** Event-Typ (Messe/Seminar/Webinar) – nur relevant bei Sparte „Events". */
+  eventTyp: string;
+  /** Veranstaltungsdatum (wann das Event stattfindet, ISO). */
+  eventDatum: string | null;
+  /** Veranstaltungsort. */
+  eventOrt: string;
   /** Verantwortung als Freitext (Originalwert aus Excel). */
   verantwortung: string;
   /** Verantwortliche als normalisierte Liste (aus verantwortung abgeleitet). */

@@ -10,10 +10,11 @@ import { useEpics } from "./data/useEpics";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
+import { VeranstaltungenAnsicht } from "./components/VeranstaltungenAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
 import { Logo } from "./components/Logo";
 
-type Ansicht = "tabelle" | "ziel";
+type Ansicht = "tabelle" | "ziel" | "event";
 
 export default function App() {
   const { nutzer, setRolle, darfBearbeiten, istAdmin, abmelden } = useAuth();
@@ -79,6 +80,7 @@ export default function App() {
   }, [kampagnen]);
   const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
   const alleVeranstaltungen = useMemo(() => eindeutigeWerte(kampagnen, "veranstaltung"), [kampagnen]);
+  const alleEventOrte = useMemo(() => eindeutigeWerte(kampagnen, "eventOrt"), [kampagnen]);
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -224,6 +226,7 @@ export default function App() {
         <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
           {tab("tabelle", "📋 Tabelle")}
           {tab("ziel", "📣 Kampagne")}
+          {tab("event", "🎟 Veranstaltungen")}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -303,13 +306,24 @@ export default function App() {
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
         />
-      ) : (
+      ) : ansicht === "ziel" ? (
         <ZielAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
           kanaele={eindeutigeWerte(kampagnen, "kanal")}
           epics={epics}
           onZeitraum={setZeitraum}
+          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onBulkUpdate={onBulkUpdate}
+          onBulkDelete={onBulkDelete}
+        />
+      ) : (
+        <VeranstaltungenAnsicht
+          kampagnen={gefiltert}
+          darfBearbeiten={darfBearbeiten}
+          kanaele={eindeutigeWerte(kampagnen, "kanal")}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
           onDelete={onDelete}
           onUpdate={onUpdate}
@@ -326,6 +340,7 @@ export default function App() {
           kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
           veranstaltungen={alleVeranstaltungen}
+          eventOrte={alleEventOrte}
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}
         />
