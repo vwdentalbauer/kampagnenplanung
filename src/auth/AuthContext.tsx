@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Nutzer, Rolle } from "../types";
 import { LoginScreen } from "./LoginScreen";
+import { findeNutzer } from "./users";
 
 interface AuthState {
   nutzer: Nutzer;
@@ -10,39 +11,34 @@ interface AuthState {
   abmelden: () => void;
 }
 
-const SESSION_KEY = "kp.session.v1";
-
-const NUTZER: Nutzer = {
-  email: "valeska.wiedemann@dentalbauer.de",
-  name: "Valeska Wiedemann",
-  rolle: "admin",
-};
+const SESSION_KEY = "kp.session.v2";
 
 const AuthCtx = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [eingeloggt, setEingeloggt] = useState<boolean>(() =>
-    sessionStorage.getItem(SESSION_KEY) === "1",
-  );
-  const [nutzer, setNutzer] = useState<Nutzer>(NUTZER);
+  // Eingeloggten Nutzer aus der Session wiederherstellen.
+  const [nutzer, setNutzer] = useState<Nutzer | null>(() => {
+    const email = sessionStorage.getItem(SESSION_KEY);
+    return email ? (findeNutzer(email) ?? null) : null;
+  });
 
-  const anmelden = () => {
-    sessionStorage.setItem(SESSION_KEY, "1");
-    setEingeloggt(true);
+  const anmelden = (n: Nutzer) => {
+    sessionStorage.setItem(SESSION_KEY, n.email);
+    setNutzer(n);
   };
 
   const abmelden = () => {
     sessionStorage.removeItem(SESSION_KEY);
-    setEingeloggt(false);
+    setNutzer(null);
   };
 
-  if (!eingeloggt) {
+  if (!nutzer) {
     return <LoginScreen onSuccess={anmelden} />;
   }
 
   const value: AuthState = {
     nutzer,
-    setRolle: (rolle) => setNutzer((n) => ({ ...n, rolle })),
+    setRolle: (rolle) => setNutzer((n) => (n ? { ...n, rolle } : n)),
     darfBearbeiten: nutzer.rolle === "editor" || nutzer.rolle === "admin",
     istAdmin: nutzer.rolle === "admin",
     abmelden,

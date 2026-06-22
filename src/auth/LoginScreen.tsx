@@ -1,9 +1,6 @@
 import { FormEvent, useState } from "react";
-
-// SHA-256 hash von "email:passwort" – Klartext-Credentials stehen nirgends im Code.
-// Hash erzeugen: node -e "require('crypto').createHash('sha256').update('email:pw').digest('hex')"
-const CREDENTIAL_HASH =
-  "718a5e82c8707cc770b8b80aa723834423d8a7f1c0739b27d60526c91ee124f1";
+import type { Nutzer } from "../types";
+import { NUTZER_LISTE } from "./users";
 
 async function sha256(text: string): Promise<string> {
   const buf = await crypto.subtle.digest(
@@ -16,7 +13,7 @@ async function sha256(text: string): Promise<string> {
 }
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (nutzer: Nutzer) => void;
 }
 
 export function LoginScreen({ onSuccess }: Props) {
@@ -30,9 +27,11 @@ export function LoginScreen({ onSuccess }: Props) {
     setFehler(false);
     setLaedt(true);
     try {
-      const hash = await sha256(`${email.trim().toLowerCase()}:${pw}`);
-      if (hash === CREDENTIAL_HASH) {
-        onSuccess();
+      const e_ = email.trim().toLowerCase();
+      const hash = await sha256(`${e_}:${pw}`);
+      const treffer = NUTZER_LISTE.find((n) => n.email === e_ && n.hash === hash);
+      if (treffer) {
+        onSuccess({ email: treffer.email, name: treffer.name, rolle: treffer.rolle });
       } else {
         setFehler(true);
       }
