@@ -14,6 +14,7 @@ interface Props {
   kanaele: string[];
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
+  veranstaltungen: string[];
   onSave: (k: Kampagne) => void;
   onClose: () => void;
 }
@@ -32,6 +33,7 @@ function leereKampagne(): Kampagne {
     ziel: "",
     kategorie: "db Kampagnen",
     bereiche: [],
+    veranstaltung: "",
     verantwortung: "",
     owners: [],
     status: "geplant",
@@ -43,6 +45,7 @@ export function KampagneEditor({
   kanaele,
   kampagnen,
   verantwortliche,
+  veranstaltungen,
   onSave,
   onClose,
 }: Props) {
@@ -230,7 +233,23 @@ export function KampagneEditor({
           </div>
 
           <div className="col-span-2">
-            <label className={label}>Bereiche / Marken</label>
+            <label className={label}>Veranstaltung (optional)</label>
+            <input
+              className={input}
+              list="dl-veranstaltung"
+              placeholder="Veranstaltung wählen oder neu eingeben…"
+              value={form.veranstaltung}
+              onChange={(e) => set("veranstaltung", e.target.value)}
+            />
+            <datalist id="dl-veranstaltung">
+              {veranstaltungen.map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
+          </div>
+
+          <div className="col-span-2">
+            <label className={label}>Sparten/ Bereich</label>
             <div className="flex flex-wrap gap-2">
               {BEREICHE.map((b) => {
                 const aktiv = form.bereiche.includes(b);

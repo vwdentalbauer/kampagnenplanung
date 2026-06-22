@@ -14,6 +14,10 @@ interface Props {
   kampagnen: string[];
   ziele: string[];
   aktuelleKw: number;
+  // „(leer)"-Option nur zeigen, wenn es auch leere Felder gibt
+  leerKanaele: boolean;
+  leerOwners: boolean;
+  leerKampagnen: boolean;
 }
 
 export function FilterBar({
@@ -26,6 +30,9 @@ export function FilterBar({
   kampagnen,
   ziele,
   aktuelleKw,
+  leerKanaele,
+  leerOwners,
+  leerKampagnen,
 }: Props) {
   const sel =
     "rounded border px-2 py-1.5 text-sm focus:border-marke focus:outline-none";
@@ -53,7 +60,7 @@ export function FilterBar({
           options={kampagnen}
           selected={filter.kampagnen}
           onChange={(v) => upd({ kampagnen: v })}
-          withEmpty
+          withEmpty={leerKampagnen}
           suchbar
         />
         <MultiSelect
@@ -68,7 +75,7 @@ export function FilterBar({
           options={kanaele}
           selected={filter.kanaele}
           onChange={(v) => upd({ kanaele: v })}
-          withEmpty
+          withEmpty={leerKanaele}
           suchbar
         />
         <MultiSelect
@@ -76,7 +83,7 @@ export function FilterBar({
           options={owners}
           selected={filter.owners}
           onChange={(v) => upd({ owners: v })}
-          withEmpty
+          withEmpty={leerOwners}
           suchbar
         />
 

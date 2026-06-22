@@ -7,10 +7,12 @@ interface Props {
   darfBearbeiten: boolean;
   onEdit: (k: Kampagne) => void;
   zeigeKw?: boolean;
+  /** Kampagnenname ausblenden (z.B. im Kampagnen-Reiter, dort redundant). */
+  kampagneAusblenden?: boolean;
 }
 
 /** Kompakte Kampagnen-Zeile für Wochen- und Kampagnenansicht. */
-export function KampagneZeile({ k, darfBearbeiten, onEdit, zeigeKw }: Props) {
+export function KampagneZeile({ k, darfBearbeiten, onEdit, zeigeKw, kampagneAusblenden }: Props) {
   const laufend = !!k.endDatum;
   return (
     <div
@@ -31,7 +33,9 @@ export function KampagneZeile({ k, darfBearbeiten, onEdit, zeigeKw }: Props) {
           )}
           <StatusBadge status={k.status} />
         </div>
-        {k.kampagne && <p className="mt-1 text-sm font-semibold text-slate-700">{k.kampagne}</p>}
+        {k.kampagne && !kampagneAusblenden && (
+          <p className="mt-1 text-sm font-semibold text-slate-700">{k.kampagne}</p>
+        )}
         <p className="mt-0.5 whitespace-pre-line text-sm">{k.details}</p>
         <div className="mt-1 text-xs text-slate-400">
           {k.verantwortung && <>👤 {k.verantwortung}</>}

@@ -25,6 +25,7 @@ const KOPF = [
   "Ziel",
   "„db 4+1“",
   ...BEREICHE,
+  "Veranstaltung",
   "Verantwortung",
   "Status",
   "Kampagne",
@@ -64,6 +65,7 @@ export function exportExcel(kampagnen: Kampagne[]) {
       Ziel: k.ziel,
       "„db 4+1“": k.kategorie,
       ...bereiche,
+      Veranstaltung: k.veranstaltung,
       Verantwortung: k.verantwortung,
       Status: STATUS_LABELS[k.status],
       Kampagne: k.kampagne,
@@ -124,6 +126,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cVer = idx("Verantwortung");
   const cStatus = idx("Status");
   const cKampagne = idx("Kampagne");
+  const cVeranstaltung = idx("Veranstaltung");
   const bereichIdx = BEREICHE.map((b) => idx(b));
 
   const get = (row: unknown[], i: number): string =>
@@ -161,6 +164,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       ziel: get(row, cZiel),
       kategorie: get(row, cKat),
       bereiche,
+      veranstaltung: get(row, cVeranstaltung),
       verantwortung: verant,
       owners,
       status: STATUS_VON_LABEL[statusLabel] ?? "geplant",

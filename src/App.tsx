@@ -5,7 +5,8 @@ import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
-import { LEERER_FILTER, passt, facette, type Filter } from "./lib/filter";
+import { LEERER_FILTER, passt, facette, gibtLeere, type Filter } from "./lib/filter";
+import { useEpics } from "./data/useEpics";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { WochenAnsicht } from "./components/WochenAnsicht";
@@ -27,6 +28,7 @@ export default function App() {
     ersetzeAlle,
     zuruecksetzen,
   } = useKampagnen();
+  const { epics, setZeitraum } = useEpics();
 
   const [ansicht, setAnsicht] = useState<Ansicht>("tabelle");
   // Beim Login standardmäßig „ab aktueller Woche" filtern (vergangene Wochen
@@ -57,9 +59,20 @@ export default function App() {
     [kampagnen, filter],
   );
 
+  // „(leer)"-Optionen nur, wenn es leere Felder gibt.
+  const leer = useMemo(
+    () => ({
+      kanaele: gibtLeere(kampagnen, filter, "kanaele"),
+      owners: gibtLeere(kampagnen, filter, "owners"),
+      kampagnen: gibtLeere(kampagnen, filter, "kampagne"),
+    }),
+    [kampagnen, filter],
+  );
+
   // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
   const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
   const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
+  const alleVeranstaltungen = useMemo(() => eindeutigeWerte(kampagnen, "veranstaltung"), [kampagnen]);
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -205,7 +218,7 @@ export default function App() {
         <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
           {tab("tabelle", "📋 Tabelle")}
           {tab("woche", "📅 Nach Woche")}
-          {tab("ziel", "📣 Nach Kampagne")}
+          {tab("ziel", "📣 Kampagne")}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -264,6 +277,9 @@ export default function App() {
           kampagnen={facetten.kampagnen}
           ziele={facetten.ziele}
           aktuelleKw={aktuelleKw}
+          leerKanaele={leer.kanaele}
+          leerOwners={leer.owners}
+          leerKampagnen={leer.kampagnen}
         />
       </div>
 
@@ -290,6 +306,8 @@ export default function App() {
         <ZielAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
+          epics={epics}
+          onZeitraum={setZeitraum}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
         />
       )}
@@ -300,6 +318,7 @@ export default function App() {
           kanaele={alleKanaele}
           kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
+          veranstaltungen={alleVeranstaltungen}
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}
         />
