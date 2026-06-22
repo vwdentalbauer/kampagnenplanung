@@ -29,7 +29,12 @@ export default function App() {
   } = useKampagnen();
 
   const [ansicht, setAnsicht] = useState<Ansicht>("tabelle");
-  const [filter, setFilter] = useState<Filter>(LEERER_FILTER);
+  // Beim Login standardmäßig „ab aktueller Woche" filtern (vergangene Wochen
+  // ausgeblendet, wie ein Filter von dieser KW bis Jahresende).
+  const [filter, setFilter] = useState<Filter>(() => ({
+    ...LEERER_FILTER,
+    kwVon: String(getISOWeek(new Date())),
+  }));
   const [editor, setEditor] = useState<{ offen: boolean; kampagne: Kampagne | null }>({
     offen: false,
     kampagne: null,

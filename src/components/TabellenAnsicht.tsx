@@ -6,7 +6,7 @@ import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
-import { wochentagKurz, kwAusDatum, formatDatum } from "../lib/date";
+import { wochentagKurz, formatDatum } from "../lib/date";
 
 interface Props {
   kampagnen: Kampagne[];
@@ -340,19 +340,6 @@ export function TabellenAnsicht({
   const heute = `${jetzt.getFullYear()}-${String(jetzt.getMonth() + 1).padStart(2, "0")}-${String(
     jetzt.getDate(),
   ).padStart(2, "0")}`;
-  const aktuelleKw = kwAusDatum(heute) ?? 0;
-
-  // Beim ersten Laden zur aktuellen Woche scrollen.
-  const heuteRowRef = useRef<HTMLTableRowElement | null>(null);
-  const gescrollt = useRef(false);
-  const aktuelleWocheIndex =
-    sort.key === "kw" ? sortiert.findIndex((k) => k.kw != null && k.kw >= aktuelleKw) : -1;
-  useEffect(() => {
-    if (!gescrollt.current && heuteRowRef.current) {
-      heuteRowRef.current.scrollIntoView({ block: "start" });
-      gescrollt.current = true;
-    }
-  }, [sortiert]);
 
   return (
     <div>
@@ -475,7 +462,6 @@ export function TabellenAnsicht({
               return (
                 <tr
                   key={k.id}
-                  ref={i === aktuelleWocheIndex ? heuteRowRef : undefined}
                   title={
                     ueberfaellig
                       ? "Überfällig – nicht erledigt und Zeitpunkt liegt in der Vergangenheit"
@@ -483,7 +469,7 @@ export function TabellenAnsicht({
                         ? "Laufende Kampagne (Zeitraum)"
                         : undefined
                   }
-                  className={`${rand} ${linkerRand} scroll-mt-24 align-top ${bg}`}
+                  className={`${rand} ${linkerRand} align-top ${bg}`}
                 >
                   <td className="px-2 py-2">
                     <input
