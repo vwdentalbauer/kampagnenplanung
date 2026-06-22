@@ -9,12 +9,11 @@ import { LEERER_FILTER, passt, facette, gibtLeere, type Filter } from "./lib/fil
 import { useEpics } from "./data/useEpics";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
-import { WochenAnsicht } from "./components/WochenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
 import { Logo } from "./components/Logo";
 
-type Ansicht = "tabelle" | "woche" | "ziel";
+type Ansicht = "tabelle" | "ziel";
 
 export default function App() {
   const { nutzer, setRolle, darfBearbeiten, istAdmin, abmelden } = useAuth();
@@ -217,7 +216,6 @@ export default function App() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
           {tab("tabelle", "📋 Tabelle")}
-          {tab("woche", "📅 Nach Woche")}
           {tab("ziel", "📣 Kampagne")}
         </div>
         <div className="flex items-center gap-2">
@@ -295,12 +293,6 @@ export default function App() {
           onUpdate={onUpdate}
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
-        />
-      ) : ansicht === "woche" ? (
-        <WochenAnsicht
-          kampagnen={gefiltert}
-          darfBearbeiten={darfBearbeiten}
-          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
         />
       ) : (
         <ZielAnsicht
