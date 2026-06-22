@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { Kampagne, Status } from "../types";
-import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
+import { STATUS_LABELS, STATUS_REIHENFOLGE, SUBKANAL_VORSCHLAEGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
@@ -17,6 +17,8 @@ interface Props {
   onUpdate: (k: Kampagne, patch: Partial<Kampagne>) => void;
   onBulkUpdate: (ids: string[], patch: Partial<Kampagne>) => void;
   onBulkDelete: (ids: string[]) => void;
+  /** Spalten, die in dieser Instanz ausgeblendet werden (z.B. im Kampagne-Reiter). */
+  ausblenden?: SpaltenKey[];
 }
 
 // Verschiebbare Spalten. „Kampagne" und „Details" stehen hinter „Datum".
@@ -26,6 +28,7 @@ type SpaltenKey =
   | "kampagne"
   | "details"
   | "kanal"
+  | "subkanal"
   | "bereiche"
   | "verantwortung"
   | "status";
@@ -34,10 +37,11 @@ type SpaltenKey =
 const SPALTEN: Record<SpaltenKey, { label: string; breite: number }> = {
   kw: { label: "KW", breite: 56 },
   datum: { label: "Datum", breite: 104 },
-  kampagne: { label: "Kampagne", breite: 180 },
-  details: { label: "Details", breite: 300 },
+  kampagne: { label: "Kampagne", breite: 170 },
+  details: { label: "Details", breite: 280 },
   kanal: { label: "Kanal", breite: 110 },
-  bereiche: { label: "Bereiche", breite: 120 },
+  subkanal: { label: "Sub-Kanal", breite: 120 },
+  bereiche: { label: "Sparten", breite: 120 },
   verantwortung: { label: "Verantwortung", breite: 140 },
   status: { label: "Status", breite: 104 },
 };
@@ -63,12 +67,13 @@ const STANDARD_REIHENFOLGE: SpaltenKey[] = [
   "kampagne",
   "details",
   "kanal",
+  "subkanal",
   "bereiche",
   "verantwortung",
   "status",
 ];
 
-const SPALTEN_KEY = "kampagnen.spalten.v2";
+const SPALTEN_KEY = "kampagnen.spalten.v3";
 
 function ladeReihenfolge(): SpaltenKey[] {
   try {
@@ -107,6 +112,8 @@ function sortWert(key: SpaltenKey, k: Kampagne): number | string {
       return k.details;
     case "kanal":
       return k.kanal;
+    case "subkanal":
+      return k.subKanal;
     case "verantwortung":
       return k.verantwortung;
   }
@@ -121,8 +128,13 @@ export function TabellenAnsicht({
   onUpdate,
   onBulkUpdate,
   onBulkDelete,
+  ausblenden,
 }: Props) {
   const [reihenfolge, setReihenfolge] = useState<SpaltenKey[]>(ladeReihenfolge);
+  // Tatsächlich angezeigte Spalten (ausgeblendete entfernt).
+  const sichtbareReihenfolge = ausblenden
+    ? reihenfolge.filter((k) => !ausblenden.includes(k))
+    : reihenfolge;
   const [breiten, setBreiten] = useState<Record<SpaltenKey, number>>(ladeBreiten);
   const [auswahl, setAuswahl] = useState<Set<string>>(new Set());
   const [dragKey, setDragKey] = useState<SpaltenKey | null>(null);
@@ -169,6 +181,13 @@ export function TabellenAnsicht({
   const kampagneVorschlaege = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.kampagne.trim() && set.add(k.kampagne.trim()));
+    return [...set].sort((a, b) => a.localeCompare(b, "de"));
+  }, [kampagnen]);
+
+  // Vorschläge für Sub-Kanal (vorhandene Werte + Standardvorschläge).
+  const subKanalVorschlaege = useMemo(() => {
+    const set = new Set<string>(SUBKANAL_VORSCHLAEGE);
+    kampagnen.forEach((k) => k.subKanal.trim() && set.add(k.subKanal.trim()));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
 
@@ -298,6 +317,16 @@ export function TabellenAnsicht({
         ) : (
           <span className="px-1.5">{k.kanal}</span>
         );
+      case "subkanal":
+        return darfBearbeiten ? (
+          <EditableCell
+            value={k.subKanal}
+            vorschlaege={subKanalVorschlaege}
+            onCommit={(v) => onUpdate(k, { subKanal: v })}
+          />
+        ) : (
+          <span className="px-1.5">{k.subKanal}</span>
+        );
       case "bereiche":
         return (
           <div className="flex flex-wrap gap-1 px-1.5">
@@ -333,7 +362,7 @@ export function TabellenAnsicht({
     }
   };
 
-  const spaltenAnzahl = reihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
+  const spaltenAnzahl = sichtbareReihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
 
   // Heutiges Datum (lokal) für Überfällig-Markierung und „aktuelle Woche".
   const jetzt = new Date();
@@ -364,13 +393,13 @@ export function TabellenAnsicht({
           style={{
             width:
               36 +
-              reihenfolge.reduce((s, k) => s + breiten[k], 0) +
+              sichtbareReihenfolge.reduce((s, k) => s + breiten[k], 0) +
               (darfBearbeiten ? 72 : 0),
           }}
         >
           <colgroup>
             <col style={{ width: 36 }} />
-            {reihenfolge.map((key) => (
+            {sichtbareReihenfolge.map((key) => (
               <col key={key} style={{ width: breiten[key] }} />
             ))}
             {darfBearbeiten && <col style={{ width: 72 }} />}
@@ -388,7 +417,7 @@ export function TabellenAnsicht({
                   title="Alle auswählen"
                 />
               </th>
-              {reihenfolge.map((key) => {
+              {sichtbareReihenfolge.map((key) => {
                 const aktiv = sort.key === key;
                 return (
                   <th
@@ -479,7 +508,7 @@ export function TabellenAnsicht({
                       className="cursor-pointer accent-marke"
                     />
                   </td>
-                  {reihenfolge.map((key) => (
+                  {sichtbareReihenfolge.map((key) => (
                     <td key={key} className="overflow-hidden px-2 py-1">
                       {zelle(key, k)}
                     </td>

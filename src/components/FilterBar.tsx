@@ -10,12 +10,14 @@ interface Props {
   quartale: string[];
   status: Status[];
   kanaele: string[];
+  subKanaele: string[];
   owners: string[];
   kampagnen: string[];
   ziele: string[];
   aktuelleKw: number;
   // „(leer)"-Option nur zeigen, wenn es auch leere Felder gibt
   leerKanaele: boolean;
+  leerSubKanaele: boolean;
   leerOwners: boolean;
   leerKampagnen: boolean;
 }
@@ -26,11 +28,13 @@ export function FilterBar({
   quartale,
   status,
   kanaele,
+  subKanaele,
   owners,
   kampagnen,
   ziele,
   aktuelleKw,
   leerKanaele,
+  leerSubKanaele,
   leerOwners,
   leerKampagnen,
 }: Props) {
@@ -76,6 +80,14 @@ export function FilterBar({
           selected={filter.kanaele}
           onChange={(v) => upd({ kanaele: v })}
           withEmpty={leerKanaele}
+          suchbar
+        />
+        <MultiSelect
+          label="Sub-Kanäle"
+          options={subKanaele}
+          selected={filter.subKanaele}
+          onChange={(v) => upd({ subKanaele: v })}
+          withEmpty={leerSubKanaele}
           suchbar
         />
         <MultiSelect

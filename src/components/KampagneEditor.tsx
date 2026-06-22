@@ -6,12 +6,14 @@ import {
   QUARTALE,
   STATUS_LABELS,
   STATUS_REIHENFOLGE,
+  SUBKANAL_VORSCHLAEGE,
 } from "../constants";
 import { kwAusDatum, quartalAusDatum } from "../lib/date";
 
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
   kanaele: string[];
+  subKanaele: string[];
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
   veranstaltungen: string[];
@@ -28,6 +30,7 @@ function leereKampagne(): Kampagne {
     endDatum: null,
     zielgruppe: "Alle",
     kanal: "",
+    subKanal: "",
     kampagne: "",
     details: "",
     ziel: "",
@@ -43,6 +46,7 @@ function leereKampagne(): Kampagne {
 export function KampagneEditor({
   kampagne,
   kanaele,
+  subKanaele,
   kampagnen,
   verantwortliche,
   veranstaltungen,
@@ -187,6 +191,21 @@ export function KampagneEditor({
             <datalist id="dl-kanal">
               {kanaele.map((k) => (
                 <option key={k} value={k} />
+              ))}
+            </datalist>
+          </div>
+          <div>
+            <label className={label}>Sub-Kanal (z.B. LinkedIn, Instagram)</label>
+            <input
+              className={input}
+              list="dl-subkanal"
+              placeholder="optional"
+              value={form.subKanal}
+              onChange={(e) => set("subKanal", e.target.value)}
+            />
+            <datalist id="dl-subkanal">
+              {[...new Set([...SUBKANAL_VORSCHLAEGE, ...subKanaele])].map((s) => (
+                <option key={s} value={s} />
               ))}
             </datalist>
           </div>

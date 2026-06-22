@@ -19,6 +19,8 @@ export interface Kampagne {
   endDatum: string | null;
   zielgruppe: string;
   kanal: string;
+  /** Sub-Kanal / Plattform (z.B. LinkedIn, Instagram für Kanal „Social Media"). */
+  subKanal: string;
   /** Kurzer Kampagnen-Name/Titel (für die Übersicht). */
   kampagne: string;
   /** Ausführliche Beschreibung/Maßnahme (= Excel-Spalte M „Details"). */

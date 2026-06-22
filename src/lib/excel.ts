@@ -21,6 +21,7 @@ const KOPF = [
   "Enddatum",
   "Zielgruppe",
   "Kanal",
+  "Sub-Kanal",
   "Details",
   "Ziel",
   "„db 4+1“",
@@ -61,6 +62,7 @@ export function exportExcel(kampagnen: Kampagne[]) {
       Enddatum: iso(k.endDatum),
       Zielgruppe: k.zielgruppe,
       Kanal: k.kanal,
+      "Sub-Kanal": k.subKanal,
       Details: k.details,
       Ziel: k.ziel,
       "„db 4+1“": k.kategorie,
@@ -120,6 +122,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cEnde = idx("Enddatum");
   const cZg = idx("Zielgruppe");
   const cKanal = idx("Kanal");
+  const cSubKanal = idx("Sub-Kanal");
   const cDetails = idx("Details");
   const cZiel = idx("Ziel");
   const cKat = idx("„db 4+1“");
@@ -159,6 +162,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       endDatum: zuIso(cEnde >= 0 ? row[cEnde] : null),
       zielgruppe: get(row, cZg) || "Alle",
       kanal,
+      subKanal: get(row, cSubKanal),
       kampagne,
       details,
       ziel: get(row, cZiel),

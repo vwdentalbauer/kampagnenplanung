@@ -51,6 +51,7 @@ export default function App() {
       quartale: facette(kampagnen, filter, "quartale"),
       status: facette(kampagnen, filter, "status") as Status[],
       kanaele: facette(kampagnen, filter, "kanaele"),
+      subkanaele: facette(kampagnen, filter, "subkanaele"),
       owners: facette(kampagnen, filter, "owners"),
       kampagnen: facette(kampagnen, filter, "kampagne"),
       ziele: facette(kampagnen, filter, "ziel"),
@@ -62,6 +63,7 @@ export default function App() {
   const leer = useMemo(
     () => ({
       kanaele: gibtLeere(kampagnen, filter, "kanaele"),
+      subKanaele: gibtLeere(kampagnen, filter, "subkanaele"),
       owners: gibtLeere(kampagnen, filter, "owners"),
       kampagnen: gibtLeere(kampagnen, filter, "kampagne"),
     }),
@@ -70,6 +72,7 @@ export default function App() {
 
   // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
   const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
+  const alleSubKanaele = useMemo(() => eindeutigeWerte(kampagnen, "subKanal"), [kampagnen]);
   const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
   const alleVeranstaltungen = useMemo(() => eindeutigeWerte(kampagnen, "veranstaltung"), [kampagnen]);
   const alleOwners = useMemo(() => {
@@ -271,11 +274,13 @@ export default function App() {
           quartale={facetten.quartale}
           status={facetten.status}
           kanaele={facetten.kanaele}
+          subKanaele={facetten.subkanaele}
           owners={facetten.owners}
           kampagnen={facetten.kampagnen}
           ziele={facetten.ziele}
           aktuelleKw={aktuelleKw}
           leerKanaele={leer.kanaele}
+          leerSubKanaele={leer.subKanaele}
           leerOwners={leer.owners}
           leerKampagnen={leer.kampagnen}
         />
@@ -298,9 +303,14 @@ export default function App() {
         <ZielAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
+          kanaele={eindeutigeWerte(kampagnen, "kanal")}
           epics={epics}
           onZeitraum={setZeitraum}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onBulkUpdate={onBulkUpdate}
+          onBulkDelete={onBulkDelete}
         />
       )}
 
@@ -308,6 +318,7 @@ export default function App() {
         <KampagneEditor
           kampagne={editor.kampagne}
           kanaele={alleKanaele}
+          subKanaele={alleSubKanaele}
           kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
           veranstaltungen={alleVeranstaltungen}

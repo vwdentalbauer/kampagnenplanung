@@ -1,16 +1,20 @@
 import type { Kampagne, Status } from "../types";
 import { STATUS_REIHENFOLGE, STATUS_LABELS, STATUS_STYLE } from "../constants";
-import { StatusBadge } from "./StatusBadge";
-import { PencilIcon } from "./Icons";
-import { kwAusDatum, formatDatum, wochentagKurz } from "../lib/date";
+import { TabellenAnsicht } from "./TabellenAnsicht";
+import { kwAusDatum, formatDatum } from "../lib/date";
 import type { EpicMeta } from "../data/useEpics";
 
 interface Props {
   kampagnen: Kampagne[];
   darfBearbeiten: boolean;
+  kanaele: string[];
   epics: Record<string, EpicMeta>;
   onZeitraum: (name: string, start: string | null, ende: string | null) => void;
   onEdit: (k: Kampagne) => void;
+  onDelete: (id: string) => void;
+  onUpdate: (k: Kampagne, patch: Partial<Kampagne>) => void;
+  onBulkUpdate: (ids: string[], patch: Partial<Kampagne>) => void;
+  onBulkDelete: (ids: string[]) => void;
 }
 
 interface Gruppe {
@@ -25,7 +29,18 @@ function spanne(werte: (string | null)[]): { von: string | null; bis: string | n
 
 const heute = new Date().toISOString().slice(0, 10);
 
-export function ZielAnsicht({ kampagnen, darfBearbeiten, epics, onZeitraum, onEdit }: Props) {
+export function ZielAnsicht({
+  kampagnen,
+  darfBearbeiten,
+  kanaele,
+  epics,
+  onZeitraum,
+  onEdit,
+  onDelete,
+  onUpdate,
+  onBulkUpdate,
+  onBulkDelete,
+}: Props) {
   const map = new Map<string, Kampagne[]>();
   const ohne: Kampagne[] = [];
   for (const k of kampagnen) {
@@ -48,78 +63,21 @@ export function ZielAnsicht({ kampagnen, darfBearbeiten, epics, onZeitraum, onEd
   const dateCls =
     "rounded border border-slate-300 px-1.5 py-0.5 text-xs focus:border-marke focus:outline-none";
 
-  // Kompakte Tabelle der Einträge (wie im Reiter „Tabelle").
-  const taskTabelle = (tasks: Kampagne[]) => {
-    const sortiert = [...tasks].sort((a, b) =>
-      (a.weekStart ?? "9999").localeCompare(b.weekStart ?? "9999"),
-    );
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs uppercase tracking-wide text-slate-400">
-            <tr>
-              <th className="px-2 py-1 font-medium">KW</th>
-              <th className="px-2 py-1 font-medium">Datum</th>
-              <th className="px-2 py-1 font-medium">Kanal</th>
-              <th className="px-2 py-1 font-medium">Details</th>
-              <th className="px-2 py-1 font-medium">Verantwortung</th>
-              <th className="px-2 py-1 font-medium">Status</th>
-              {darfBearbeiten && <th className="px-2 py-1" />}
-            </tr>
-          </thead>
-          <tbody>
-            {sortiert.map((k) => {
-              const laufend = !!k.endDatum;
-              const effEnde = k.endDatum ?? k.weekStart;
-              const ueberfaellig = !!effEnde && effEnde < heute && k.status !== "erledigt";
-              const linkerRand = ueberfaellig
-                ? "border-l-4 border-l-rose-400"
-                : laufend
-                  ? "border-l-4 border-l-marke-light"
-                  : "";
-              return (
-                <tr
-                  key={k.id}
-                  className={`border-t border-slate-100 align-top ${linkerRand} ${
-                    ueberfaellig ? "bg-rose-50/60" : ""
-                  }`}
-                >
-                  <td className="whitespace-nowrap px-2 py-1 font-medium">
-                    {k.kw ? `KW ${k.kw}` : "—"}
-                  </td>
-                  <td className="whitespace-nowrap px-2 py-1 text-slate-500">
-                    {k.weekStart ? formatDatum(k.weekStart) : "—"}
-                    {k.endDatum ? (
-                      <span className="text-marke-light"> – {formatDatum(k.endDatum)}</span>
-                    ) : k.weekStart ? (
-                      <span className="text-slate-400"> {wochentagKurz(k.weekStart)}</span>
-                    ) : null}
-                  </td>
-                  <td className="px-2 py-1">{k.kanal}</td>
-                  <td className="px-2 py-1 whitespace-pre-line">{k.details}</td>
-                  <td className="px-2 py-1 text-slate-600">{k.verantwortung}</td>
-                  <td className="px-2 py-1">
-                    <StatusBadge status={k.status} />
-                  </td>
-                  {darfBearbeiten && (
-                    <td className="px-2 py-1 text-right">
-                      <button
-                        onClick={() => onEdit(k)}
-                        title="Bearbeiten"
-                        className="rounded p-1 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
-                      >
-                        <PencilIcon />
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+  // Wiederverwendung der vollwertigen Tabelle (Sortieren, Spalten verschieben,
+  // Bulk etc.) – mit ausgeblendeter Kampagne-Spalte (im Reiter redundant).
+  const tabelle = (tasks: Kampagne[]) => (
+    <TabellenAnsicht
+      kampagnen={tasks}
+      darfBearbeiten={darfBearbeiten}
+      kanaele={kanaele}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onUpdate={onUpdate}
+      onBulkUpdate={onBulkUpdate}
+      onBulkDelete={onBulkDelete}
+      ausblenden={["kampagne"]}
+    />
+  );
 
   const kampagnenKarte = (g: Gruppe) => {
     const meta = epics[g.name];
@@ -207,7 +165,7 @@ export function ZielAnsicht({ kampagnen, darfBearbeiten, epics, onZeitraum, onEd
           </div>
         </header>
 
-        <div className="p-2">{taskTabelle(g.tasks)}</div>
+        <div className="p-2">{tabelle(g.tasks)}</div>
       </section>
     );
   };
@@ -227,7 +185,7 @@ export function ZielAnsicht({ kampagnen, darfBearbeiten, epics, onZeitraum, onEd
             </h3>
             <span className="text-xs text-slate-400">{ohne.length} Einträge</span>
           </header>
-          <div className="p-2">{taskTabelle(ohne)}</div>
+          <div className="p-2">{tabelle(ohne)}</div>
         </section>
       )}
 
