@@ -11,6 +11,7 @@ import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { WochenAnsicht } from "./components/WochenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
+import { Logo } from "./components/Logo";
 
 type Ansicht = "tabelle" | "woche" | "ziel";
 
@@ -145,11 +146,14 @@ export default function App() {
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6">
       <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Kampagnenplanung 2026</h1>
-          <p className="text-sm text-slate-500">
-            {kampagnen.length} Maßnahmen · Ersatz für den Excel-Jahresplan
-          </p>
+        <div className="flex items-center gap-3">
+          <Logo className="h-11 w-auto" />
+          <div>
+            <h1 className="text-2xl font-bold text-marke">Kampagnenplanung 2026</h1>
+            <p className="text-sm text-slate-500">
+              {kampagnen.length} Maßnahmen · Ersatz für den Excel-Jahresplan
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <span className="text-slate-500">{nutzer.name}</span>

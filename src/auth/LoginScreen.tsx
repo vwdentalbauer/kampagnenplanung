@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import type { Nutzer } from "../types";
 import { NUTZER_LISTE } from "./users";
+import { Logo } from "../components/Logo";
 
 async function sha256(text: string): Promise<string> {
   const buf = await crypto.subtle.digest(
@@ -44,12 +45,8 @@ export function LoginScreen({ onSuccess }: Props) {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-marke/20">
-            <svg className="h-6 w-6 text-marke-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-slate-800">Kampagnenplanung</h1>
+          <Logo className="mx-auto mb-3 h-12 w-auto" />
+          <h1 className="text-xl font-bold text-marke">Kampagnenplanung</h1>
           <p className="mt-1 text-sm text-slate-500">Bitte anmelden</p>
         </div>
 

@@ -15,12 +15,12 @@ export const STATUS_REIHENFOLGE: Status[] = [
   "abgesagt",
 ];
 
-/** Tailwind-Klassen je Status (Badge). */
+/** Tailwind-Klassen je Status (Badge) – an dental bauer CI angelehnt. */
 export const STATUS_STYLE: Record<Status, string> = {
-  geplant: "bg-slate-100 text-slate-700 border-slate-300",
-  in_arbeit: "bg-amber-100 text-amber-800 border-amber-300",
-  erledigt: "bg-emerald-100 text-emerald-800 border-emerald-300",
-  abgesagt: "bg-indigo-100 text-indigo-700 border-indigo-300",
+  geplant: "bg-[#E6E8EA] text-[#4A4C4F] border-[#C9CED1]",
+  in_arbeit: "bg-[#FDEFA8] text-[#806c10] border-[#ecd877]",
+  erledigt: "bg-[#B1D9CF] text-[#1f5147] border-[#8fc7ba]",
+  abgesagt: "bg-[#B4B1D9] text-[#3c3768] border-[#9b97c9]",
 };
 
 export const ROLLEN_LABELS: Record<Rolle, string> = {
