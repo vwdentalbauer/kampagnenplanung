@@ -6,7 +6,6 @@ import {
   QUARTALE,
   STATUS_LABELS,
   STATUS_REIHENFOLGE,
-  SUBKANAL_VORSCHLAEGE,
 } from "../constants";
 import { kwAusDatum, quartalAusDatum } from "../lib/date";
 
@@ -195,16 +194,16 @@ export function KampagneEditor({
             </datalist>
           </div>
           <div>
-            <label className={label}>Sub-Kanal (z.B. LinkedIn, Instagram)</label>
+            <label className={label}>Sub-Kanal (mehrere mit / trennen)</label>
             <input
               className={input}
               list="dl-subkanal"
-              placeholder="optional"
+              placeholder="optional, z.B. LinkedIn / Instagram"
               value={form.subKanal}
               onChange={(e) => set("subKanal", e.target.value)}
             />
             <datalist id="dl-subkanal">
-              {[...new Set([...SUBKANAL_VORSCHLAEGE, ...subKanaele])].map((s) => (
+              {subKanaele.map((s) => (
                 <option key={s} value={s} />
               ))}
             </datalist>

@@ -49,15 +49,3 @@ export const KATEGORIEN = [
 ] as const;
 
 export const QUARTALE = ["Q1", "Q2", "Q3", "Q4"] as const;
-
-/** Vorschläge für Sub-Kanäle (z.B. zu „Social Media"). Freitext bleibt möglich. */
-export const SUBKANAL_VORSCHLAEGE = [
-  "LinkedIn",
-  "Instagram",
-  "Facebook",
-  "WhatsApp",
-  "YouTube",
-  "TikTok",
-  "Google Ads",
-  "Meta Ads",
-];

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { Kampagne, Status } from "../types";
-import { STATUS_LABELS, STATUS_REIHENFOLGE, SUBKANAL_VORSCHLAEGE } from "../constants";
+import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
+import { subKanalListe } from "../lib/filter";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
@@ -184,10 +185,10 @@ export function TabellenAnsicht({
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
 
-  // Vorschläge für Sub-Kanal (vorhandene Werte + Standardvorschläge).
+  // Vorschläge für Sub-Kanal (nur aus vorhandenen Werten, einzeln).
   const subKanalVorschlaege = useMemo(() => {
-    const set = new Set<string>(SUBKANAL_VORSCHLAEGE);
-    kampagnen.forEach((k) => k.subKanal.trim() && set.add(k.subKanal.trim()));
+    const set = new Set<string>();
+    kampagnen.forEach((k) => subKanalListe(k.subKanal).forEach((s) => set.add(s)));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
 

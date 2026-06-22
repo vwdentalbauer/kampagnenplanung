@@ -5,7 +5,7 @@ import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
-import { LEERER_FILTER, passt, facette, gibtLeere, type Filter } from "./lib/filter";
+import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
@@ -72,7 +72,11 @@ export default function App() {
 
   // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
   const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
-  const alleSubKanaele = useMemo(() => eindeutigeWerte(kampagnen, "subKanal"), [kampagnen]);
+  const alleSubKanaele = useMemo(() => {
+    const set = new Set<string>();
+    kampagnen.forEach((k) => subKanalListe(k.subKanal).forEach((s) => set.add(s)));
+    return [...set].sort((a, b) => a.localeCompare(b, "de"));
+  }, [kampagnen]);
   const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
   const alleVeranstaltungen = useMemo(() => eindeutigeWerte(kampagnen, "veranstaltung"), [kampagnen]);
   const alleOwners = useMemo(() => {
