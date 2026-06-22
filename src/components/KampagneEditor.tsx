@@ -61,11 +61,11 @@ export function KampagneEditor({
     }));
   };
 
-  // Pflichtfelder: Kampagne, Details/Maßnahme, Startdatum
-  const fehltKampagne = !form.kampagne.trim();
+  // Pflichtfelder: Details/Maßnahme, Startdatum. Kampagne ist optional
+  // (leer = keiner Kampagne zugeordnet / Einzel-Task).
   const fehltDetails = !form.details.trim();
   const fehltDatum = !form.weekStart;
-  const unvollstaendig = fehltKampagne || fehltDetails || fehltDatum;
+  const unvollstaendig = fehltDetails || fehltDatum;
 
   const speichern = () => {
     if (unvollstaendig) {
@@ -101,11 +101,13 @@ export function KampagneEditor({
 
         <div className="grid grid-cols-2 gap-4 p-5">
           <div className="col-span-2">
-            <label className={label}>Kampagne {stern}</label>
+            <label className={label}>
+              Kampagne <span className="font-normal text-slate-400">(optional – leer = keiner Kampagne zugeordnet)</span>
+            </label>
             <input
-              className={`${input} ${versucht && fehltKampagne ? fehlerInput : ""}`}
+              className={input}
               list="dl-kampagne"
-              placeholder="Name wählen oder neu eingeben…"
+              placeholder="Kampagne wählen, neu eingeben oder leer lassen…"
               value={form.kampagne}
               onChange={(e) => set("kampagne", e.target.value)}
             />
@@ -257,7 +259,7 @@ export function KampagneEditor({
         <div className="flex items-center justify-between gap-2 border-t px-5 py-3">
           <span className="text-xs text-slate-400">
             {versucht && unvollstaendig ? (
-              <span className="text-rose-500">Bitte Kampagne, Details und Startdatum ausfüllen.</span>
+              <span className="text-rose-500">Bitte Details und Startdatum ausfüllen.</span>
             ) : (
               <>{stern} Pflichtfeld</>
             )}

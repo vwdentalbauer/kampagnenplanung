@@ -31,13 +31,18 @@ function ersteZeile(text: string): string {
 
 /** Sorgt dafür, dass jeder Datensatz das Feld „kampagne" hat (Migration). */
 function normalisieren(daten: Kampagne[]): Kampagne[] {
-  return daten.map((k) => ({
-    ...k,
-    kampagne: k.kampagne ?? ersteZeile(k.details),
-    endDatum: k.endDatum ?? null,
-    // Kategorie umbenannt: „Hero Kampagne" -> „WKZ".
-    kategorie: k.kategorie === "Hero Kampagne" ? "WKZ" : k.kategorie,
-  }));
+  const leerWerte = ["none", "keine", "n/a", "na", "-", "–", "kein", "ohne"];
+  return daten.map((k) => {
+    const basis = (k.kampagne ?? ersteZeile(k.details)).trim();
+    const kampagne = leerWerte.includes(basis.toLowerCase()) ? "" : basis;
+    return {
+      ...k,
+      kampagne,
+      endDatum: k.endDatum ?? null,
+      // Kategorie umbenannt: „Hero Kampagne" -> „WKZ".
+      kategorie: k.kategorie === "Hero Kampagne" ? "WKZ" : k.kategorie,
+    };
+  });
 }
 
 export class LocalStorageRepository implements KampagnenRepository {
