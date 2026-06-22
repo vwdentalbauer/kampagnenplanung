@@ -64,7 +64,7 @@ export function MultiSelect({
       </button>
 
       {offen && (
-        <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-60 overflow-auto rounded-lg border border-slate-200 bg-white p-1 shadow-xl">
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-max min-w-[15rem] max-w-[28rem] overflow-auto rounded-lg border border-slate-200 bg-white p-1 shadow-xl">
           {suchbar && (
             <input
               autoFocus
@@ -86,15 +86,15 @@ export function MultiSelect({
           {alle.map((v) => (
             <label
               key={v}
-              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-slate-50"
+              className="flex cursor-pointer items-start gap-2 rounded px-2 py-1 text-sm hover:bg-slate-50"
             >
               <input
                 type="checkbox"
                 checked={selected.includes(v)}
                 onChange={() => toggle(v)}
-                className="accent-marke"
+                className="mt-0.5 accent-marke"
               />
-              <span className="truncate">{labelText(v)}</span>
+              <span className="whitespace-normal break-words">{labelText(v)}</span>
             </label>
           ))}
         </div>

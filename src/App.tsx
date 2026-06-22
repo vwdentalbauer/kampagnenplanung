@@ -196,7 +196,7 @@ export default function App() {
         <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
           {tab("tabelle", "📋 Tabelle")}
           {tab("woche", "📅 Nach Woche")}
-          {tab("ziel", "🎯 Nach Ziel")}
+          {tab("ziel", "📣 Nach Kampagne")}
         </div>
         <div className="flex items-center gap-2">
           <button

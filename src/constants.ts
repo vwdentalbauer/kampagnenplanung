@@ -5,7 +5,7 @@ export const STATUS_LABELS: Record<Status, string> = {
   geplant: "Geplant",
   in_arbeit: "In Arbeit",
   erledigt: "Erledigt",
-  abgesagt: "Abgesagt",
+  abgesagt: "On Hold",
 };
 
 export const STATUS_REIHENFOLGE: Status[] = [
@@ -20,7 +20,7 @@ export const STATUS_STYLE: Record<Status, string> = {
   geplant: "bg-slate-100 text-slate-700 border-slate-300",
   in_arbeit: "bg-amber-100 text-amber-800 border-amber-300",
   erledigt: "bg-emerald-100 text-emerald-800 border-emerald-300",
-  abgesagt: "bg-rose-100 text-rose-700 border-rose-300",
+  abgesagt: "bg-indigo-100 text-indigo-700 border-indigo-300",
 };
 
 export const ROLLEN_LABELS: Record<Rolle, string> = {
@@ -42,7 +42,8 @@ export const BEREICHE = [
 
 export const KATEGORIEN = [
   "db Kampagnen",
-  "Hero Kampagne",
+  "WKZ",
+  "Handelsmarketing",
   "Abverkauf/ Aktionen",
   "CI",
 ] as const;

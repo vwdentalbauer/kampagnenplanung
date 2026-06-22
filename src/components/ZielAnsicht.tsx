@@ -8,11 +8,11 @@ interface Props {
   onEdit: (k: Kampagne) => void;
 }
 
-/** Gruppiert nach Ziel – für die strategische Auswertung „nach Ziel“. */
+/** Gruppiert nach Kampagne – für die Auswertung „nach Kampagne“. */
 export function ZielAnsicht({ kampagnen, darfBearbeiten, onEdit }: Props) {
   const gruppen = new Map<string, Kampagne[]>();
   for (const k of kampagnen) {
-    const z = k.ziel || "Ohne Ziel";
+    const z = k.kampagne || "Ohne Kampagne";
     if (!gruppen.has(z)) gruppen.set(z, []);
     gruppen.get(z)!.push(k);
   }

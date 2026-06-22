@@ -330,6 +330,12 @@ export function TabellenAnsicht({
 
   const spaltenAnzahl = reihenfolge.length + 1 + (darfBearbeiten ? 1 : 0);
 
+  // Heutiges Datum (lokal) für die Überfällig-Markierung.
+  const jetzt = new Date();
+  const heute = `${jetzt.getFullYear()}-${String(jetzt.getMonth() + 1).padStart(2, "0")}-${String(
+    jetzt.getDate(),
+  ).padStart(2, "0")}`;
+
   return (
     <div>
       {darfBearbeiten && ausgewaehlteSichtbar.length > 0 && (
@@ -428,15 +434,22 @@ export function TabellenAnsicht({
               // Trennlinie, wenn eine neue KW beginnt (nur bei Sortierung nach KW/Datum sinnvoll).
               const nachZeit = sort.key === "kw" || sort.key === "datum";
               const neueWoche = nachZeit && (i === 0 || sortiert[i - 1].kw !== k.kw);
+              // Überfällig: liegt in der Vergangenheit und ist nicht erledigt.
+              const ueberfaellig = !!k.weekStart && k.weekStart < heute && k.status !== "erledigt";
               const rand = neueWoche
                 ? "border-t-2 border-marke/50"
                 : "border-t border-slate-100";
+              const ueberfRand = ueberfaellig ? "border-l-4 border-l-rose-400" : "";
+              const bg = gewaehlt
+                ? "bg-marke/5"
+                : ueberfaellig
+                  ? "bg-rose-50 hover:bg-rose-100/70"
+                  : "hover:bg-slate-50/60";
               return (
                 <tr
                   key={k.id}
-                  className={`${rand} align-top ${
-                    gewaehlt ? "bg-marke/5" : "hover:bg-slate-50/60"
-                  }`}
+                  title={ueberfaellig ? "Überfällig – liegt in der Vergangenheit und ist nicht erledigt" : undefined}
+                  className={`${rand} ${ueberfRand} align-top ${bg}`}
                 >
                   <td className="px-2 py-2">
                     <input
