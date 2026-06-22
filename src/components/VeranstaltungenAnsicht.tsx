@@ -52,9 +52,10 @@ export function VeranstaltungenAnsicht({
 
   const gruppen = [...map.entries()].map(([kategorie, tasks]) => {
     const datum = erster(tasks.map((t) => t.eventDatum ?? ""));
+    const datumBis = erster(tasks.map((t) => t.eventDatumBis ?? ""));
     const typ = erster(tasks.map((t) => t.eventTyp));
     const ort = erster(tasks.map((t) => t.eventOrt));
-    return { kategorie, tasks, datum, typ, ort };
+    return { kategorie, tasks, datum, datumBis, typ, ort };
   });
   gruppen.sort((a, b) => (a.datum || "9999").localeCompare(b.datum || "9999"));
 
@@ -104,7 +105,12 @@ export function VeranstaltungenAnsicht({
                       {g.typ}
                     </span>
                   )}
-                  {g.datum && <span className="text-xs text-slate-400">📅 {formatDatum(g.datum)}</span>}
+                  {g.datum && (
+                    <span className="text-xs text-slate-400">
+                      📅 {formatDatum(g.datum)}
+                      {g.datumBis && g.datumBis !== g.datum ? ` – ${formatDatum(g.datumBis)}` : ""}
+                    </span>
+                  )}
                   {g.ort && <span className="text-xs text-slate-400">📍 {g.ort}</span>}
                 </div>
               </div>

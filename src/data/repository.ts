@@ -43,6 +43,7 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
       veranstaltung: k.veranstaltung ?? "",
       eventTyp: k.eventTyp ?? "",
       eventDatum: k.eventDatum ?? null,
+      eventDatumBis: k.eventDatumBis ?? null,
       eventOrt: k.eventOrt ?? "",
       // Kategorie umbenannt: „Hero Kampagne" -> „WKZ".
       kategorie: k.kategorie === "Hero Kampagne" ? "WKZ" : k.kategorie,

@@ -40,6 +40,7 @@ function leereKampagne(): Kampagne {
     veranstaltung: "",
     eventTyp: "",
     eventDatum: null,
+    eventDatumBis: null,
     eventOrt: "",
     verantwortung: "",
     owners: [],
@@ -317,13 +318,24 @@ export function KampagneEditor({
                 </select>
               </div>
               <div>
-                <label className={label}>Veranstaltungsdatum</label>
-                <input
-                  type="date"
-                  className={input}
-                  value={form.eventDatum ?? ""}
-                  onChange={(e) => set("eventDatum", e.target.value || null)}
-                />
+                <label className={label}>Veranstaltungsdatum (von – bis)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="date"
+                    className={input}
+                    value={form.eventDatum ?? ""}
+                    onChange={(e) => set("eventDatum", e.target.value || null)}
+                  />
+                  <span className="text-slate-400">–</span>
+                  <input
+                    type="date"
+                    className={input}
+                    min={form.eventDatum ?? undefined}
+                    value={form.eventDatumBis ?? ""}
+                    onChange={(e) => set("eventDatumBis", e.target.value || null)}
+                  />
+                </div>
+                <p className="mt-0.5 text-xs text-slate-400">„bis" nur bei mehrtägigen Events</p>
               </div>
               <div className="col-span-2">
                 <label className={label}>Veranstaltungsort</label>

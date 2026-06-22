@@ -35,8 +35,10 @@ export interface Kampagne {
   veranstaltung: string;
   /** Event-Typ (Messe/Seminar/Webinar) – nur relevant bei Sparte „Events". */
   eventTyp: string;
-  /** Veranstaltungsdatum (wann das Event stattfindet, ISO). */
+  /** Veranstaltungsdatum (Beginn, ISO). */
   eventDatum: string | null;
+  /** Veranstaltungs-Enddatum (optional, bei mehrtägigen Events, ISO). */
+  eventDatumBis: string | null;
   /** Veranstaltungsort. */
   eventOrt: string;
   /** Verantwortung als Freitext (Originalwert aus Excel). */

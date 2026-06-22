@@ -29,6 +29,7 @@ const KOPF = [
   "Veranstaltung",
   "Event-Typ",
   "Veranstaltungsdatum",
+  "Veranstaltungsdatum bis",
   "Veranstaltungsort",
   "Verantwortung",
   "Status",
@@ -73,6 +74,7 @@ export function exportExcel(kampagnen: Kampagne[]) {
       Veranstaltung: k.veranstaltung,
       "Event-Typ": k.eventTyp,
       Veranstaltungsdatum: iso(k.eventDatum),
+      "Veranstaltungsdatum bis": iso(k.eventDatumBis),
       Veranstaltungsort: k.eventOrt,
       Verantwortung: k.verantwortung,
       Status: STATUS_LABELS[k.status],
@@ -138,6 +140,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cVeranstaltung = idx("Veranstaltung");
   const cEventTyp = idx("Event-Typ");
   const cEventDatum = idx("Veranstaltungsdatum");
+  const cEventDatumBis = idx("Veranstaltungsdatum bis");
   const cEventOrt = idx("Veranstaltungsort");
   const bereichIdx = BEREICHE.map((b) => idx(b));
 
@@ -180,6 +183,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       veranstaltung: get(row, cVeranstaltung),
       eventTyp: get(row, cEventTyp),
       eventDatum: zuIso(cEventDatum >= 0 ? row[cEventDatum] : null),
+      eventDatumBis: zuIso(cEventDatumBis >= 0 ? row[cEventDatumBis] : null),
       eventOrt: get(row, cEventOrt),
       verantwortung: verant,
       owners,
