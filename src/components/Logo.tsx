@@ -42,11 +42,11 @@ export function Logo({ className = "h-10" }: Props) {
       >
         bauer
       </text>
-      {/* Zahn rechts (zwei obere Höcker mit Kerbe, runder Körper) */}
+      {/* Zahn rechts: gewölbte Krone, zwei Wurzeln mit mittlerer Spitze */}
       <path
         transform="translate(60 9) scale(0.62)"
         fill="#fff"
-        d="M8 6 C14 2 20 4 24 9 C28 4 34 2 40 6 C46 12 44 28 40 40 C37 49 31 52 27 47 C25 44 23 44 21 47 C17 52 11 49 8 40 C4 28 2 12 8 6 Z"
+        d="M11 12 C18 5 31 5 38 13 C42 17 42 24 40 30 C39 36 37 43 35 48 C34 51 31 51 30 47 C28 41 26 35 24 34 C22 35 20 41 18 47 C17 51 14 51 13 48 C11 43 9 36 8 30 C6 24 6 17 11 12 Z"
       />
     </svg>
   );
