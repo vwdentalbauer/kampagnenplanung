@@ -53,7 +53,7 @@ export default function App() {
 
   // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
   const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
-  const alleZielgruppen = useMemo(() => eindeutigeWerte(kampagnen, "zielgruppe"), [kampagnen]);
+  const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -289,7 +289,7 @@ export default function App() {
         <KampagneEditor
           kampagne={editor.kampagne}
           kanaele={alleKanaele}
-          zielgruppen={alleZielgruppen}
+          kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}

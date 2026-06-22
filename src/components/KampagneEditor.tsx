@@ -12,7 +12,7 @@ import { kwAusDatum, quartalAusDatum } from "../lib/date";
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
   kanaele: string[];
-  zielgruppen: string[];
+  kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
   onSave: (k: Kampagne) => void;
   onClose: () => void;
@@ -40,12 +40,13 @@ function leereKampagne(): Kampagne {
 export function KampagneEditor({
   kampagne,
   kanaele,
-  zielgruppen,
+  kampagnen,
   verantwortliche,
   onSave,
   onClose,
 }: Props) {
   const [form, setForm] = useState<Kampagne>(kampagne ?? leereKampagne());
+  const [versucht, setVersucht] = useState(false);
 
   const set = <K extends keyof Kampagne>(feld: K, wert: Kampagne[K]) =>
     setForm((f) => ({ ...f, [feld]: wert }));
@@ -59,7 +60,17 @@ export function KampagneEditor({
     }));
   };
 
+  // Pflichtfelder: Kampagne, Details/Maßnahme, Startdatum
+  const fehltKampagne = !form.kampagne.trim();
+  const fehltDetails = !form.details.trim();
+  const fehltDatum = !form.weekStart;
+  const unvollstaendig = fehltKampagne || fehltDetails || fehltDatum;
+
   const speichern = () => {
+    if (unvollstaendig) {
+      setVersucht(true);
+      return;
+    }
     const owners = form.verantwortung
       .split(/[/,]/)
       .map((o) => o.trim())
@@ -70,16 +81,14 @@ export function KampagneEditor({
   const label = "block text-sm font-medium text-slate-600 mb-1";
   const input =
     "w-full rounded border border-slate-300 px-2 py-1.5 text-sm focus:border-marke focus:outline-none focus:ring-1 focus:ring-marke";
+  const fehlerInput = "border-rose-400 ring-1 ring-rose-300";
+  const stern = <span className="text-rose-500">*</span>;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="my-8 w-full max-w-2xl rounded-lg bg-white shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+    // Hintergrund schließt NICHT mehr (verhindert versehentliches Schließen
+    // ohne Speichern). Schließen nur über ✕ oder Abbrechen.
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
+      <div className="my-8 w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-b px-5 py-3">
           <h2 className="text-lg font-semibold">
             {kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
@@ -91,17 +100,25 @@ export function KampagneEditor({
 
         <div className="grid grid-cols-2 gap-4 p-5">
           <div className="col-span-2">
-            <label className={label}>Kampagne (Kurztitel)</label>
+            <label className={label}>Kampagne {stern}</label>
             <input
-              className={input}
+              className={`${input} ${versucht && fehltKampagne ? fehlerInput : ""}`}
+              list="dl-kampagne"
+              placeholder="Name wählen oder neu eingeben…"
               value={form.kampagne}
               onChange={(e) => set("kampagne", e.target.value)}
             />
+            <datalist id="dl-kampagne">
+              {kampagnen.map((k) => (
+                <option key={k} value={k} />
+              ))}
+            </datalist>
           </div>
+
           <div className="col-span-2">
-            <label className={label}>Details / Maßnahme</label>
+            <label className={label}>Details / Maßnahme {stern}</label>
             <textarea
-              className={input}
+              className={`${input} ${versucht && fehltDetails ? fehlerInput : ""}`}
               rows={3}
               value={form.details}
               onChange={(e) => set("details", e.target.value)}
@@ -109,10 +126,10 @@ export function KampagneEditor({
           </div>
 
           <div>
-            <label className={label}>Startdatum</label>
+            <label className={label}>Startdatum {stern}</label>
             <input
               type="date"
-              className={input}
+              className={`${input} ${versucht && fehltDatum ? fehlerInput : ""}`}
               value={form.weekStart ?? ""}
               onChange={(e) => datumGeaendert(e.target.value)}
             />
@@ -136,9 +153,7 @@ export function KampagneEditor({
                 type="number"
                 className={input}
                 value={form.kw ?? ""}
-                onChange={(e) =>
-                  set("kw", e.target.value ? Number(e.target.value) : null)
-                }
+                onChange={(e) => set("kw", e.target.value ? Number(e.target.value) : null)}
               />
             </div>
           </div>
@@ -158,30 +173,6 @@ export function KampagneEditor({
             </datalist>
           </div>
           <div>
-            <label className={label}>Zielgruppe</label>
-            <input
-              className={input}
-              list="dl-zielgruppe"
-              value={form.zielgruppe}
-              onChange={(e) => set("zielgruppe", e.target.value)}
-            />
-            <datalist id="dl-zielgruppe">
-              {zielgruppen.map((z) => (
-                <option key={z} value={z} />
-              ))}
-            </datalist>
-          </div>
-
-          <div className="col-span-2">
-            <label className={label}>Ziel</label>
-            <input
-              className={input}
-              value={form.ziel}
-              onChange={(e) => set("ziel", e.target.value)}
-            />
-          </div>
-
-          <div>
             <label className={label}>Kategorie (db 4+1)</label>
             <select
               className={input}
@@ -193,6 +184,7 @@ export function KampagneEditor({
               ))}
             </select>
           </div>
+
           <div>
             <label className={label}>Status</label>
             <select
@@ -207,38 +199,7 @@ export function KampagneEditor({
               ))}
             </select>
           </div>
-
-          <div className="col-span-2">
-            <label className={label}>Bereiche / Marken</label>
-            <div className="flex flex-wrap gap-2">
-              {BEREICHE.map((b) => {
-                const aktiv = form.bereiche.includes(b);
-                return (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() =>
-                      set(
-                        "bereiche",
-                        aktiv
-                          ? form.bereiche.filter((x) => x !== b)
-                          : [...form.bereiche, b],
-                      )
-                    }
-                    className={`rounded-full border px-3 py-1 text-xs ${
-                      aktiv
-                        ? "border-marke bg-marke text-white"
-                        : "border-slate-300 text-slate-600"
-                    }`}
-                  >
-                    {b}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="col-span-2">
+          <div>
             <label className={label}>Verantwortung (mit / oder , trennen)</label>
             <input
               className={input}
@@ -252,21 +213,56 @@ export function KampagneEditor({
               ))}
             </datalist>
           </div>
+
+          <div className="col-span-2">
+            <label className={label}>Bereiche / Marken</label>
+            <div className="flex flex-wrap gap-2">
+              {BEREICHE.map((b) => {
+                const aktiv = form.bereiche.includes(b);
+                return (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() =>
+                      set(
+                        "bereiche",
+                        aktiv ? form.bereiche.filter((x) => x !== b) : [...form.bereiche, b],
+                      )
+                    }
+                    className={`rounded-full border px-3 py-1 text-xs ${
+                      aktiv ? "border-marke bg-marke text-white" : "border-slate-300 text-slate-600"
+                    }`}
+                  >
+                    {b}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-2 border-t px-5 py-3">
-          <button
-            onClick={onClose}
-            className="rounded border border-slate-300 px-4 py-1.5 text-sm hover:bg-slate-50"
-          >
-            Abbrechen
-          </button>
-          <button
-            onClick={speichern}
-            className="rounded bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
-          >
-            Speichern
-          </button>
+        <div className="flex items-center justify-between gap-2 border-t px-5 py-3">
+          <span className="text-xs text-slate-400">
+            {versucht && unvollstaendig ? (
+              <span className="text-rose-500">Bitte Kampagne, Details und Startdatum ausfüllen.</span>
+            ) : (
+              <>{stern} Pflichtfeld</>
+            )}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="rounded border border-slate-300 px-4 py-1.5 text-sm hover:bg-slate-50"
+            >
+              Abbrechen
+            </button>
+            <button
+              onClick={speichern}
+              className="rounded bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
+            >
+              Speichern
+            </button>
+          </div>
         </div>
       </div>
     </div>
