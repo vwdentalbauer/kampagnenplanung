@@ -9,6 +9,8 @@ export type Rolle = "viewer" | "editor" | "admin";
 /** Eine einzelne Kampagne / Maßnahme (= eine Zeile im Excel). */
 export interface Kampagne {
   id: string;
+  /** Mandant / Land (z.B. DE, DK, NL, CH, AT). */
+  land: string;
   /** Quartal Q1–Q4 – wird aus weekStart abgeleitet, ist aber überschreibbar. */
   quartal: string;
   /** Kalenderwoche (1–53). */

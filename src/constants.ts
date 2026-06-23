@@ -52,3 +52,12 @@ export const KATEGORIEN = [
 ] as const;
 
 export const QUARTALE = ["Q1", "Q2", "Q3", "Q4"] as const;
+
+/** Mandanten / Länder. */
+export const MANDANTEN = [
+  { code: "DE", label: "dentalbauer.de" },
+  { code: "DK", label: "dentalbauer.dk" },
+  { code: "NL", label: "dentalbauer.nl" },
+  { code: "CH", label: "demadent.ch" },
+  { code: "AT", label: "austrodent.at" },
+] as const;

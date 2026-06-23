@@ -3,6 +3,7 @@ import type { Kampagne } from "../types";
 import {
   BEREICHE,
   KATEGORIEN,
+  MANDANTEN,
   QUARTALE,
   STATUS_LABELS,
   STATUS_REIHENFOLGE,
@@ -12,19 +13,21 @@ import type { Veranstaltung } from "../data/useVeranstaltungen";
 
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
+  mandant: string; // aktueller Mandant (Land) für neue Einträge
   kanaele: string[];
   subKanaele: string[];
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
   veranstaltungen: Veranstaltung[]; // angelegte Events zur Auswahl
   onNeueVeranstaltung: () => void; // „+ neue Veranstaltung" aus dem Eintrag heraus
-  onSave: (k: Kampagne) => void;
+  onSave: (k: Kampagne, spiegelLaender: string[]) => void;
   onClose: () => void;
 }
 
 function leereKampagne(): Kampagne {
   return {
     id: `c${Date.now()}`,
+    land: "DE",
     quartal: "Q1",
     kw: null,
     weekStart: null,
@@ -49,6 +52,7 @@ function leereKampagne(): Kampagne {
 
 export function KampagneEditor({
   kampagne,
+  mandant,
   kanaele,
   subKanaele,
   kampagnen,
@@ -58,9 +62,10 @@ export function KampagneEditor({
   onSave,
   onClose,
 }: Props) {
-  const [form, setForm] = useState<Kampagne>(kampagne ?? leereKampagne());
+  const [form, setForm] = useState<Kampagne>(kampagne ?? { ...leereKampagne(), land: mandant });
   const [versucht, setVersucht] = useState(false);
   const [eventAn, setEventAn] = useState<boolean>(() => !!(kampagne?.veranstaltung));
+  const [spiegeln, setSpiegeln] = useState<string[]>([]);
   const gewaehltesEvent = veranstaltungen.find((v) => v.kategorie === form.veranstaltung);
 
   const set = <K extends keyof Kampagne>(feld: K, wert: Kampagne[K]) =>
@@ -90,7 +95,7 @@ export function KampagneEditor({
       .split(/[/,]/)
       .map((o) => o.trim())
       .filter(Boolean);
-    onSave({ ...form, owners });
+    onSave({ ...form, owners }, spiegeln);
   };
 
   const label = "block text-sm font-medium text-slate-600 mb-1";
@@ -382,6 +387,49 @@ export function KampagneEditor({
                 )}
               </div>
             )}
+          </div>
+
+          {/* Mandant / Land: verschieben oder spiegeln */}
+          <div className="col-span-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={label}>Mandant (Land)</label>
+                <select className={input} value={form.land} onChange={(e) => set("land", e.target.value)}>
+                  {MANDANTEN.map((m) => (
+                    <option key={m.code} value={m.code}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Anderen Mandanten wählen = Eintrag verschieben
+                </p>
+              </div>
+              <div>
+                <label className={label}>Auch spiegeln nach (Kopie anlegen)</label>
+                <div className="flex flex-wrap gap-2">
+                  {MANDANTEN.filter((m) => m.code !== form.land).map((m) => {
+                    const an = spiegeln.includes(m.code);
+                    return (
+                      <button
+                        key={m.code}
+                        type="button"
+                        onClick={() =>
+                          setSpiegeln((s) =>
+                            an ? s.filter((x) => x !== m.code) : [...s, m.code],
+                          )
+                        }
+                        className={`rounded-full border px-2 py-1 text-xs ${
+                          an ? "border-marke bg-marke text-white" : "border-slate-300 text-slate-600"
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

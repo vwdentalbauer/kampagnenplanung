@@ -8,6 +8,7 @@ const SHEET = "Jahresübersicht";
 
 // Spaltenreihenfolge wie in der Original-Excel, plus Status & Kampagne am Ende.
 const KOPF = [
+  "Land",
   "Quartal",
   "Start KW",
   "MO",
@@ -57,6 +58,7 @@ export function exportExcel(kampagnen: Kampagne[]) {
     const bereiche: Record<string, string> = {};
     BEREICHE.forEach((b) => (bereiche[b] = k.bereiche.includes(b) ? "x" : ""));
     return {
+      Land: k.land,
       Quartal: k.quartal,
       "Start KW": k.kw ? `KW ${k.kw}` : "",
       ...tage,
@@ -119,6 +121,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const kopf = (matrix[0] as unknown[]).map((c) => normal(String(c ?? "")));
   const idx = (name: string) => kopf.indexOf(normal(name));
 
+  const cLand = idx("Land");
   const cQuartal = idx("Quartal");
   const cKw = idx("Start KW");
   const cMo = idx("MO");
@@ -162,6 +165,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
 
     ergebnis.push({
       id: `imp${Date.now()}_${r}`,
+      land: get(row, cLand) || "DE",
       quartal: get(row, cQuartal),
       kw: kwMatch ? Number(kwMatch[1]) : null,
       weekStart,

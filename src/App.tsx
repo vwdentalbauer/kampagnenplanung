@@ -4,7 +4,7 @@ import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
-import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
+import { MANDANTEN, ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
@@ -51,42 +51,59 @@ export default function App() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [mehrOffen, setMehrOffen] = useState(false);
   const [eventBand, setEventBand] = useState(true);
+  const [mandant, setMandant] = useState<string>(
+    () => localStorage.getItem("kampagnen.mandant.v1") ?? "DE",
+  );
+  const wechsleMandant = (code: string) => {
+    setMandant(code);
+    localStorage.setItem("kampagnen.mandant.v1", code);
+  };
 
   const aktuelleKw = getISOWeek(new Date());
-  const gefiltert = useMemo(() => kampagnen.filter((k) => passt(k, filter)), [kampagnen, filter]);
+
+  // Nur Einträge des aktuellen Mandanten (Land).
+  const mandantKampagnen = useMemo(
+    () => kampagnen.filter((k) => k.land === mandant),
+    [kampagnen, mandant],
+  );
+
+  const gefiltert = useMemo(
+    () => mandantKampagnen.filter((k) => passt(k, filter)),
+    [mandantKampagnen, filter],
+  );
 
   // Von den übrigen Filtern abhängige Auswahlwerte (Faceted Search).
   const facetten = useMemo(
     () => ({
-      quartale: facette(kampagnen, filter, "quartale"),
-      status: facette(kampagnen, filter, "status") as Status[],
-      kanaele: facette(kampagnen, filter, "kanaele"),
-      subkanaele: facette(kampagnen, filter, "subkanaele"),
-      owners: facette(kampagnen, filter, "owners"),
-      kampagnen: facette(kampagnen, filter, "kampagne"),
+      quartale: facette(mandantKampagnen, filter, "quartale"),
+      status: facette(mandantKampagnen, filter, "status") as Status[],
+      kanaele: facette(mandantKampagnen, filter, "kanaele"),
+      subkanaele: facette(mandantKampagnen, filter, "subkanaele"),
+      owners: facette(mandantKampagnen, filter, "owners"),
+      kampagnen: facette(mandantKampagnen, filter, "kampagne"),
     }),
-    [kampagnen, filter],
+    [mandantKampagnen, filter],
   );
 
   // „(leer)"-Optionen nur, wenn es leere Felder gibt.
   const leer = useMemo(
     () => ({
-      kanaele: gibtLeere(kampagnen, filter, "kanaele"),
-      subKanaele: gibtLeere(kampagnen, filter, "subkanaele"),
-      owners: gibtLeere(kampagnen, filter, "owners"),
-      kampagnen: gibtLeere(kampagnen, filter, "kampagne"),
+      kanaele: gibtLeere(mandantKampagnen, filter, "kanaele"),
+      subKanaele: gibtLeere(mandantKampagnen, filter, "subkanaele"),
+      owners: gibtLeere(mandantKampagnen, filter, "owners"),
+      kampagnen: gibtLeere(mandantKampagnen, filter, "kampagne"),
     }),
-    [kampagnen, filter],
+    [mandantKampagnen, filter],
   );
 
-  // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor).
-  const alleKanaele = useMemo(() => eindeutigeWerte(kampagnen, "kanal"), [kampagnen]);
+  // Vollständige Wertelisten (für die Eingabe-Dropdowns im Editor) – mandantweit.
+  const alleKanaele = useMemo(() => eindeutigeWerte(mandantKampagnen, "kanal"), [mandantKampagnen]);
   const alleSubKanaele = useMemo(() => {
     const set = new Set<string>();
-    kampagnen.forEach((k) => subKanalListe(k.subKanal).forEach((s) => set.add(s)));
+    mandantKampagnen.forEach((k) => subKanalListe(k.subKanal).forEach((s) => set.add(s)));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [kampagnen]);
-  const alleKampagnen = useMemo(() => eindeutigeWerte(kampagnen, "kampagne"), [kampagnen]);
+  }, [mandantKampagnen]);
+  const alleKampagnen = useMemo(() => eindeutigeWerte(mandantKampagnen, "kampagne"), [mandantKampagnen]);
   // Angelegte Veranstaltungen als Liste (für Auswahl im Eintrag + Editor).
   const veranstaltungenListe = useMemo<Veranstaltung[]>(
     () =>
@@ -111,21 +128,21 @@ export default function App() {
   );
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
-    kampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
+    mandantKampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [kampagnen]);
+  }, [mandantKampagnen]);
 
   // Vollständige Vorschläge für die Inline-Bearbeitung – unabhängig vom Filter.
   const vorschlaege = useMemo(() => {
     const details = new Set<string>();
-    kampagnen.forEach((k) => k.details.trim() && details.add(k.details.trim()));
+    mandantKampagnen.forEach((k) => k.details.trim() && details.add(k.details.trim()));
     return {
       kanal: alleKanaele,
       subKanal: alleSubKanaele,
       kampagne: alleKampagnen,
       details: [...details].sort((a, b) => a.localeCompare(b, "de")),
     };
-  }, [kampagnen, alleKanaele, alleSubKanaele, alleKampagnen]);
+  }, [mandantKampagnen, alleKanaele, alleSubKanaele, alleKampagnen]);
 
   const statusZaehler = useMemo(() => {
     const z: Record<Status, number> = { geplant: 0, in_arbeit: 0, erledigt: 0, abgesagt: 0 };
@@ -133,8 +150,17 @@ export default function App() {
     return z;
   }, [gefiltert]);
 
-  const onSave = (k: Kampagne) => {
+  const onSave = (k: Kampagne, spiegelLaender: string[] = []) => {
     speichern(k);
+    // Spiegeln: Kopien in anderen Mandanten anlegen.
+    if (spiegelLaender.length) {
+      const kopien = spiegelLaender.map((land, i) => ({
+        ...k,
+        id: `c${Date.now()}${i}`,
+        land,
+      }));
+      speichernViele(kopien);
+    }
     setEditor({ offen: false, kampagne: null });
   };
   const onDelete = (id: string) => {
@@ -223,11 +249,27 @@ export default function App() {
           <div>
             <h1 className="text-2xl font-bold text-marke">Kampagnenplanung 2026</h1>
             <p className="text-sm text-slate-500">
-              {kampagnen.length} Maßnahmen · Ersatz für den Excel-Jahresplan
+              {mandantKampagnen.length} Einträge ·{" "}
+              {MANDANTEN.find((m) => m.code === mandant)?.label ?? mandant}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3 text-sm">
+          {/* Mandanten-Umschalter: gut sichtbar, aber dezent */}
+          <label className="flex items-center gap-1 rounded-md border border-marke/40 bg-marke/5 px-2 py-1">
+            <span className="text-marke-dark">🌐</span>
+            <select
+              value={mandant}
+              onChange={(e) => wechsleMandant(e.target.value)}
+              className="bg-transparent text-sm font-medium text-marke-dark focus:outline-none"
+            >
+              {MANDANTEN.map((m) => (
+                <option key={m.code} value={m.code}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <span className="text-slate-500">{nutzer.name}</span>
           {istAdmin && (
             <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
@@ -269,23 +311,10 @@ export default function App() {
 
       {/* Steuerleiste */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
-            {tab("tabelle", "📋 Tabelle")}
-            {tab("ziel", "📣 Kampagne")}
-            {tab("event", "🎟 Veranstaltungen")}
-          </div>
-          <button
-            onClick={() => setEventBand((v) => !v)}
-            title="Veranstaltungen in der Tabelle ein-/ausblenden"
-            className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
-              eventBand
-                ? "border-marke bg-marke/10 text-marke-dark"
-                : "border-slate-300 bg-white text-slate-500"
-            }`}
-          >
-            🎟 Veranstaltungen {eventBand ? "ausblenden" : "einblenden"}
-          </button>
+        <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
+          {tab("tabelle", "📋 Tabelle")}
+          {tab("ziel", "📣 Kampagne")}
+          {tab("event", "🎟 Veranstaltungen")}
         </div>
         <div className="flex items-center gap-2">
           {/* Dezentes „Mehr"-Menü: Excel & Daten */}
@@ -384,24 +413,41 @@ export default function App() {
       {!geladen ? (
         <p className="py-10 text-center text-slate-400">Lädt…</p>
       ) : ansicht === "tabelle" ? (
-        <TabellenAnsicht
-          kampagnen={gefiltert}
-          darfBearbeiten={darfBearbeiten}
-          kanaele={eindeutigeWerte(kampagnen, "kanal")}
-          vorschlaege={vorschlaege}
-          eventZeilen={eventBand ? subEvents : []}
-          onEventClick={() => setAnsicht("event")}
-          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
-          onBulkUpdate={onBulkUpdate}
-          onBulkDelete={onBulkDelete}
-        />
+        <>
+          {subEvents.length > 0 && (
+            <div className="mb-2 flex justify-end">
+              <button
+                onClick={() => setEventBand((v) => !v)}
+                title="Veranstaltungen in der Tabelle ein-/ausblenden"
+                className={`rounded-md border px-3 py-1 text-xs font-medium ${
+                  eventBand
+                    ? "border-marke bg-marke/10 text-marke-dark"
+                    : "border-slate-300 bg-white text-slate-500"
+                }`}
+              >
+                🎟 Veranstaltungen {eventBand ? "ausblenden" : "einblenden"}
+              </button>
+            </div>
+          )}
+          <TabellenAnsicht
+            kampagnen={gefiltert}
+            darfBearbeiten={darfBearbeiten}
+            kanaele={alleKanaele}
+            vorschlaege={vorschlaege}
+            eventZeilen={eventBand ? subEvents : []}
+            onEventClick={() => setAnsicht("event")}
+            onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+            onBulkUpdate={onBulkUpdate}
+            onBulkDelete={onBulkDelete}
+          />
+        </>
       ) : ansicht === "ziel" ? (
         <ZielAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
-          kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          kanaele={alleKanaele}
           vorschlaege={vorschlaege}
           epics={epics}
           onZeitraum={setZeitraum}
@@ -415,7 +461,7 @@ export default function App() {
         <VeranstaltungenAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
-          kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          kanaele={alleKanaele}
           vorschlaege={vorschlaege}
           events={events}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
@@ -430,6 +476,7 @@ export default function App() {
       {editor.offen && (
         <KampagneEditor
           kampagne={editor.kampagne}
+          mandant={mandant}
           kanaele={alleKanaele}
           subKanaele={alleSubKanaele}
           kampagnen={alleKampagnen}

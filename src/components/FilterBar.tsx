@@ -94,28 +94,32 @@ export function FilterBar({
           suchbar
         />
 
-        <button
-          onClick={() => upd({ pluline: !filter.pluline })}
-          title="Nur PLULINE-Einträge"
-          className={`rounded border px-2 py-1.5 text-sm font-medium ${
-            filter.pluline
-              ? "border-[#00a2d3] bg-[#00a2d3] text-white"
-              : "border-slate-300 bg-white text-[#00a2d3]"
-          }`}
-        >
-          PLU°LINE
-        </button>
-        <button
-          onClick={() => upd({ wkz: !filter.wkz })}
-          title="Nur WKZ-Einträge"
-          className={`rounded border px-2 py-1.5 text-sm font-medium ${
-            filter.wkz
-              ? "border-slate-700 bg-slate-700 text-white"
-              : "border-slate-300 bg-white text-slate-700"
-          }`}
-        >
-          WKZ
-        </button>
+        {/* abgesetzte Schnellfilter PLULINE / WKZ */}
+        <span className="mx-1 h-7 w-px bg-slate-300" />
+        <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-2 py-1">
+          <button
+            onClick={() => upd({ pluline: !filter.pluline })}
+            title="Nur PLULINE-Einträge"
+            className={`rounded border px-2 py-1 text-sm font-medium ${
+              filter.pluline
+                ? "border-[#00a2d3] bg-[#00a2d3] text-white"
+                : "border-slate-300 bg-white text-[#00a2d3]"
+            }`}
+          >
+            PLU°LINE
+          </button>
+          <button
+            onClick={() => upd({ wkz: !filter.wkz })}
+            title="Nur WKZ-Einträge"
+            className={`rounded border px-2 py-1 text-sm font-medium ${
+              filter.wkz
+                ? "border-slate-700 bg-slate-700 text-white"
+                : "border-slate-300 bg-white text-slate-700"
+            }`}
+          >
+            WKZ
+          </button>
+        </div>
 
         {anzahl > 0 && (
           <button

@@ -37,6 +37,7 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
     const kampagne = leerWerte.includes(basis.toLowerCase()) ? "" : basis;
     return {
       ...k,
+      land: k.land ?? "DE",
       kampagne,
       endDatum: k.endDatum ?? null,
       subKanal: k.subKanal ?? "",
