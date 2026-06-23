@@ -15,7 +15,13 @@ function leer(): Veranstaltung {
 }
 
 function neueSub(): SubEvent {
-  return { id: `s${Date.now()}${Math.random().toString(36).slice(2, 6)}`, ort: "", start: null, ende: null };
+  return {
+    id: `s${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+    name: "",
+    ort: "",
+    start: null,
+    ende: null,
+  };
 }
 
 export function VeranstaltungEditor({ veranstaltung, orte, onSave, onDelete, onClose }: Props) {
@@ -103,7 +109,16 @@ export function VeranstaltungEditor({ veranstaltung, orte, onSave, onDelete, onC
             <div className="space-y-2">
               {form.subs.map((s) => (
                 <div key={s.id} className="flex flex-wrap items-end gap-2 rounded-lg border border-slate-200 p-2">
-                  <div className="flex-1">
+                  <div className="min-w-[140px] flex-1">
+                    <label className="mb-0.5 block text-xs text-slate-500">Event-Name</label>
+                    <input
+                      className={input}
+                      placeholder="z.B. Fachdental Südwest"
+                      value={s.name}
+                      onChange={(e) => setSub(s.id, { name: e.target.value })}
+                    />
+                  </div>
+                  <div className="min-w-[120px] flex-1">
                     <label className="mb-0.5 block text-xs text-slate-500">Ort</label>
                     <input
                       className={input}

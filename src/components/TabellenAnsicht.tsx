@@ -22,7 +22,14 @@ interface Props {
   /** Spalten, die in dieser Instanz ausgeblendet werden (z.B. im Kampagne-Reiter). */
   ausblenden?: SpaltenKey[];
   /** Sub-Veranstaltungen als halbhohe Zeilen einsortieren (nur Haupttabelle). */
-  eventZeilen?: { id: string; kat: string; ort: string; start: string | null; ende: string | null }[];
+  eventZeilen?: {
+    id: string;
+    kat: string;
+    name?: string;
+    ort: string;
+    start: string | null;
+    ende: string | null;
+  }[];
   onEventClick?: () => void;
 }
 
@@ -517,6 +524,7 @@ export function TabellenAnsicht({
                         className="flex w-full items-center gap-2 text-xs text-marke-dark hover:underline"
                       >
                         🎟 <span className="font-semibold">{e.kat}</span>
+                        {e.name && <span className="text-slate-600">· {e.name}</span>}
                         {e.ort && <span className="text-slate-500">· {e.ort}</span>}
                         {e.start && (
                           <span className="text-slate-500">

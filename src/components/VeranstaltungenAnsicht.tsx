@@ -65,8 +65,8 @@ export function VeranstaltungenAnsicht(props: Props) {
     />
   );
 
-  const subLabel = (s: { ort: string; start: string | null; ende: string | null }) =>
-    `${s.ort || "ohne Ort"}${s.start ? ` · ${formatDatum(s.start)}` : ""}${
+  const subLabel = (s: { name?: string; ort: string; start: string | null; ende: string | null }) =>
+    `${s.name ? `${s.name} – ` : ""}${s.ort || "ohne Ort"}${s.start ? ` · ${formatDatum(s.start)}` : ""}${
       s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""
     }`;
 
@@ -149,6 +149,7 @@ export function VeranstaltungenAnsicht(props: Props) {
                       </span>
                     )}
                     <span className="font-medium text-slate-800">{kat}</span>
+                    {sub.name && <span className="text-sm text-slate-600">{sub.name}</span>}
                     {sub.ort && <span className="text-xs text-slate-500">📍 {sub.ort}</span>}
                     {typ && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{typ}</span>}
                   </div>

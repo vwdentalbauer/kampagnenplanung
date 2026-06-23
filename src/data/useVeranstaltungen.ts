@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export interface SubEvent {
   id: string;
+  name: string;
   ort: string;
   start: string | null;
   ende: string | null;
@@ -35,11 +36,11 @@ function migriereFlach(roh: Record<string, AltMeta>): Record<string, EventMeta> 
   const out: Record<string, EventMeta> = {};
   for (const [kat, m] of Object.entries(roh)) {
     if (Array.isArray(m.subs)) {
-      out[kat] = { typ: m.typ ?? "", subs: m.subs };
+      out[kat] = { typ: m.typ ?? "", subs: m.subs.map((s) => ({ ...s, name: s.name ?? "" })) };
     } else {
       const sub: SubEvent[] =
         m.ort || m.start
-          ? [{ id: `s${Date.now()}_${kat}`, ort: m.ort ?? "", start: m.start ?? null, ende: m.ende ?? null }]
+          ? [{ id: `s${Date.now()}_${kat}`, name: "", ort: m.ort ?? "", start: m.start ?? null, ende: m.ende ?? null }]
           : [];
       out[kat] = { typ: m.typ ?? "", subs: sub };
     }

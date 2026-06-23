@@ -374,6 +374,7 @@ export function KampagneEditor({
                           <option value="">– Ort/Termin wählen (optional) –</option>
                           {gewaehltesEvent.subs.map((s) => (
                             <option key={s.id} value={s.id}>
+                              {s.name ? `${s.name} – ` : ""}
                               {s.ort || "ohne Ort"}
                               {s.start ? ` · ${formatDatum(s.start)}` : ""}
                               {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
