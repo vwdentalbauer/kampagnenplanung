@@ -9,6 +9,7 @@ interface Props {
   kampagnen: Kampagne[];
   darfBearbeiten: boolean;
   kanaele: string[];
+  vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
   events: Record<string, EventMeta>;
   onEditEvent: (kategorie: string) => void;
   onEdit: (k: Kampagne) => void;
@@ -22,6 +23,7 @@ export function VeranstaltungenAnsicht({
   kampagnen,
   darfBearbeiten,
   kanaele,
+  vorschlaege,
   events,
   onEditEvent,
   onEdit,
@@ -130,6 +132,7 @@ export function VeranstaltungenAnsicht({
                     kampagnen={g.tasks}
                     darfBearbeiten={darfBearbeiten}
                     kanaele={kanaele}
+                    vorschlaege={vorschlaege}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onUpdate={onUpdate}

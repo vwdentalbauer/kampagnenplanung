@@ -26,6 +26,8 @@ const KOPF = [
   "Ziel",
   "„db 4+1“",
   ...BEREICHE,
+  "PLULINE",
+  "WKZ",
   "Veranstaltung",
   "Verantwortung",
   "Status",
@@ -67,6 +69,8 @@ export function exportExcel(kampagnen: Kampagne[]) {
       Ziel: k.ziel,
       "„db 4+1“": k.kategorie,
       ...bereiche,
+      PLULINE: k.pluline ? "x" : "",
+      WKZ: k.wkz ? "x" : "",
       Veranstaltung: k.veranstaltung,
       Verantwortung: k.verantwortung,
       Status: STATUS_LABELS[k.status],
@@ -130,6 +134,8 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
   const cStatus = idx("Status");
   const cKampagne = idx("Kampagne");
   const cVeranstaltung = idx("Veranstaltung");
+  const cPluline = idx("PLULINE");
+  const cWkz = idx("WKZ");
   const bereichIdx = BEREICHE.map((b) => idx(b));
 
   const get = (row: unknown[], i: number): string =>
@@ -168,6 +174,8 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       ziel: get(row, cZiel),
       kategorie: get(row, cKat),
       bereiche,
+      pluline: get(row, cPluline).toLowerCase() === "x",
+      wkz: get(row, cWkz).toLowerCase() === "x",
       veranstaltung: get(row, cVeranstaltung),
       verantwortung: verant,
       owners,

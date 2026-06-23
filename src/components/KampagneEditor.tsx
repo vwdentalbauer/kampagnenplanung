@@ -37,6 +37,8 @@ function leereKampagne(): Kampagne {
     ziel: "",
     kategorie: "db Kampagnen",
     bereiche: [],
+    pluline: false,
+    wkz: false,
     veranstaltung: "",
     verantwortung: "",
     owners: [],
@@ -279,6 +281,27 @@ export function KampagneEditor({
                 );
               })}
             </div>
+          </div>
+
+          <div className="col-span-2 flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                className="accent-[#E72F89]"
+                checked={form.pluline}
+                onChange={(e) => set("pluline", e.target.checked)}
+              />
+              PLU°LINE (Eigenmarke)
+            </label>
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                className="accent-slate-700"
+                checked={form.wkz}
+                onChange={(e) => set("wkz", e.target.checked)}
+              />
+              WKZ
+            </label>
           </div>
 
           {/* Veranstaltung (Event) verknüpfen */}

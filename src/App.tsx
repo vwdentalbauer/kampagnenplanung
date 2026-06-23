@@ -104,6 +104,18 @@ export default function App() {
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [kampagnen]);
 
+  // Vollständige Vorschläge für die Inline-Bearbeitung – unabhängig vom Filter.
+  const vorschlaege = useMemo(() => {
+    const details = new Set<string>();
+    kampagnen.forEach((k) => k.details.trim() && details.add(k.details.trim()));
+    return {
+      kanal: alleKanaele,
+      subKanal: alleSubKanaele,
+      kampagne: alleKampagnen,
+      details: [...details].sort((a, b) => a.localeCompare(b, "de")),
+    };
+  }, [kampagnen, alleKanaele, alleSubKanaele, alleKampagnen]);
+
   const statusZaehler = useMemo(() => {
     const z: Record<Status, number> = { geplant: 0, in_arbeit: 0, erledigt: 0, abgesagt: 0 };
     gefiltert.forEach((k) => z[k.status]++);
@@ -351,6 +363,7 @@ export default function App() {
             kampagnen={gefiltert}
             darfBearbeiten={darfBearbeiten}
             kanaele={eindeutigeWerte(kampagnen, "kanal")}
+            vorschlaege={vorschlaege}
             onEdit={(k) => setEditor({ offen: true, kampagne: k })}
             onDelete={onDelete}
             onUpdate={onUpdate}
@@ -363,6 +376,7 @@ export default function App() {
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
           kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          vorschlaege={vorschlaege}
           epics={epics}
           onZeitraum={setZeitraum}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}
@@ -376,6 +390,7 @@ export default function App() {
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
           kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          vorschlaege={vorschlaege}
           events={events}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
           onEdit={(k) => setEditor({ offen: true, kampagne: k })}

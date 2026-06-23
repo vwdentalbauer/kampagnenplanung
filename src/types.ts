@@ -31,6 +31,10 @@ export interface Kampagne {
   kategorie: string;
   /** Betroffene Marken/Bereiche (Brand, MIZ, EV, TS, Planung, Exi, DSO). */
   bereiche: string[];
+  /** Eigenmarke PLULINE. */
+  pluline: boolean;
+  /** WKZ-Markierung. */
+  wkz: boolean;
   /** Verknüpfte Veranstaltung (= deren Kategorie/Name). Leer = kein Event. */
   veranstaltung: string;
   /** Verantwortung als Freitext (Originalwert aus Excel). */

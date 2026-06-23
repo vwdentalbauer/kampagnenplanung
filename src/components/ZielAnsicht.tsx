@@ -10,6 +10,7 @@ interface Props {
   kampagnen: Kampagne[];
   darfBearbeiten: boolean;
   kanaele: string[];
+  vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
   epics: Record<string, EpicMeta>;
   onZeitraum: (name: string, start: string | null, ende: string | null) => void;
   onEdit: (k: Kampagne) => void;
@@ -37,6 +38,7 @@ export function ZielAnsicht({
   kampagnen,
   darfBearbeiten,
   kanaele,
+  vorschlaege,
   epics,
   onZeitraum,
   onEdit,
@@ -90,6 +92,7 @@ export function ZielAnsicht({
       kampagnen={tasks}
       darfBearbeiten={darfBearbeiten}
       kanaele={kanaele}
+      vorschlaege={vorschlaege}
       onEdit={onEdit}
       onDelete={onDelete}
       onUpdate={onUpdate}

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { Kampagne, Status } from "../types";
 import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
-import { subKanalListe } from "../lib/filter";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
@@ -18,6 +17,8 @@ interface Props {
   onUpdate: (k: Kampagne, patch: Partial<Kampagne>) => void;
   onBulkUpdate: (ids: string[], patch: Partial<Kampagne>) => void;
   onBulkDelete: (ids: string[]) => void;
+  /** Vollständige Vorschlagslisten (unabhängig vom aktiven Filter). */
+  vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
   /** Spalten, die in dieser Instanz ausgeblendet werden (z.B. im Kampagne-Reiter). */
   ausblenden?: SpaltenKey[];
 }
@@ -25,6 +26,7 @@ interface Props {
 // Verschiebbare Spalten. „Kampagne" und „Details" stehen hinter „Datum".
 type SpaltenKey =
   | "kw"
+  | "flags"
   | "datum"
   | "kampagne"
   | "details"
@@ -37,6 +39,7 @@ type SpaltenKey =
 // Default-Breiten (px). Per Drag am Spaltenrand individuell anpassbar.
 const SPALTEN: Record<SpaltenKey, { label: string; breite: number }> = {
   kw: { label: "KW", breite: 56 },
+  flags: { label: "Marker", breite: 64 },
   datum: { label: "Datum", breite: 104 },
   kampagne: { label: "Kampagne", breite: 170 },
   details: { label: "Details", breite: 280 },
@@ -64,6 +67,7 @@ function ladeBreiten(): Record<SpaltenKey, number> {
 
 const STANDARD_REIHENFOLGE: SpaltenKey[] = [
   "kw",
+  "flags",
   "datum",
   "kampagne",
   "details",
@@ -74,7 +78,7 @@ const STANDARD_REIHENFOLGE: SpaltenKey[] = [
   "status",
 ];
 
-const SPALTEN_KEY = "kampagnen.spalten.v3";
+const SPALTEN_KEY = "kampagnen.spalten.v4";
 
 function ladeReihenfolge(): SpaltenKey[] {
   try {
@@ -101,6 +105,8 @@ function sortWert(key: SpaltenKey, k: Kampagne): number | string {
   switch (key) {
     case "kw":
       return k.kw ?? Number.POSITIVE_INFINITY;
+    case "flags":
+      return (k.pluline ? 2 : 0) + (k.wkz ? 1 : 0);
     case "datum":
       return k.weekStart ?? "";
     case "status":
@@ -129,6 +135,7 @@ export function TabellenAnsicht({
   onUpdate,
   onBulkUpdate,
   onBulkDelete,
+  vorschlaege,
   ausblenden,
 }: Props) {
   const [reihenfolge, setReihenfolge] = useState<SpaltenKey[]>(ladeReihenfolge);
@@ -171,26 +178,10 @@ export function TabellenAnsicht({
     window.addEventListener("mouseup", ende);
   };
 
-  // Vorlagen für die Details-Spalte (eindeutige, nicht-leere Texte).
-  const vorlagen = useMemo(() => {
-    const set = new Set<string>();
-    kampagnen.forEach((k) => k.details.trim() && set.add(k.details.trim()));
-    return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [kampagnen]);
-
-  // Vorschläge (Autocomplete) für die Kampagne-Spalte.
-  const kampagneVorschlaege = useMemo(() => {
-    const set = new Set<string>();
-    kampagnen.forEach((k) => k.kampagne.trim() && set.add(k.kampagne.trim()));
-    return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [kampagnen]);
-
-  // Vorschläge für Sub-Kanal (nur aus vorhandenen Werten, einzeln).
-  const subKanalVorschlaege = useMemo(() => {
-    const set = new Set<string>();
-    kampagnen.forEach((k) => subKanalListe(k.subKanal).forEach((s) => set.add(s)));
-    return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [kampagnen]);
+  // Vollständige Vorschläge kommen als Prop (unabhängig vom aktiven Filter).
+  const vorlagen = vorschlaege.details;
+  const kampagneVorschlaege = vorschlaege.kampagne;
+  const subKanalVorschlaege = vorschlaege.subKanal;
 
   // Sortierte Liste für die Anzeige.
   const sortiert = useMemo(() => {
@@ -271,6 +262,27 @@ export function TabellenAnsicht({
             <div className="px-1.5 text-xs text-slate-400">{k.quartal}</div>
           </>
         );
+      case "flags":
+        return (
+          <div className="flex flex-wrap gap-1 px-1">
+            {k.pluline && (
+              <span
+                title="PLU°LINE"
+                className="rounded bg-[#E72F89] px-1 text-[10px] font-bold leading-4 text-white"
+              >
+                P
+              </span>
+            )}
+            {k.wkz && (
+              <span
+                title="WKZ"
+                className="rounded bg-slate-700 px-1 text-[10px] font-bold leading-4 text-white"
+              >
+                WKZ
+              </span>
+            )}
+          </div>
+        );
       case "datum":
         return (
           <div>
@@ -314,7 +326,11 @@ export function TabellenAnsicht({
         );
       case "kanal":
         return darfBearbeiten ? (
-          <EditableCell value={k.kanal} onCommit={(v) => onUpdate(k, { kanal: v })} />
+          <EditableCell
+            value={k.kanal}
+            vorschlaege={vorschlaege.kanal}
+            onCommit={(v) => onUpdate(k, { kanal: v })}
+          />
         ) : (
           <span className="px-1.5">{k.kanal}</span>
         );

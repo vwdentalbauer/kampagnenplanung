@@ -43,6 +43,8 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
       veranstaltung: k.veranstaltung ?? "",
       // „Events" ist keine Sparte mehr -> aus bestehenden Daten entfernen.
       bereiche: (k.bereiche ?? []).filter((b) => b !== "Events"),
+      pluline: k.pluline ?? false,
+      wkz: k.wkz ?? false,
       // Kategorie umbenannt: „Hero Kampagne" -> „WKZ".
       kategorie: k.kategorie === "Hero Kampagne" ? "WKZ" : k.kategorie,
     };

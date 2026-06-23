@@ -110,6 +110,29 @@ export function FilterBar({
           ))}
         </select>
 
+        <button
+          onClick={() => upd({ pluline: !filter.pluline })}
+          title="Nur PLULINE-Einträge"
+          className={`rounded border px-2 py-1.5 text-sm font-medium ${
+            filter.pluline
+              ? "border-[#E72F89] bg-[#E72F89] text-white"
+              : "border-slate-300 bg-white text-[#E72F89]"
+          }`}
+        >
+          PLU°LINE
+        </button>
+        <button
+          onClick={() => upd({ wkz: !filter.wkz })}
+          title="Nur WKZ-Einträge"
+          className={`rounded border px-2 py-1.5 text-sm font-medium ${
+            filter.wkz
+              ? "border-slate-700 bg-slate-700 text-white"
+              : "border-slate-300 bg-white text-slate-700"
+          }`}
+        >
+          WKZ
+        </button>
+
         {anzahl > 0 && (
           <button
             onClick={() => setFilter(LEERER_FILTER)}
