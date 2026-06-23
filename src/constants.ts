@@ -41,7 +41,7 @@ export const BEREICHE = [
 ] as const;
 
 /** Auswahl der Event-Typen (Sparte „Events"). */
-export const EVENT_TYPEN = ["Messe", "Seminar", "Webinar", "Kongress"] as const;
+export const EVENT_TYPEN = ["Messe", "Seminar", "Webinar", "Kongress", "Fortbildung", "Tagung"] as const;
 
 export const KATEGORIEN = [
   "db Kampagnen",

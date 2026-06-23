@@ -16,8 +16,12 @@ export interface Veranstaltung extends EventMeta {
   kategorie: string;
 }
 
-const KEY = "kampagnen.veranstaltungen.v2";
-const ALT_KEY = "kampagnen.veranstaltungen.v1";
+// Pro Land: { kategorie -> EventMeta }
+type ProLand = Record<string, Record<string, EventMeta>>;
+
+const KEY = "kampagnen.veranstaltungen.v3";
+const ALT_V2 = "kampagnen.veranstaltungen.v2";
+const ALT_V1 = "kampagnen.veranstaltungen.v1";
 
 interface AltMeta {
   typ?: string;
@@ -27,13 +31,12 @@ interface AltMeta {
   subs?: SubEvent[];
 }
 
-function migriere(roh: Record<string, AltMeta>): Record<string, EventMeta> {
+function migriereFlach(roh: Record<string, AltMeta>): Record<string, EventMeta> {
   const out: Record<string, EventMeta> = {};
   for (const [kat, m] of Object.entries(roh)) {
     if (Array.isArray(m.subs)) {
       out[kat] = { typ: m.typ ?? "", subs: m.subs };
     } else {
-      // altes Format (eine Veranstaltung = ein Ort/Datum) -> eine Sub-Veranstaltung
       const sub: SubEvent[] =
         m.ort || m.start
           ? [{ id: `s${Date.now()}_${kat}`, ort: m.ort ?? "", start: m.start ?? null, ende: m.ende ?? null }]
@@ -44,16 +47,18 @@ function migriere(roh: Record<string, AltMeta>): Record<string, EventMeta> {
   return out;
 }
 
-function load(): Record<string, EventMeta> {
+function load(): ProLand {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw) as Record<string, EventMeta>;
-    // Einmalige Migration aus v1
-    const alt = localStorage.getItem(ALT_KEY);
-    if (alt) {
-      const migr = migriere(JSON.parse(alt) as Record<string, AltMeta>);
-      localStorage.setItem(KEY, JSON.stringify(migr));
-      return migr;
+    if (raw) return JSON.parse(raw) as ProLand;
+    // Migration: bisherige (flache) Veranstaltungen gehören alle zu „DE".
+    const v2 = localStorage.getItem(ALT_V2);
+    const v1 = localStorage.getItem(ALT_V1);
+    if (v2 || v1) {
+      const flach = migriereFlach(JSON.parse((v2 ?? v1)!) as Record<string, AltMeta>);
+      const proLand: ProLand = { DE: flach };
+      localStorage.setItem(KEY, JSON.stringify(proLand));
+      return proLand;
     }
     return {};
   } catch {
@@ -62,31 +67,31 @@ function load(): Record<string, EventMeta> {
 }
 
 /**
- * Veranstaltungen als eigene Objekte mit Sub-Veranstaltungen (Ort/Datum).
- * Schlüssel = Kategorie/Name. Einträge verlinken über `veranstaltung` (Kategorie)
- * und `subEvent` (Sub-Veranstaltungs-ID).
+ * Veranstaltungen je Mandant (Land). Schlüssel: land -> kategorie -> EventMeta.
  */
 export function useVeranstaltungen() {
-  const [events, setEvents] = useState<Record<string, EventMeta>>(load);
+  const [alle, setAlle] = useState<ProLand>(load);
 
-  const speichern = (v: Veranstaltung, vorherigeKategorie?: string) => {
-    setEvents((prev) => {
-      const next = { ...prev };
-      if (vorherigeKategorie && vorherigeKategorie !== v.kategorie) delete next[vorherigeKategorie];
-      next[v.kategorie] = { typ: v.typ, subs: v.subs };
+  const speichern = (land: string, v: Veranstaltung, vorherigeKategorie?: string) => {
+    setAlle((prev) => {
+      const landMap = { ...(prev[land] ?? {}) };
+      if (vorherigeKategorie && vorherigeKategorie !== v.kategorie) delete landMap[vorherigeKategorie];
+      landMap[v.kategorie] = { typ: v.typ, subs: v.subs };
+      const next = { ...prev, [land]: landMap };
       localStorage.setItem(KEY, JSON.stringify(next));
       return next;
     });
   };
 
-  const loeschen = (kategorie: string) => {
-    setEvents((prev) => {
-      const next = { ...prev };
-      delete next[kategorie];
+  const loeschen = (land: string, kategorie: string) => {
+    setAlle((prev) => {
+      const landMap = { ...(prev[land] ?? {}) };
+      delete landMap[kategorie];
+      const next = { ...prev, [land]: landMap };
       localStorage.setItem(KEY, JSON.stringify(next));
       return next;
     });
   };
 
-  return { events, speichern, loeschen };
+  return { alle, speichern, loeschen };
 }

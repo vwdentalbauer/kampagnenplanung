@@ -19,7 +19,7 @@ interface Props {
   kampagnen: string[]; // vorhandene Kampagnen-Namen (Vorschläge)
   verantwortliche: string[];
   veranstaltungen: Veranstaltung[]; // angelegte Events zur Auswahl
-  onNeueVeranstaltung: () => void; // „+ neue Veranstaltung" aus dem Eintrag heraus
+  onNeueVeranstaltung: (kategorie?: string) => void; // Veranstaltung/Sub anlegen aus dem Eintrag
   onSave: (k: Kampagne, spiegelLaender: string[]) => void;
   onClose: () => void;
 }
@@ -332,7 +332,7 @@ export function KampagneEditor({
                     Noch keine Veranstaltung angelegt.{" "}
                     <button
                       type="button"
-                      onClick={onNeueVeranstaltung}
+                      onClick={() => onNeueVeranstaltung()}
                       className="font-medium text-marke-dark hover:underline"
                     >
                       + Neue Veranstaltung anlegen
@@ -357,7 +357,7 @@ export function KampagneEditor({
                       </select>
                       <button
                         type="button"
-                        onClick={onNeueVeranstaltung}
+                        onClick={() => onNeueVeranstaltung()}
                         className="whitespace-nowrap rounded border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
                       >
                         + Neu
@@ -365,20 +365,30 @@ export function KampagneEditor({
                     </div>
 
                     {gewaehltesEvent && (
-                      <select
-                        className={input}
-                        value={form.subEvent}
-                        onChange={(e) => set("subEvent", e.target.value)}
-                      >
-                        <option value="">– Ort/Termin wählen (optional) –</option>
-                        {gewaehltesEvent.subs.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.ort || "ohne Ort"}
-                            {s.start ? ` · ${formatDatum(s.start)}` : ""}
-                            {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <select
+                          className={input}
+                          value={form.subEvent}
+                          onChange={(e) => set("subEvent", e.target.value)}
+                        >
+                          <option value="">– Ort/Termin wählen (optional) –</option>
+                          {gewaehltesEvent.subs.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.ort || "ohne Ort"}
+                              {s.start ? ` · ${formatDatum(s.start)}` : ""}
+                              {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => onNeueVeranstaltung(form.veranstaltung)}
+                          title="Ort/Termin zu dieser Veranstaltung hinzufügen"
+                          className="whitespace-nowrap rounded border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+                        >
+                          + Ort/Termin
+                        </button>
+                      </div>
                     )}
                     {gewaehltesEvent && gewaehltesEvent.typ && (
                       <p className="text-xs text-slate-500">Typ: {gewaehltesEvent.typ}</p>

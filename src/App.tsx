@@ -31,7 +31,11 @@ export default function App() {
     zuruecksetzen,
   } = useKampagnen();
   const { epics, setZeitraum } = useEpics();
-  const { events, speichern: speichernEvent, loeschen: loeschenEvent } = useVeranstaltungen();
+  const {
+    alle: alleEvents,
+    speichern: speichernEvent,
+    loeschen: loeschenEvent,
+  } = useVeranstaltungen();
 
   const [ansicht, setAnsicht] = useState<Ansicht>("tabelle");
   const [eventEditor, setEventEditor] = useState<{ offen: boolean; kategorie: string | null }>({
@@ -66,6 +70,8 @@ export default function App() {
     () => kampagnen.filter((k) => k.land === mandant),
     [kampagnen, mandant],
   );
+  // Veranstaltungen des aktuellen Mandanten.
+  const events = useMemo(() => alleEvents[mandant] ?? {}, [alleEvents, mandant]);
 
   const gefiltert = useMemo(
     () => mandantKampagnen.filter((k) => passt(k, filter)),
@@ -167,9 +173,9 @@ export default function App() {
     if (confirm("Kampagne wirklich löschen?")) loeschen(id);
   };
 
-  // Veranstaltungen (Events)
+  // Veranstaltungen (Events) – immer im aktuellen Mandanten.
   const onSaveEvent = (v: Veranstaltung, vorher?: string) => {
-    speichernEvent(v, vorher);
+    speichernEvent(mandant, v, vorher);
     setEventEditor({ offen: false, kategorie: null });
   };
 
@@ -482,7 +488,9 @@ export default function App() {
           kampagnen={alleKampagnen}
           verantwortliche={alleOwners}
           veranstaltungen={veranstaltungenListe}
-          onNeueVeranstaltung={() => setEventEditor({ offen: true, kategorie: null })}
+          onNeueVeranstaltung={(kategorie) =>
+            setEventEditor({ offen: true, kategorie: kategorie ?? null })
+          }
           onSave={onSave}
           onClose={() => setEditor({ offen: false, kampagne: null })}
         />
@@ -497,7 +505,7 @@ export default function App() {
           }
           orte={eventOrte}
           onSave={onSaveEvent}
-          onDelete={loeschenEvent}
+          onDelete={(kat) => loeschenEvent(mandant, kat)}
           onClose={() => setEventEditor({ offen: false, kategorie: null })}
         />
       )}
