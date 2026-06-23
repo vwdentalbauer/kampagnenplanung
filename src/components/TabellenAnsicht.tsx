@@ -516,14 +516,20 @@ export function TabellenAnsicht({
               if (it.typ === "event") {
                 const e = it.e;
                 return (
-                  <tr key={`ev-${e.id}`} className={`${randTop} bg-marke/10`}>
-                    <td colSpan={spaltenAnzahl} className="px-3 py-0.5">
+                  <tr
+                    key={`ev-${e.id}`}
+                    className={`${randTop} border-l-4 border-l-marke bg-gradient-to-r from-marke/15 to-transparent`}
+                  >
+                    <td colSpan={spaltenAnzahl} className="px-2 py-0.5">
                       <button
                         onClick={onEventClick}
                         title="Im Reiter Veranstaltungen ansehen"
-                        className="flex w-full items-center gap-2 text-xs text-marke-dark hover:underline"
+                        className="flex w-full items-center gap-1.5 text-xs text-marke-dark hover:underline"
                       >
-                        🎟 <span className="font-semibold">{e.kat}</span>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 shrink-0 text-marke">
+                          <path d="M12 2a7 7 0 00-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z" />
+                        </svg>
+                        <span className="font-semibold">{e.kat}</span>
                         {e.name && <span className="text-slate-600">· {e.name}</span>}
                         {e.ort && <span className="text-slate-500">· {e.ort}</span>}
                         {e.start && (

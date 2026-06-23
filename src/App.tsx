@@ -123,15 +123,35 @@ export default function App() {
     Object.values(events).forEach((m) => m.subs.forEach((s) => s.ort && set.add(s.ort)));
     return [...set].sort();
   }, [events]);
-  // Flache Liste aller Sub-Veranstaltungen (für die Tabellen-Leiste).
+  // Flache Liste aller Sub-Veranstaltungen (für die Tabelle).
   const subEvents = useMemo(
     () =>
       Object.entries(events)
         .flatMap(([kat, m]) => m.subs.map((s) => ({ kat, ...s })))
-        .filter((s) => s.ort || s.start)
+        .filter((s) => s.ort || s.start || s.name)
         .sort((a, b) => (a.start || "9999").localeCompare(b.start || "9999")),
     [events],
   );
+
+  // In der Tabelle nur Events zeigen, die im aktiven Zeitraum liegen.
+  const subEventsImZeitraum = useMemo(() => {
+    const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
+    const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
+    const zeitAktiv = kwVon != null || kwBis != null || !!filter.datumVon || !!filter.datumBis;
+    return subEvents.filter((s) => {
+      if (!zeitAktiv) return true;
+      const start = s.start;
+      const ende = s.ende ?? s.start;
+      if (!start) return false; // ohne Datum nicht in einen Zeitraum einordbar
+      const startKw = kwAusDatum(start);
+      const endeKw = kwAusDatum(ende) ?? startKw;
+      if (kwVon != null && (endeKw == null || endeKw < kwVon)) return false;
+      if (kwBis != null && (startKw == null || startKw > kwBis)) return false;
+      if (filter.datumVon && (!ende || ende < filter.datumVon)) return false;
+      if (filter.datumBis && start > filter.datumBis) return false;
+      return true;
+    });
+  }, [subEvents, filter]);
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     mandantKampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -420,7 +440,7 @@ export default function App() {
         <p className="py-10 text-center text-slate-400">Lädt…</p>
       ) : ansicht === "tabelle" ? (
         <>
-          {subEvents.length > 0 && (
+          {subEventsImZeitraum.length > 0 && (
             <div className="mb-2 flex justify-end">
               <button
                 onClick={() => setEventBand((v) => !v)}
@@ -440,7 +460,7 @@ export default function App() {
             darfBearbeiten={darfBearbeiten}
             kanaele={alleKanaele}
             vorschlaege={vorschlaege}
-            eventZeilen={eventBand ? subEvents : []}
+            eventZeilen={eventBand ? subEventsImZeitraum : []}
             onEventClick={() => setAnsicht("event")}
             onEdit={(k) => setEditor({ offen: true, kampagne: k })}
             onDelete={onDelete}
