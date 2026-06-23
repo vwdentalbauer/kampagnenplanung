@@ -40,6 +40,7 @@ function leereKampagne(): Kampagne {
     pluline: false,
     wkz: false,
     veranstaltung: "",
+    subEvent: "",
     verantwortung: "",
     owners: [],
     status: "geplant",
@@ -287,7 +288,7 @@ export function KampagneEditor({
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <input
                 type="checkbox"
-                className="accent-[#E72F89]"
+                className="accent-[#00a2d3]"
                 checked={form.pluline}
                 onChange={(e) => set("pluline", e.target.checked)}
               />
@@ -313,7 +314,7 @@ export function KampagneEditor({
                 checked={eventAn}
                 onChange={(e) => {
                   setEventAn(e.target.checked);
-                  if (!e.target.checked) set("veranstaltung", "");
+                  if (!e.target.checked) setForm((f) => ({ ...f, veranstaltung: "", subEvent: "" }));
                 }}
               />
               Event – gehört zu einer Veranstaltung
@@ -338,7 +339,9 @@ export function KampagneEditor({
                       <select
                         className={input}
                         value={form.veranstaltung}
-                        onChange={(e) => set("veranstaltung", e.target.value)}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, veranstaltung: e.target.value, subEvent: "" }))
+                        }
                       >
                         <option value="">– Veranstaltung wählen –</option>
                         {veranstaltungen.map((v) => (
@@ -355,15 +358,25 @@ export function KampagneEditor({
                         + Neu
                       </button>
                     </div>
+
                     {gewaehltesEvent && (
-                      <p className="text-xs text-slate-500">
-                        {gewaehltesEvent.typ && <>{gewaehltesEvent.typ} · </>}
-                        {gewaehltesEvent.ort && <>📍 {gewaehltesEvent.ort} · </>}
-                        {gewaehltesEvent.start ? `📅 ${formatDatum(gewaehltesEvent.start)}` : ""}
-                        {gewaehltesEvent.ende && gewaehltesEvent.ende !== gewaehltesEvent.start
-                          ? ` – ${formatDatum(gewaehltesEvent.ende)}`
-                          : ""}
-                      </p>
+                      <select
+                        className={input}
+                        value={form.subEvent}
+                        onChange={(e) => set("subEvent", e.target.value)}
+                      >
+                        <option value="">– Ort/Termin wählen (optional) –</option>
+                        {gewaehltesEvent.subs.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.ort || "ohne Ort"}
+                            {s.start ? ` · ${formatDatum(s.start)}` : ""}
+                            {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {gewaehltesEvent && gewaehltesEvent.typ && (
+                      <p className="text-xs text-slate-500">Typ: {gewaehltesEvent.typ}</p>
                     )}
                   </>
                 )}

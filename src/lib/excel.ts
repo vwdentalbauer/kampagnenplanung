@@ -177,6 +177,7 @@ export async function importExcel(file: File): Promise<Kampagne[]> {
       pluline: get(row, cPluline).toLowerCase() === "x",
       wkz: get(row, cWkz).toLowerCase() === "x",
       veranstaltung: get(row, cVeranstaltung),
+      subEvent: "",
       verantwortung: verant,
       owners,
       status: STATUS_VON_LABEL[statusLabel] ?? "geplant",

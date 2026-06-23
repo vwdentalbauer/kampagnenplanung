@@ -37,6 +37,8 @@ export interface Kampagne {
   wkz: boolean;
   /** Verknüpfte Veranstaltung (= deren Kategorie/Name). Leer = kein Event. */
   veranstaltung: string;
+  /** Verknüpfte Sub-Veranstaltung (ID, Ort/Datum-Instanz). Leer = nur Kategorie. */
+  subEvent: string;
   /** Verantwortung als Freitext (Originalwert aus Excel). */
   verantwortung: string;
   /** Verantwortliche als normalisierte Liste (aus verantwortung abgeleitet). */

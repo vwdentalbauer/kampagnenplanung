@@ -41,6 +41,7 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
       endDatum: k.endDatum ?? null,
       subKanal: k.subKanal ?? "",
       veranstaltung: k.veranstaltung ?? "",
+      subEvent: k.subEvent ?? "",
       // „Events" ist keine Sparte mehr -> aus bestehenden Daten entfernen.
       bereiche: (k.bereiche ?? []).filter((b) => b !== "Events"),
       pluline: k.pluline ?? false,

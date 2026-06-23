@@ -268,7 +268,7 @@ export function TabellenAnsicht({
             {k.pluline && (
               <span
                 title="PLU°LINE"
-                className="rounded bg-[#E72F89] px-1 text-[10px] font-bold leading-4 text-white"
+                className="rounded bg-[#00a2d3] px-1 text-[10px] font-bold leading-4 text-white"
               >
                 P
               </span>
@@ -494,14 +494,15 @@ export function TabellenAnsicht({
                 ? "border-t-2 border-marke/50"
                 : "border-t border-slate-100";
               const linkerRand = ueberfaellig
-                ? "border-l-4 border-l-rose-400"
+                ? "border-l-4 border-l-[#E72F89]"
                 : laufend
                   ? "border-l-4 border-l-marke-light"
                   : "";
+              // Überfällig: 60%-Raster der Primärfarbe #E72F89.
               const bg = gewaehlt
                 ? "bg-marke/5"
                 : ueberfaellig
-                  ? "bg-rose-50 hover:bg-rose-100/70"
+                  ? "bg-[#E72F89]/60 hover:bg-[#E72F89]/70"
                   : laufend
                     ? "bg-marke-light/[0.07] hover:bg-marke-light/15"
                     : "hover:bg-slate-50/60";

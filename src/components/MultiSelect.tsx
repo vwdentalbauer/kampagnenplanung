@@ -39,7 +39,7 @@ export function MultiSelect({
 
   const labelText = (v: string) => (v === LEER ? "(leer)" : anzeige ? anzeige(v) : v);
   const zusammenfassung = !aktiv
-    ? `Alle ${label}`
+    ? label
     : selected.length === 1
       ? labelText(selected[0])
       : `${label}: ${selected.length}`;

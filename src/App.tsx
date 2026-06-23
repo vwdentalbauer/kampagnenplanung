@@ -49,6 +49,8 @@ export default function App() {
     kampagne: null,
   });
   const fileRef = useRef<HTMLInputElement>(null);
+  const [mehrOffen, setMehrOffen] = useState(false);
+  const [eventBand, setEventBand] = useState(true);
 
   const aktuelleKw = getISOWeek(new Date());
   const gefiltert = useMemo(() => kampagnen.filter((k) => passt(k, filter)), [kampagnen, filter]);
@@ -62,7 +64,6 @@ export default function App() {
       subkanaele: facette(kampagnen, filter, "subkanaele"),
       owners: facette(kampagnen, filter, "owners"),
       kampagnen: facette(kampagnen, filter, "kampagne"),
-      ziele: facette(kampagnen, filter, "ziel"),
     }),
     [kampagnen, filter],
   );
@@ -94,8 +95,18 @@ export default function App() {
         .sort((a, b) => a.kategorie.localeCompare(b.kategorie, "de")),
     [events],
   );
-  const eventOrte = useMemo(
-    () => [...new Set(Object.values(events).map((m) => m.ort).filter(Boolean))].sort(),
+  const eventOrte = useMemo(() => {
+    const set = new Set<string>();
+    Object.values(events).forEach((m) => m.subs.forEach((s) => s.ort && set.add(s.ort)));
+    return [...set].sort();
+  }, [events]);
+  // Flache Liste aller Sub-Veranstaltungen (für die Tabellen-Leiste).
+  const subEvents = useMemo(
+    () =>
+      Object.entries(events)
+        .flatMap(([kat, m]) => m.subs.map((s) => ({ kat, ...s })))
+        .filter((s) => s.ort || s.start)
+        .sort((a, b) => (a.start || "9999").localeCompare(b.start || "9999")),
     [events],
   );
   const alleOwners = useMemo(() => {
@@ -264,40 +275,62 @@ export default function App() {
           {tab("event", "🎟 Veranstaltungen")}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={onExport}
-            title="Alle Einträge als Excel im Originalformat exportieren"
-            className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            ⬇ Excel-Export
-          </button>
-          {istAdmin && (
-            <>
-              <button
-                onClick={() => fileRef.current?.click()}
-                title="Excel-Datei importieren (ersetzt den Bestand)"
-                className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-              >
-                ⬆ Excel-Import
-              </button>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={onImport}
-              />
-              <button
-                onClick={() => {
-                  if (confirm("Alle lokalen Änderungen verwerfen und Originaldaten laden?"))
-                    zuruecksetzen();
-                }}
-                className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100"
-              >
-                Daten zurücksetzen
-              </button>
-            </>
-          )}
+          {/* Dezentes „Mehr"-Menü: Excel & Daten */}
+          <div className="relative">
+            <button
+              onClick={() => setMehrOffen((o) => !o)}
+              title="Excel & Daten"
+              className="rounded border border-slate-200 px-2 py-1.5 text-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            >
+              ⋯
+            </button>
+            {mehrOffen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMehrOffen(false)} />
+                <div className="absolute right-0 z-20 mt-1 w-56 rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg">
+                  <button
+                    onClick={() => {
+                      setMehrOffen(false);
+                      onExport();
+                    }}
+                    className="block w-full px-3 py-2 text-left text-slate-600 hover:bg-slate-50"
+                  >
+                    ⬇ Excel-Export
+                  </button>
+                  {istAdmin && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setMehrOffen(false);
+                          fileRef.current?.click();
+                        }}
+                        className="block w-full px-3 py-2 text-left text-slate-600 hover:bg-slate-50"
+                      >
+                        ⬆ Excel-Import (ersetzt Bestand)
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMehrOffen(false);
+                          if (confirm("Alle lokalen Änderungen verwerfen und Originaldaten laden?"))
+                            zuruecksetzen();
+                        }}
+                        className="block w-full px-3 py-2 text-left text-slate-500 hover:bg-slate-50"
+                      >
+                        Daten zurücksetzen
+                      </button>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={onImport}
+          />
           {darfBearbeiten && (
             <button
               onClick={() => setEventEditor({ offen: true, kategorie: null })}
@@ -327,7 +360,6 @@ export default function App() {
           subKanaele={facetten.subkanaele}
           owners={facetten.owners}
           kampagnen={facetten.kampagnen}
-          ziele={facetten.ziele}
           aktuelleKw={aktuelleKw}
           leerKanaele={leer.kanaele}
           leerSubKanaele={leer.subKanaele}
@@ -340,23 +372,37 @@ export default function App() {
         <p className="py-10 text-center text-slate-400">Lädt…</p>
       ) : ansicht === "tabelle" ? (
         <>
-          {/* Veranstaltungen abgesetzt über den Einträgen */}
-          {veranstaltungenListe.length > 0 && (
-            <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-marke/30 bg-marke/5 px-3 py-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-marke-dark">
-                🎟 Veranstaltungen
-              </span>
-              {veranstaltungenListe.map((v) => (
+          {/* Veranstaltungen abgesetzt über den Einträgen (ein-/ausblendbar) */}
+          {subEvents.length > 0 && (
+            <div className="mb-3 rounded-lg border border-dashed border-marke/40 bg-marke/5 px-3 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-marke-dark">
+                  🎟 Veranstaltungen ({subEvents.length})
+                </span>
                 <button
-                  key={v.kategorie}
-                  onClick={() => setAnsicht("event")}
-                  title="Im Reiter Veranstaltungen ansehen"
-                  className="rounded-full border border-marke/40 bg-white px-2 py-0.5 text-xs text-slate-600 hover:bg-marke/10"
+                  onClick={() => setEventBand((v) => !v)}
+                  className="ml-auto rounded border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-50"
                 >
-                  {v.kategorie}
-                  {v.start ? ` · ${formatDatum(v.start)}` : ""}
+                  {eventBand ? "ausblenden" : "einblenden"}
                 </button>
-              ))}
+              </div>
+              {eventBand && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {subEvents.map((s) => (
+                    <button
+                      key={`${s.kat}-${s.id}`}
+                      onClick={() => setAnsicht("event")}
+                      title="Im Reiter Veranstaltungen ansehen"
+                      className="rounded-full border border-marke/40 bg-white px-2 py-0.5 text-xs text-slate-700 hover:bg-marke/10"
+                    >
+                      <span className="font-medium">{s.kat}</span>
+                      {s.ort ? ` · ${s.ort}` : ""}
+                      {s.start ? ` · ${formatDatum(s.start)}` : ""}
+                      {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           <TabellenAnsicht

@@ -13,7 +13,6 @@ interface Props {
   subKanaele: string[];
   owners: string[];
   kampagnen: string[];
-  ziele: string[];
   aktuelleKw: number;
   // „(leer)"-Option nur zeigen, wenn es auch leere Felder gibt
   leerKanaele: boolean;
@@ -31,7 +30,6 @@ export function FilterBar({
   subKanaele,
   owners,
   kampagnen,
-  ziele,
   aktuelleKw,
   leerKanaele,
   leerSubKanaele,
@@ -42,9 +40,6 @@ export function FilterBar({
     "rounded border px-2 py-1.5 text-sm focus:border-marke focus:outline-none";
   const upd = (teil: Partial<Filter>) => setFilter({ ...filter, ...teil });
   const anzahl = aktiveAnzahl(filter);
-
-  const einzelStil = (aktiv: boolean) =>
-    `${sel} ${aktiv ? "border-marke bg-marke/10 font-medium text-marke-dark" : "border-slate-300 bg-white text-slate-600"}`;
 
   const dieseWoche = () =>
     upd({ kwVon: String(aktuelleKw), kwBis: String(aktuelleKw), datumVon: "", datumBis: "" });
@@ -99,24 +94,13 @@ export function FilterBar({
           suchbar
         />
 
-        <select
-          className={einzelStil(!!filter.ziel)}
-          value={filter.ziel}
-          onChange={(e) => upd({ ziel: e.target.value })}
-        >
-          <option value="">Alle Ziele</option>
-          {ziele.map((z) => (
-            <option key={z}>{z}</option>
-          ))}
-        </select>
-
         <button
           onClick={() => upd({ pluline: !filter.pluline })}
           title="Nur PLULINE-Einträge"
           className={`rounded border px-2 py-1.5 text-sm font-medium ${
             filter.pluline
-              ? "border-[#E72F89] bg-[#E72F89] text-white"
-              : "border-slate-300 bg-white text-[#E72F89]"
+              ? "border-[#00a2d3] bg-[#00a2d3] text-white"
+              : "border-slate-300 bg-white text-[#00a2d3]"
           }`}
         >
           PLU°LINE
