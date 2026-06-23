@@ -3,7 +3,7 @@ import { getISOWeek } from "date-fns";
 import type { Kampagne, Status, Rolle } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
-import { kwAusDatum, quartalAusDatum, formatDatum } from "./lib/date";
+import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
@@ -269,10 +269,23 @@ export default function App() {
 
       {/* Steuerleiste */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
-          {tab("tabelle", "📋 Tabelle")}
-          {tab("ziel", "📣 Kampagne")}
-          {tab("event", "🎟 Veranstaltungen")}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
+            {tab("tabelle", "📋 Tabelle")}
+            {tab("ziel", "📣 Kampagne")}
+            {tab("event", "🎟 Veranstaltungen")}
+          </div>
+          <button
+            onClick={() => setEventBand((v) => !v)}
+            title="Veranstaltungen in der Tabelle ein-/ausblenden"
+            className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
+              eventBand
+                ? "border-marke bg-marke/10 text-marke-dark"
+                : "border-slate-300 bg-white text-slate-500"
+            }`}
+          >
+            🎟 Veranstaltungen {eventBand ? "ausblenden" : "einblenden"}
+          </button>
         </div>
         <div className="flex items-center gap-2">
           {/* Dezentes „Mehr"-Menü: Excel & Daten */}
@@ -371,52 +384,19 @@ export default function App() {
       {!geladen ? (
         <p className="py-10 text-center text-slate-400">Lädt…</p>
       ) : ansicht === "tabelle" ? (
-        <>
-          {/* Veranstaltungen abgesetzt über den Einträgen (ein-/ausblendbar) */}
-          {subEvents.length > 0 && (
-            <div className="mb-3 rounded-lg border border-dashed border-marke/40 bg-marke/5 px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-marke-dark">
-                  🎟 Veranstaltungen ({subEvents.length})
-                </span>
-                <button
-                  onClick={() => setEventBand((v) => !v)}
-                  className="ml-auto rounded border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-50"
-                >
-                  {eventBand ? "ausblenden" : "einblenden"}
-                </button>
-              </div>
-              {eventBand && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {subEvents.map((s) => (
-                    <button
-                      key={`${s.kat}-${s.id}`}
-                      onClick={() => setAnsicht("event")}
-                      title="Im Reiter Veranstaltungen ansehen"
-                      className="rounded-full border border-marke/40 bg-white px-2 py-0.5 text-xs text-slate-700 hover:bg-marke/10"
-                    >
-                      <span className="font-medium">{s.kat}</span>
-                      {s.ort ? ` · ${s.ort}` : ""}
-                      {s.start ? ` · ${formatDatum(s.start)}` : ""}
-                      {s.ende && s.ende !== s.start ? `–${formatDatum(s.ende)}` : ""}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          <TabellenAnsicht
-            kampagnen={gefiltert}
-            darfBearbeiten={darfBearbeiten}
-            kanaele={eindeutigeWerte(kampagnen, "kanal")}
-            vorschlaege={vorschlaege}
-            onEdit={(k) => setEditor({ offen: true, kampagne: k })}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-            onBulkUpdate={onBulkUpdate}
-            onBulkDelete={onBulkDelete}
-          />
-        </>
+        <TabellenAnsicht
+          kampagnen={gefiltert}
+          darfBearbeiten={darfBearbeiten}
+          kanaele={eindeutigeWerte(kampagnen, "kanal")}
+          vorschlaege={vorschlaege}
+          eventZeilen={eventBand ? subEvents : []}
+          onEventClick={() => setAnsicht("event")}
+          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onBulkUpdate={onBulkUpdate}
+          onBulkDelete={onBulkDelete}
+        />
       ) : ansicht === "ziel" ? (
         <ZielAnsicht
           kampagnen={gefiltert}

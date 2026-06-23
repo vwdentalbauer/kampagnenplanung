@@ -6,7 +6,7 @@ import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
-import { wochentagKurz, formatDatum } from "../lib/date";
+import { wochentagKurz, formatDatum, kwAusDatum } from "../lib/date";
 
 interface Props {
   kampagnen: Kampagne[];
@@ -21,6 +21,9 @@ interface Props {
   vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
   /** Spalten, die in dieser Instanz ausgeblendet werden (z.B. im Kampagne-Reiter). */
   ausblenden?: SpaltenKey[];
+  /** Sub-Veranstaltungen als halbhohe Zeilen einsortieren (nur Haupttabelle). */
+  eventZeilen?: { id: string; kat: string; ort: string; start: string | null; ende: string | null }[];
+  onEventClick?: () => void;
 }
 
 // Verschiebbare Spalten. „Kampagne" und „Details" stehen hinter „Datum".
@@ -137,6 +140,8 @@ export function TabellenAnsicht({
   onBulkDelete,
   vorschlaege,
   ausblenden,
+  eventZeilen,
+  onEventClick,
 }: Props) {
   const [reihenfolge, setReihenfolge] = useState<SpaltenKey[]>(ladeReihenfolge);
   // Tatsächlich angezeigte Spalten (ausgeblendete entfernt).
@@ -183,20 +188,32 @@ export function TabellenAnsicht({
   const kampagneVorschlaege = vorschlaege.kampagne;
   const subKanalVorschlaege = vorschlaege.subKanal;
 
-  // Sortierte Liste für die Anzeige.
-  const sortiert = useMemo(() => {
-    if (!sort.key) return kampagnen;
-    const key = sort.key;
+  // Sortierte, gemischte Liste (Einträge + Sub-Veranstaltungen als halbe Zeilen).
+  type EventZeile = NonNullable<Props["eventZeilen"]>[number];
+  type Zeile = { typ: "task"; k: Kampagne } | { typ: "event"; e: EventZeile };
+
+  const gemischt = useMemo<Zeile[]>(() => {
+    const key = sort.key ?? "kw";
     const faktor = sort.dir === "asc" ? 1 : -1;
-    return [...kampagnen].sort((a, b) => {
-      const av = sortWert(key, a);
-      const bv = sortWert(key, b);
+    const items: Zeile[] = kampagnen.map((k) => ({ typ: "task", k }));
+    (eventZeilen ?? []).forEach((e) => items.push({ typ: "event", e }));
+    const wert = (it: Zeile): number | string =>
+      it.typ === "task"
+        ? sortWert(key, it.k)
+        : key === "kw"
+          ? (kwAusDatum(it.e.start) ?? Number.POSITIVE_INFINITY)
+          : key === "datum"
+            ? (it.e.start ?? "")
+            : "";
+    return items.sort((a, b) => {
+      const av = wert(a);
+      const bv = wert(b);
       let cmp: number;
       if (typeof av === "number" && typeof bv === "number") cmp = av - bv;
       else cmp = String(av).localeCompare(String(bv), "de");
       return cmp * faktor;
     });
-  }, [kampagnen, sort]);
+  }, [kampagnen, eventZeilen, sort]);
 
   const sortBy = (key: SpaltenKey) =>
     setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
@@ -480,11 +497,41 @@ export function TabellenAnsicht({
           </thead>
 
           <tbody>
-            {sortiert.map((k, i) => {
-              const gewaehlt = auswahl.has(k.id);
-              // Trennlinie, wenn eine neue KW beginnt (nur bei Sortierung nach KW/Datum sinnvoll).
+            {gemischt.map((it, i) => {
               const nachZeit = sort.key === "kw" || sort.key === "datum";
-              const neueWoche = nachZeit && (i === 0 || sortiert[i - 1].kw !== k.kw);
+              const kwAktuell = it.typ === "task" ? it.k.kw : kwAusDatum(it.e.start);
+              const prev = gemischt[i - 1];
+              const prevKw = prev ? (prev.typ === "task" ? prev.k.kw : kwAusDatum(prev.e.start)) : undefined;
+              const neueWoche = nachZeit && (i === 0 || prevKw !== kwAktuell);
+              const randTop = neueWoche ? "border-t-2 border-marke/50" : "border-t border-slate-100";
+
+              // Sub-Veranstaltung: halbhohe, deutlich abgesetzte Zeile.
+              if (it.typ === "event") {
+                const e = it.e;
+                return (
+                  <tr key={`ev-${e.id}`} className={`${randTop} bg-marke/10`}>
+                    <td colSpan={spaltenAnzahl} className="px-3 py-0.5">
+                      <button
+                        onClick={onEventClick}
+                        title="Im Reiter Veranstaltungen ansehen"
+                        className="flex w-full items-center gap-2 text-xs text-marke-dark hover:underline"
+                      >
+                        🎟 <span className="font-semibold">{e.kat}</span>
+                        {e.ort && <span className="text-slate-500">· {e.ort}</span>}
+                        {e.start && (
+                          <span className="text-slate-500">
+                            · {formatDatum(e.start)}
+                            {e.ende && e.ende !== e.start ? `–${formatDatum(e.ende)}` : ""}
+                          </span>
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              }
+
+              const k = it.k;
+              const gewaehlt = auswahl.has(k.id);
               // Laufende Kampagne (Zeitraum) vs. Einzeltermin.
               const laufend = !!k.endDatum;
               // Überfällig: (effektives) Ende liegt in der Vergangenheit und nicht erledigt.
@@ -498,11 +545,11 @@ export function TabellenAnsicht({
                 : laufend
                   ? "border-l-4 border-l-marke-light"
                   : "";
-              // Überfällig: 60%-Raster der Primärfarbe #E72F89.
+              // Überfällig: helles Raster der Primärfarbe #E72F89.
               const bg = gewaehlt
                 ? "bg-marke/5"
                 : ueberfaellig
-                  ? "bg-[#E72F89]/60 hover:bg-[#E72F89]/70"
+                  ? "bg-[#E72F89]/15 hover:bg-[#E72F89]/25"
                   : laufend
                     ? "bg-marke-light/[0.07] hover:bg-marke-light/15"
                     : "hover:bg-slate-50/60";
