@@ -372,7 +372,9 @@ export function KampagneEditor({
                           onChange={(e) => set("subEvent", e.target.value)}
                         >
                           <option value="">– Ort/Termin wählen (optional) –</option>
-                          {gewaehltesEvent.subs.map((s) => (
+                          {[...gewaehltesEvent.subs]
+                            .sort((a, b) => (a.start || "9999").localeCompare(b.start || "9999"))
+                            .map((s) => (
                             <option key={s.id} value={s.id}>
                               {s.name ? `${s.name} – ` : ""}
                               {s.ort || "ohne Ort"}

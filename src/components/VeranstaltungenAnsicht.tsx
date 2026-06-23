@@ -181,7 +181,9 @@ export function VeranstaltungenAnsicht(props: Props) {
           .sort((a, b) => a.localeCompare(b, "de"))
           .map((kat) => {
             const meta = events[kat];
-            const subs = meta?.subs ?? [];
+            const subs = [...(meta?.subs ?? [])].sort((a, b) =>
+              (a.start || "9999").localeCompare(b.start || "9999"),
+            );
             const ohneTermin = eintraegeFuer(kat, null);
             const catKey = `cat:${kat}`;
             const catOffen = offen.has(catKey);
