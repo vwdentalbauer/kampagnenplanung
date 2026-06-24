@@ -105,6 +105,7 @@ function Nutzerverwaltung() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [rolle, setRolle] = useState<Rolle>("viewer");
+  const [passwort, setPasswort] = useState("");
   const [hinweis, setHinweis] = useState<string | null>(null);
 
   const laden = useCallback(async () => {
@@ -124,26 +125,39 @@ function Nutzerverwaltung() {
     laden();
   }, [laden]);
 
+  const passwortGenerieren = () => {
+    const z = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    const arr = crypto.getRandomValues(new Uint32Array(12));
+    setPasswort(Array.from(arr, (n) => z[n % z.length]).join(""));
+  };
+
   const einladen = async () => {
     setFehler(null);
     setHinweis(null);
     if (!email.trim()) return;
+    if (passwort && passwort.length < 8) {
+      setFehler("Das Start-Passwort muss mindestens 8 Zeichen haben.");
+      return;
+    }
     try {
       const d = await adminAktion({
         action: "invite",
         email,
         name,
         rolle,
+        // Wenn ein Passwort gesetzt ist: Konto direkt anlegen (ohne E-Mail-Link).
+        passwort: passwort || undefined,
         redirectTo: window.location.origin + window.location.pathname,
       });
       setHinweis(
         d.modus === "passwort"
-          ? "Nutzer angelegt (mit Initial-Passwort)."
-          : "Einladung verschickt.",
+          ? `Konto angelegt. Bitte Zugangsdaten weitergeben — E-Mail: ${email} · Passwort: ${passwort}`
+          : "Einladung per E-Mail verschickt.",
       );
       setEmail("");
       setName("");
       setRolle("viewer");
+      setPasswort("");
       await laden();
     } catch (e) {
       setFehler((e as Error).message);
@@ -180,10 +194,10 @@ function Nutzerverwaltung() {
 
   return (
     <div>
-      {/* Einladen */}
+      {/* Einladen / Anlegen */}
       <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
         <h3 className="mb-2 text-sm font-semibold text-slate-700">
-          Neuen Nutzer einladen
+          Neuen Nutzer anlegen
         </h3>
         <div className="flex flex-wrap items-end gap-2">
           <input
@@ -210,14 +224,44 @@ function Nutzerverwaltung() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-end gap-2">
+          <input
+            type="text"
+            placeholder="Start-Passwort (optional – ohne E-Mail-Einladung)"
+            value={passwort}
+            onChange={(e) => setPasswort(e.target.value)}
+            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            onClick={passwortGenerieren}
+            title="Sicheres Passwort erzeugen"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            🎲 Erzeugen
+          </button>
           <button
             onClick={einladen}
             className="rounded-lg bg-marke px-4 py-2 text-sm font-medium text-white hover:bg-marke-dark"
           >
-            Einladen
+            {passwort ? "Konto anlegen" : "Per E-Mail einladen"}
           </button>
         </div>
-        {hinweis && <p className="mt-2 text-sm text-emerald-700">{hinweis}</p>}
+
+        <p className="mt-2 text-xs text-slate-500">
+          <strong>Mit Start-Passwort</strong> (empfohlen, sofort nutzbar): Konto
+          wird direkt angelegt – E-Mail + Passwort der Person mitteilen, sie kann
+          sich sofort anmelden. <strong>Ohne Passwort</strong>: Einladung per
+          E-Mail (setzt korrekte „Site URL"/SMTP in Supabase voraus).
+        </p>
+
+        {hinweis && (
+          <p className="mt-2 select-all rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            {hinweis}
+          </p>
+        )}
       </div>
 
       {fehler && (
