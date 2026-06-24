@@ -2,43 +2,32 @@ import { FormEvent, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { Logo } from "../components/Logo";
 
-export function LoginScreen() {
-  const [email, setEmail] = useState("");
+/**
+ * Wird nach Einladungs- oder Zurücksetzen-Link angezeigt: der Nutzer ist über
+ * den Link bereits angemeldet und vergibt hier sein (neues) Passwort.
+ */
+export function PasswortSetzen({ onFertig }: { onFertig: () => void }) {
   const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
   const [fehler, setFehler] = useState<string | null>(null);
-  const [hinweis, setHinweis] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
 
   const absenden = async (e: FormEvent) => {
     e.preventDefault();
     setFehler(null);
-    setHinweis(null);
-    setLaedt(true);
-    const { error } = await supabase!.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password: pw,
-    });
-    setLaedt(false);
-    if (error) setFehler("E-Mail oder Passwort falsch.");
-    // Erfolg: onAuthStateChange im AuthContext übernimmt.
-  };
-
-  const passwortVergessen = async () => {
-    setFehler(null);
-    setHinweis(null);
-    const e_ = email.trim().toLowerCase();
-    if (!e_) {
-      setFehler("Bitte zuerst die E-Mail-Adresse eintragen.");
+    if (pw.length < 8) {
+      setFehler("Das Passwort muss mindestens 8 Zeichen haben.");
       return;
     }
-    const { error } = await supabase!.auth.resetPasswordForEmail(e_, {
-      redirectTo: window.location.origin + window.location.pathname,
-    });
+    if (pw !== pw2) {
+      setFehler("Die Passwörter stimmen nicht überein.");
+      return;
+    }
+    setLaedt(true);
+    const { error } = await supabase!.auth.updateUser({ password: pw });
+    setLaedt(false);
     if (error) setFehler(error.message);
-    else
-      setHinweis(
-        "Falls ein Konto existiert, wurde eine E-Mail zum Zurücksetzen verschickt.",
-      );
+    else onFertig();
   };
 
   return (
@@ -46,34 +35,36 @@ export function LoginScreen() {
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
           <Logo className="mx-auto mb-3 h-12 w-auto" />
-          <h1 className="text-xl font-bold text-marke">Kampagnenplanung</h1>
-          <p className="mt-1 text-sm text-slate-500">Bitte anmelden</p>
+          <h1 className="text-xl font-bold text-marke">Passwort festlegen</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Bitte vergeben Sie ein neues Passwort.
+          </p>
         </div>
 
         <form onSubmit={absenden} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-600">
-              E-Mail
+              Neues Passwort
             </label>
             <input
-              type="email"
-              autoComplete="email"
+              type="password"
+              autoComplete="new-password"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-marke focus:outline-none focus:ring-1 focus:ring-marke"
             />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-600">
-              Passwort
+              Passwort wiederholen
             </label>
             <input
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
+              value={pw2}
+              onChange={(e) => setPw2(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-marke focus:outline-none focus:ring-1 focus:ring-marke"
             />
           </div>
@@ -83,27 +74,15 @@ export function LoginScreen() {
               {fehler}
             </p>
           )}
-          {hinweis && (
-            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-              {hinweis}
-            </p>
-          )}
 
           <button
             type="submit"
             disabled={laedt}
             className="w-full rounded-lg bg-marke py-2 text-sm font-medium text-white hover:bg-marke-dark disabled:opacity-60"
           >
-            {laedt ? "Prüfe…" : "Anmelden"}
+            {laedt ? "Speichere…" : "Passwort speichern"}
           </button>
         </form>
-
-        <button
-          onClick={passwortVergessen}
-          className="mt-4 block w-full text-center text-xs text-slate-400 hover:text-marke-dark"
-        >
-          Passwort vergessen?
-        </button>
       </div>
     </div>
   );

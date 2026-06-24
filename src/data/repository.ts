@@ -1,12 +1,15 @@
 import type { Kampagne } from "../types";
 import seed from "./seed.json";
+import { supabaseAktiv } from "../lib/supabase";
+import { SupabaseRepository } from "./supabaseRepository";
 
 /**
  * Abstraktion über die Datenhaltung.
  *
- * Aktuell: LocalStorageRepository (läuft offline im Browser, ideal für
- * GitHub Pages ohne Backend). Später: SupabaseRepository mit identischer
- * Signatur – die UI muss dafür nicht angepasst werden.
+ * - `SupabaseRepository`: gemeinsame Datenbank, Anmeldung, Rollen (Phase 2).
+ * - `LocalStorageRepository`: lokaler Demo-Modus ohne Backend (Fallback, wenn
+ *   keine Supabase-Zugangsdaten gesetzt sind). Beide haben dieselbe Signatur,
+ *   die UI bleibt unverändert.
  */
 export interface KampagnenRepository {
   alle(): Promise<Kampagne[]>;
@@ -16,9 +19,8 @@ export interface KampagnenRepository {
   loeschen(id: string): Promise<void>;
   /** Mehrere Kampagnen auf einmal löschen. */
   loeschenViele(ids: string[]): Promise<void>;
-  /** Kompletten Datenbestand ersetzen (z.B. Excel-Import). */
+  /** Kompletten Datenbestand ersetzen (Excel-Import, nur Admin). */
   ersetzeAlle(ks: Kampagne[]): Promise<Kampagne[]>;
-  zuruecksetzen(): Promise<Kampagne[]>;
 }
 
 const STORAGE_KEY = "kampagnen.v1";
@@ -29,8 +31,8 @@ function ersteZeile(text: string): string {
   return z.length > 80 ? z.slice(0, 80) + "…" : z;
 }
 
-/** Sorgt dafür, dass jeder Datensatz das Feld „kampagne" hat (Migration). */
-function normalisieren(daten: Kampagne[]): Kampagne[] {
+/** Sorgt dafür, dass jeder Datensatz alle Felder hat (Migration/Bereinigung). */
+export function normalisieren(daten: Kampagne[]): Kampagne[] {
   const leerWerte = ["none", "keine", "n/a", "na", "-", "–", "kein", "ohne"];
   return daten.map((k) => {
     const basis = (k.kampagne ?? ersteZeile(k.details)).trim();
@@ -53,18 +55,23 @@ function normalisieren(daten: Kampagne[]): Kampagne[] {
   });
 }
 
+/** Initialdaten (echte Excel-Daten) – Quelle für das erste Befüllen. */
+export function seedDaten(): Kampagne[] {
+  return normalisieren(seed as unknown as Kampagne[]);
+}
+
 export class LocalStorageRepository implements KampagnenRepository {
   private load(): Kampagne[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const data = normalisieren(seed as unknown as Kampagne[]);
+      const data = seedDaten();
       this.save(data);
       return data;
     }
     try {
       return normalisieren(JSON.parse(raw) as Kampagne[]);
     } catch {
-      return normalisieren(seed as unknown as Kampagne[]);
+      return seedDaten();
     }
   }
 
@@ -108,13 +115,9 @@ export class LocalStorageRepository implements KampagnenRepository {
     this.save(data);
     return data;
   }
-
-  async zuruecksetzen(): Promise<Kampagne[]> {
-    const data = normalisieren(seed as unknown as Kampagne[]);
-    this.save(data);
-    return data;
-  }
 }
 
-// Zentrale Instanz – hier später durch SupabaseRepository ersetzen.
-export const repository: KampagnenRepository = new LocalStorageRepository();
+// Zentrale Instanz: Supabase, wenn konfiguriert – sonst lokaler Demo-Modus.
+export const repository: KampagnenRepository = supabaseAktiv
+  ? new SupabaseRepository()
+  : new LocalStorageRepository();

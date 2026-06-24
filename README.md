@@ -3,12 +3,14 @@
 Web-App als Ersatz für den Excel-Jahresplan „Jahresübersicht". Übersichtlich,
 schwer kaputtzumachen, von mehreren Personen nutzbar – mit Lese-, Schreib- und
 Adminrechten. Hosting über **GitHub Pages**, gemeinsame Datenbank &
-Nutzerverwaltung später über **Supabase**.
+Nutzerverwaltung über **Supabase**.
 
-> **Aktueller Stand:** Lauffähige Version mit den echten Daten aus der Excel
-> (182 Maßnahmen). Die Daten liegen vorerst lokal im Browser (`localStorage`),
-> damit man die App sofort ausprobieren kann, ohne Backend. Der Wechsel auf
-> Supabase ist vorbereitet und in der Architektur abgekoppelt.
+> **Aktueller Stand:** Phase 2 umgesetzt – gemeinsame **Supabase**-Datenbank,
+> echte Anmeldung (Supabase Auth), drei Rollen (Lese-/Schreib-/Adminrechte),
+> Live-Updates für alle, Bearbeitungs-Sperren, Änderungs-Historie mit Undo,
+> tägliches Backup (7 Tage) und individuelle Tabellenansicht je Nutzer.
+> Ohne hinterlegte Supabase-Zugangsdaten läuft die App weiterhin im lokalen
+> Demo-Modus (`localStorage`). Einrichtung/Betrieb: siehe `docs/LIVEGANG.md`.
 
 ## Schnellstart
 
@@ -27,8 +29,10 @@ npm run build    # Produktions-Build nach dist/
 - **Einfacher Status** (das, was in der Excel fehlte): `Geplant → In Arbeit → Erledigt`, plus `Abgesagt`.
 - **Filter & Suche** über Quartal, Status, Kanal, Ziel und Verantwortliche.
 - **Bearbeiten ohne kaputtzumachen:** strukturiertes Formular statt freier Excel-Zellen.
-- **Rollen** (viewer / editor / admin) sind bereits implementiert – aktuell über
-  einen Umschalter oben rechts zum Ausprobieren, später über echte Anmeldung.
+- **Rollen** (viewer / editor / admin) über echte Anmeldung; Nutzer- und
+  Rechteverwaltung, User-Logs und Backups im **⚙ Administration**-Bereich (Admin).
+- **Gemeinsames Arbeiten:** Änderungen erscheinen live bei allen; beim
+  Bearbeiten wird ein Eintrag für andere kurzzeitig gesperrt.
 
 ## Architektur in Kürze
 
@@ -36,19 +40,18 @@ npm run build    # Produktions-Build nach dist/
 React + TypeScript + Vite + Tailwind   →  statischer Build  →  GitHub Pages
         │
         ├─ src/data/repository.ts   ← austauschbare Datenschicht
-        │     • heute:  LocalStorageRepository (Browser)
-        │     • später: SupabaseRepository (gleiche Schnittstelle)
+        │     • Supabase (gemeinsame DB)  – wenn Zugangsdaten gesetzt
+        │     • LocalStorage (Demo)       – Fallback ohne Backend
         │
-        └─ src/auth/AuthContext.tsx ← Rollenmodell
-              • heute:  Mock-Nutzer mit Rollen-Umschalter
-              • später: Supabase Auth + Nutzerfreigabe
+        └─ src/auth/AuthContext.tsx ← Supabase Auth + Rollen aus `profile`
 ```
 
-Der Trick: **UI und Datenhaltung sind getrennt.** Wenn Supabase kommt, tauschen
-wir nur `repository.ts` und `AuthContext.tsx` aus – die Ansichten bleiben gleich.
+Der Trick: **UI und Datenhaltung sind getrennt** – die Ansichten bleiben gleich,
+egal ob Supabase- oder lokaler Modus.
 
 Details: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md) ·
-Datenbank-Entwurf: [`docs/supabase-schema.sql`](docs/supabase-schema.sql)
+Umgesetztes Schema: [`docs/supabase-schema.sql`](docs/supabase-schema.sql) ·
+Betrieb/Go-Live: [`docs/LIVEGANG.md`](docs/LIVEGANG.md)
 
 ## Dokumente
 

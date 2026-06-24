@@ -20,17 +20,52 @@ Reihenfolge ist so gewählt, dass nach jedem Block etwas Vorzeigbares existiert.
 - [ ] Falls Repo-Name abweicht: `base` in `vite.config.ts` anpassen
 - [ ] Mit dem Team durchklicken, offene Punkte aus `RUECKFRAGEN.md` klären
 
-## 🔜 Phase 2 – Supabase (gemeinsame Daten + Anmeldung)
+## ✅ Phase 2 – Supabase (gemeinsame Daten + Anmeldung) – umgesetzt
 
-- [ ] Supabase-Projekt anlegen
-- [ ] Schema aus `docs/supabase-schema.sql` einspielen (ggf. nach Rückfragen anpassen)
-- [ ] Echte Excel-Daten einmalig in die DB importieren (Skript vorhanden/anpassbar)
-- [ ] `SupabaseRepository` implementieren (gleiche Schnittstelle wie heute)
-- [ ] `AuthContext` auf Supabase Auth umstellen (Login per E-Mail/Magic-Link)
-- [ ] **Nutzerfreigabe:** Admin-Ansicht, um neue Nutzer freizugeben & Rollen zu vergeben
-- [ ] Row Level Security testen (kann ein viewer wirklich nicht schreiben?)
-- [ ] `.env` mit `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` befüllen
-      (in GitHub als Repository-Secrets für den Build hinterlegen)
+Implementiert: gemeinsame Datenbank, Supabase-Auth-Login, drei Rollen
+(viewer/editor/admin), Live-Updates (Realtime), Bearbeitungs-Sperren,
+Änderungs-Historie + Undo, tägliches Backup (7 Tage) und individuelle
+Tabellenansicht je Nutzer. Schema siehe `docs/supabase-schema.sql`.
+
+### Noch manuell zu erledigen (einmalig, im Supabase-Dashboard)
+
+1. **GitHub-Secrets** setzen (Settings → Secrets and variables → Actions):
+   - `VITE_SUPABASE_URL` = `https://bylcztqahqzsaeztqfov.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = der anon/publishable Key des Projekts
+   (öffentlich-sicher – Schutz erfolgt über Row Level Security). Ohne diese
+   Secrets baut die App im lokalen Demo-Modus (`localStorage`).
+
+2. **Selbst-Registrierung deaktivieren** (Authentication → Sign In / Providers →
+   „Allow new users to sign up" **aus**). Damit können sich nur per Admin
+   eingeladene Nutzer anmelden. (Zusätzliche Absicherung im Code: selbst
+   angelegte Konten ohne Admin-Rolle bleiben inaktiv = ohne Zugriff.)
+
+3. **E-Mail/SMTP** (Authentication → Emails): Für zuverlässige Einladungs- und
+   Passwort-Reset-Mails ein **eigenes SMTP** hinterlegen (der eingebaute
+   Supabase-Mailversand ist stark limitiert). Einladungs- und Reset-Vorlagen
+   können auf Deutsch angepasst werden. Ohne SMTP kann der Admin Nutzer
+   alternativ mit einem Initial-Passwort anlegen (Funktion ist vorhanden).
+
+4. **Site URL / Redirect URLs** (Authentication → URL Configuration): die
+   GitHub-Pages-URL eintragen, z.B.
+   `https://<organisation>.github.io/kampagnenplanung/`, damit Einladungs- und
+   Reset-Links zurück in die App führen.
+
+### Bootstrap-Admin
+
+Der erste Admin ist bereits angelegt:
+**valeska.wiedemann@dentalbauer.de** (Rolle `admin`). Das Initial-Passwort
+wurde gesondert mitgeteilt und sollte beim ersten Login über
+„Passwort vergessen" bzw. das Profil **sofort geändert** werden. Danach lädt
+die Admin die übrigen Nutzer über **⚙ Administration → Nutzerverwaltung** ein.
+
+### Backups & Wiederherstellung
+
+- Täglich um 02:17 UTC erstellt ein `pg_cron`-Job automatisch ein
+  vollständiges Backup; Backups älter als 7 Tage werden gelöscht.
+- Admins können unter **⚙ Administration → Backups** einen Tagesstand
+  wiederherstellen (der aktuelle Stand wird vorher automatisch gesichert) und
+  unter **User-Logs** einzelne Änderungen gezielt rückgängig machen.
 
 ## 🧭 Phase 3 – Komfort (optional, nach Bedarf)
 

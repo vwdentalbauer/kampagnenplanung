@@ -1,13 +1,15 @@
 import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import { getISOWeek } from "date-fns";
-import type { Kampagne, Status, Rolle } from "./types";
+import type { Kampagne, Status } from "./types";
 import { useAuth } from "./auth/AuthContext";
 import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
+import { useLocks } from "./data/useLock";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
-import { MANDANTEN, ROLLEN_LABELS, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
+import { MANDANTEN, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
 import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
+import { AdminPanel } from "./admin/AdminPanel";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
@@ -19,7 +21,7 @@ import { Logo } from "./components/Logo";
 type Ansicht = "tabelle" | "ziel" | "event";
 
 export default function App() {
-  const { nutzer, setRolle, darfBearbeiten, istAdmin, abmelden } = useAuth();
+  const { nutzer, userId, darfBearbeiten, istAdmin, abmelden } = useAuth();
   const {
     kampagnen,
     geladen,
@@ -28,8 +30,8 @@ export default function App() {
     loeschen,
     loeschenViele,
     ersetzeAlle,
-    zuruecksetzen,
   } = useKampagnen();
+  const { locks, sperren, freigeben } = useLocks(userId, nutzer.name);
   const { epics, setZeitraum } = useEpics();
   const {
     alle: alleEvents,
@@ -54,6 +56,23 @@ export default function App() {
   });
   const fileRef = useRef<HTMLInputElement>(null);
   const [mehrOffen, setMehrOffen] = useState(false);
+  const [adminOffen, setAdminOffen] = useState(false);
+
+  // Name des Nutzers, der eine Kampagne sperrt (null = frei oder von uns selbst).
+  const gesperrtVon = (id: string): string | null => {
+    const l = locks[`kampagne:${id}`];
+    return l && l.userId !== userId ? l.userName : null;
+  };
+
+  // Editor öffnen: bestehende Kampagne dabei für andere sperren.
+  const oeffneEditor = async (k: Kampagne | null) => {
+    if (k) await sperren("kampagne", k.id);
+    setEditor({ offen: true, kampagne: k });
+  };
+  const schliesseEditor = () => {
+    if (editor.kampagne) freigeben("kampagne", editor.kampagne.id);
+    setEditor({ offen: false, kampagne: null });
+  };
   const [eventBand, setEventBand] = useState(true);
   const [mandant, setMandant] = useState<string>(
     () => localStorage.getItem("kampagnen.mandant.v1") ?? "DE",
@@ -189,9 +208,15 @@ export default function App() {
       }));
       speichernViele(kopien);
     }
+    freigeben("kampagne", k.id);
     setEditor({ offen: false, kampagne: null });
   };
   const onDelete = (id: string) => {
+    const von = gesperrtVon(id);
+    if (von) {
+      alert(`Wird gerade von ${von} bearbeitet und kann nicht gelöscht werden.`);
+      return;
+    }
     if (confirm("Kampagne wirklich löschen?")) loeschen(id);
   };
 
@@ -300,20 +325,12 @@ export default function App() {
           </label>
           <span className="text-slate-500">{nutzer.name}</span>
           {istAdmin && (
-            <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-              <span className="text-slate-400 text-xs">Rolle</span>
-              <select
-                value={nutzer.rolle}
-                onChange={(e) => setRolle(e.target.value as Rolle)}
-                className="bg-transparent text-sm font-medium focus:outline-none"
-              >
-                {(Object.keys(ROLLEN_LABELS) as Rolle[]).map((r) => (
-                  <option key={r} value={r}>
-                    {ROLLEN_LABELS[r]}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <button
+              onClick={() => setAdminOffen(true)}
+              className="rounded-md border border-marke/40 bg-marke/5 px-3 py-1 text-sm font-medium text-marke-dark hover:bg-marke/10"
+            >
+              ⚙ Administration
+            </button>
           )}
           <button
             onClick={abmelden}
@@ -368,27 +385,15 @@ export default function App() {
                     ⬇ Excel-Export
                   </button>
                   {istAdmin && (
-                    <>
-                      <button
-                        onClick={() => {
-                          setMehrOffen(false);
-                          fileRef.current?.click();
-                        }}
-                        className="block w-full px-3 py-2 text-left text-slate-600 hover:bg-slate-50"
-                      >
-                        ⬆ Excel-Import (ersetzt Bestand)
-                      </button>
-                      <button
-                        onClick={() => {
-                          setMehrOffen(false);
-                          if (confirm("Alle lokalen Änderungen verwerfen und Originaldaten laden?"))
-                            zuruecksetzen();
-                        }}
-                        className="block w-full px-3 py-2 text-left text-slate-500 hover:bg-slate-50"
-                      >
-                        Daten zurücksetzen
-                      </button>
-                    </>
+                    <button
+                      onClick={() => {
+                        setMehrOffen(false);
+                        fileRef.current?.click();
+                      }}
+                      className="block w-full px-3 py-2 text-left text-slate-600 hover:bg-slate-50"
+                    >
+                      ⬆ Excel-Import (ersetzt Bestand)
+                    </button>
                   )}
                 </div>
               </>
@@ -411,7 +416,7 @@ export default function App() {
           )}
           {darfBearbeiten && (
             <button
-              onClick={() => setEditor({ offen: true, kampagne: null })}
+              onClick={() => oeffneEditor(null)}
               className="rounded-md bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
             >
               + Neuer Eintrag
@@ -462,11 +467,12 @@ export default function App() {
           <TabellenAnsicht
             kampagnen={gefiltert}
             darfBearbeiten={darfBearbeiten}
+            gesperrtVon={gesperrtVon}
             kanaele={alleKanaele}
             vorschlaege={vorschlaege}
             eventZeilen={eventBand ? subEventsImZeitraum : []}
             onEventClick={() => setAnsicht("event")}
-            onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+            onEdit={oeffneEditor}
             onDelete={onDelete}
             onUpdate={onUpdate}
             onBulkUpdate={onBulkUpdate}
@@ -481,7 +487,7 @@ export default function App() {
           vorschlaege={vorschlaege}
           epics={epics}
           onZeitraum={setZeitraum}
-          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onEdit={oeffneEditor}
           onDelete={onDelete}
           onUpdate={onUpdate}
           onBulkUpdate={onBulkUpdate}
@@ -495,7 +501,7 @@ export default function App() {
           vorschlaege={vorschlaege}
           events={events}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
-          onEdit={(k) => setEditor({ offen: true, kampagne: k })}
+          onEdit={oeffneEditor}
           onDelete={onDelete}
           onUpdate={onUpdate}
           onBulkUpdate={onBulkUpdate}
@@ -516,9 +522,12 @@ export default function App() {
             setEventEditor({ offen: true, kategorie: kategorie ?? null })
           }
           onSave={onSave}
-          onClose={() => setEditor({ offen: false, kampagne: null })}
+          onClose={schliesseEditor}
+          gesperrtVon={editor.kampagne ? gesperrtVon(editor.kampagne.id) : null}
         />
       )}
+
+      {adminOffen && <AdminPanel onClose={() => setAdminOffen(false)} />}
 
       {eventEditor.offen && (
         <VeranstaltungEditor
@@ -535,8 +544,8 @@ export default function App() {
       )}
 
       <footer className="mt-10 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
-        Demo-Stand · Daten liegen lokal im Browser · Nutzerverwaltung &amp; gemeinsame
-        Datenbank folgen über Supabase
+        Gemeinsame Datenbank, Anmeldung &amp; Rollen über Supabase · Änderungen
+        werden live für alle übernommen
         <div className="mt-1 text-slate-300">Version vom {__BUILD_TIME__}</div>
       </footer>
     </div>

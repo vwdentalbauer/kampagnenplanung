@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { supabase, supabaseAktiv } from "../lib/supabase";
 
 export interface SubEvent {
   id: string;
@@ -48,11 +49,10 @@ function migriereFlach(roh: Record<string, AltMeta>): Record<string, EventMeta> 
   return out;
 }
 
-function load(): ProLand {
+function ladeLokal(): ProLand {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw) as ProLand;
-    // Migration: bisherige (flache) Veranstaltungen gehören alle zu „DE".
     const v2 = localStorage.getItem(ALT_V2);
     const v1 = localStorage.getItem(ALT_V1);
     if (v2 || v1) {
@@ -67,32 +67,97 @@ function load(): ProLand {
   }
 }
 
+interface VRow {
+  id: string;
+  land: string;
+  kategorie: string;
+  typ: string;
+  subs: SubEvent[];
+}
+
 /**
  * Veranstaltungen je Mandant (Land). Schlüssel: land -> kategorie -> EventMeta.
+ * Supabase, wenn konfiguriert – sonst localStorage.
  */
 export function useVeranstaltungen() {
-  const [alle, setAlle] = useState<ProLand>(load);
+  const [alle, setAlle] = useState<ProLand>(() => (supabaseAktiv ? {} : ladeLokal()));
 
-  const speichern = (land: string, v: Veranstaltung, vorherigeKategorie?: string) => {
-    setAlle((prev) => {
-      const landMap = { ...(prev[land] ?? {}) };
-      if (vorherigeKategorie && vorherigeKategorie !== v.kategorie) delete landMap[vorherigeKategorie];
-      landMap[v.kategorie] = { typ: v.typ, subs: v.subs };
-      const next = { ...prev, [land]: landMap };
-      localStorage.setItem(KEY, JSON.stringify(next));
-      return next;
-    });
-  };
+  const neuLaden = useCallback(async () => {
+    if (!supabase) return;
+    const { data } = await supabase.from("veranstaltung").select("*");
+    const proLand: ProLand = {};
+    for (const r of (data ?? []) as VRow[]) {
+      (proLand[r.land] ??= {})[r.kategorie] = { typ: r.typ ?? "", subs: r.subs ?? [] };
+    }
+    setAlle(proLand);
+  }, []);
 
-  const loeschen = (land: string, kategorie: string) => {
-    setAlle((prev) => {
-      const landMap = { ...(prev[land] ?? {}) };
-      delete landMap[kategorie];
-      const next = { ...prev, [land]: landMap };
-      localStorage.setItem(KEY, JSON.stringify(next));
-      return next;
-    });
-  };
+  useEffect(() => {
+    const sb = supabase;
+    if (!sb) return;
+    neuLaden();
+    const ch = sb
+      .channel("veranstaltung-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "veranstaltung" },
+        () => neuLaden(),
+      )
+      .subscribe();
+    return () => {
+      sb.removeChannel(ch);
+    };
+  }, [neuLaden]);
+
+  const speichern = useCallback(
+    async (land: string, v: Veranstaltung, vorherigeKategorie?: string) => {
+      if (supabase) {
+        if (vorherigeKategorie && vorherigeKategorie !== v.kategorie) {
+          await supabase
+            .from("veranstaltung")
+            .delete()
+            .match({ land, kategorie: vorherigeKategorie });
+        }
+        await supabase
+          .from("veranstaltung")
+          .upsert(
+            { land, kategorie: v.kategorie, typ: v.typ, subs: v.subs },
+            { onConflict: "land,kategorie" },
+          );
+        await neuLaden();
+        return;
+      }
+      // lokaler Modus
+      setAlle((prev) => {
+        const landMap = { ...(prev[land] ?? {}) };
+        if (vorherigeKategorie && vorherigeKategorie !== v.kategorie)
+          delete landMap[vorherigeKategorie];
+        landMap[v.kategorie] = { typ: v.typ, subs: v.subs };
+        const next = { ...prev, [land]: landMap };
+        localStorage.setItem(KEY, JSON.stringify(next));
+        return next;
+      });
+    },
+    [neuLaden],
+  );
+
+  const loeschen = useCallback(
+    async (land: string, kategorie: string) => {
+      if (supabase) {
+        await supabase.from("veranstaltung").delete().match({ land, kategorie });
+        await neuLaden();
+        return;
+      }
+      setAlle((prev) => {
+        const landMap = { ...(prev[land] ?? {}) };
+        delete landMap[kategorie];
+        const next = { ...prev, [land]: landMap };
+        localStorage.setItem(KEY, JSON.stringify(next));
+        return next;
+      });
+    },
+    [neuLaden],
+  );
 
   return { alle, speichern, loeschen };
 }

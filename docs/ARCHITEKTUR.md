@@ -40,6 +40,28 @@ Siehe [`src/types.ts`](../src/types.ts). Felder: `quartal`, `kw`, `weekStart`,
 
 - **Phase 1 (erledigt):** Lauffähige App, echte Daten, drei Ansichten, Status,
   Filter, Rollen-Gerüst, GitHub-Pages-Deploy.
-- **Phase 2:** Supabase einbinden – `SupabaseRepository` + echte Anmeldung +
-  Nutzerfreigabe durch Admin. Schema-Entwurf liegt in `docs/supabase-schema.sql`.
-- **Phase 3 (optional):** Excel-Import/Export, Benachrichtigungen, Verlauf/Historie.
+- **Phase 2 (erledigt):** Supabase eingebunden – `SupabaseRepository` + echte
+  Anmeldung (Supabase Auth) + Nutzer-/Rechteverwaltung durch Admin, Row Level
+  Security, Live-Updates (Realtime), Bearbeitungs-Sperren, Änderungs-Historie
+  + Undo, tägliches Backup (7 Tage), individuelle Tabellenansicht je Nutzer.
+  Umgesetztes Schema: `docs/supabase-schema.sql`, Betrieb: `docs/LIVEGANG.md`.
+- **Phase 3 (optional):** Benachrichtigungen, Druck-/Mobilansicht, weitere
+  Auswertungen.
+
+## Rechtemanagement (Phase 2)
+
+| Rolle | Rechte |
+|---|---|
+| **viewer** (Leserechte) | Nur Ansicht, keine Änderungen. |
+| **editor** (Schreibrechte) | Alles erstellen/ändern/löschen – **außer** Excel-Import. |
+| **admin** | Wie editor + Nutzer-/Rechteverwaltung, Excel-Import, User-Logs, Änderungen rückgängig machen, Backups wiederherstellen. |
+
+- **Anmeldung:** Supabase Auth. Neue Nutzer legt **nur der Admin** an
+  (Einladung per E-Mail); öffentliche Selbst-Registrierung ist deaktiviert.
+- **Gleichzeitigkeit:** Beim Öffnen eines Eintrags wird dieser für andere
+  gesperrt (Nur-Lese-Hinweis); alle Änderungen erscheinen live bei allen.
+  Abgelaufene Sperren (>5 min) werden automatisch übernommen.
+- **Sicherheit:** Durchgesetzt serverseitig über Row Level Security; die UI
+  blendet zusätzlich passende Aktionen je Rolle ein/aus. Admin-Aktionen
+  (Nutzeranlage) laufen über eine Edge Function mit Service-Role – der
+  Service-Key ist nie im Frontend.

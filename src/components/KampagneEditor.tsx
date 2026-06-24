@@ -22,6 +22,8 @@ interface Props {
   onNeueVeranstaltung: (kategorie?: string) => void; // Veranstaltung/Sub anlegen aus dem Eintrag
   onSave: (k: Kampagne, spiegelLaender: string[]) => void;
   onClose: () => void;
+  /** Name des Nutzers, der den Eintrag gerade sperrt (null = frei). */
+  gesperrtVon?: string | null;
 }
 
 function leereKampagne(): Kampagne {
@@ -61,7 +63,9 @@ export function KampagneEditor({
   onNeueVeranstaltung,
   onSave,
   onClose,
+  gesperrtVon = null,
 }: Props) {
+  const readOnly = !!gesperrtVon;
   const [form, setForm] = useState<Kampagne>(kampagne ?? { ...leereKampagne(), land: mandant });
   const [versucht, setVersucht] = useState(false);
   const [eventAn, setEventAn] = useState<boolean>(() => !!(kampagne?.veranstaltung));
@@ -118,6 +122,14 @@ export function KampagneEditor({
           </button>
         </div>
 
+        {readOnly && (
+          <div className="border-b border-amber-200 bg-amber-50 px-5 py-2 text-sm text-amber-800">
+            🔒 Wird gerade von <strong>{gesperrtVon}</strong> bearbeitet –
+            Nur-Lese-Modus. Änderungen sind nicht möglich.
+          </div>
+        )}
+
+        <fieldset disabled={readOnly} className="contents">
         <div className="grid grid-cols-2 gap-4 p-5">
           <div className="col-span-2">
             <label className={label}>
@@ -445,6 +457,7 @@ export function KampagneEditor({
             </div>
           </div>
         </div>
+        </fieldset>
 
         <div className="flex items-center justify-between gap-2 border-t px-5 py-3">
           <span className="text-xs text-slate-400">
@@ -463,7 +476,8 @@ export function KampagneEditor({
             </button>
             <button
               onClick={speichern}
-              className="rounded bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark"
+              disabled={readOnly}
+              className="rounded bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark disabled:opacity-50"
             >
               Speichern
             </button>

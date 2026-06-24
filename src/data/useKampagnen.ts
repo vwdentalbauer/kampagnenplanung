@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Kampagne } from "../types";
 import { repository } from "./repository";
+import { supabase } from "../lib/supabase";
 
 export function useKampagnen() {
   const [kampagnen, setKampagnen] = useState<Kampagne[]>([]);
@@ -13,6 +14,23 @@ export function useKampagnen() {
 
   useEffect(() => {
     neuLaden();
+  }, [neuLaden]);
+
+  // Live-Updates: Änderungen anderer Nutzer sofort übernehmen.
+  useEffect(() => {
+    const sb = supabase;
+    if (!sb) return;
+    const ch = sb
+      .channel("kampagne-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "kampagne" },
+        () => neuLaden(),
+      )
+      .subscribe();
+    return () => {
+      sb.removeChannel(ch);
+    };
   }, [neuLaden]);
 
   const speichern = useCallback(
@@ -47,13 +65,12 @@ export function useKampagnen() {
     [neuLaden],
   );
 
-  const zuruecksetzen = useCallback(async () => {
-    setKampagnen(await repository.zuruecksetzen());
-  }, []);
-
-  const ersetzeAlle = useCallback(async (ks: Kampagne[]) => {
-    setKampagnen(await repository.ersetzeAlle(ks));
-  }, []);
+  const ersetzeAlle = useCallback(
+    async (ks: Kampagne[]) => {
+      setKampagnen(await repository.ersetzeAlle(ks));
+    },
+    [],
+  );
 
   return {
     kampagnen,
@@ -63,7 +80,6 @@ export function useKampagnen() {
     loeschen,
     loeschenViele,
     ersetzeAlle,
-    zuruecksetzen,
   };
 }
 

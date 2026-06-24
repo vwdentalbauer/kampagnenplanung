@@ -7,10 +7,16 @@ import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
 import { wochentagKurz, formatDatum, kwAusDatum } from "../lib/date";
+import { ladePref, speicherePref } from "../data/userPrefs";
+
+const PREF_SPALTEN = "tabelle.reihenfolge";
+const PREF_BREITEN = "tabelle.breiten";
 
 interface Props {
   kampagnen: Kampagne[];
   darfBearbeiten: boolean;
+  /** Liefert den Namen des sperrenden Nutzers (oder null), je Kampagne. */
+  gesperrtVon?: (id: string) => string | null;
   kanaele: string[];
   onEdit: (k: Kampagne) => void;
   onDelete: (id: string) => void;
@@ -139,6 +145,7 @@ function sortWert(key: SpaltenKey, k: Kampagne): number | string {
 export function TabellenAnsicht({
   kampagnen,
   darfBearbeiten,
+  gesperrtVon,
   kanaele,
   onEdit,
   onDelete,
@@ -162,12 +169,38 @@ export function TabellenAnsicht({
   const [sort, setSort] = useState<SortZustand>({ key: "kw", dir: "asc" });
   const selectAllRef = useRef<HTMLInputElement>(null);
 
+  // Individuelle Ansicht des Nutzers aus Supabase laden (einmalig beim Start).
+  const prefsGeladen = useRef(false);
+  useEffect(() => {
+    let aktiv = true;
+    (async () => {
+      const r = await ladePref<SpaltenKey[]>(PREF_SPALTEN);
+      const b = await ladePref<Record<SpaltenKey, number>>(PREF_BREITEN);
+      if (!aktiv) return;
+      if (r && Array.isArray(r)) {
+        const gueltig = r.filter((k) => k in SPALTEN);
+        const fehlend = STANDARD_REIHENFOLGE.filter((k) => !gueltig.includes(k));
+        setReihenfolge([...gueltig, ...fehlend]);
+      }
+      if (b) setBreiten((alt) => ({ ...alt, ...b }));
+      prefsGeladen.current = true;
+    })();
+    return () => {
+      aktiv = false;
+    };
+  }, []);
+
   useEffect(() => {
     localStorage.setItem(SPALTEN_KEY, JSON.stringify(reihenfolge));
+    if (prefsGeladen.current) speicherePref(PREF_SPALTEN, reihenfolge);
   }, [reihenfolge]);
 
   useEffect(() => {
     localStorage.setItem(BREITEN_KEY, JSON.stringify(breiten));
+    if (!prefsGeladen.current) return;
+    // Beim Breite-Ziehen entstehen viele Updates -> Speichern entprellen.
+    const t = setTimeout(() => speicherePref(PREF_BREITEN, breiten), 800);
+    return () => clearTimeout(t);
   }, [breiten]);
 
   // Spaltenbreite per Drag am rechten Rand des Spaltenkopfs anpassen.
@@ -268,12 +301,12 @@ export function TabellenAnsicht({
     setDragKey(null);
   };
 
-  const zelle = (key: SpaltenKey, k: Kampagne) => {
+  const zelle = (key: SpaltenKey, k: Kampagne, bearbeitbar: boolean) => {
     switch (key) {
       case "kw":
         return (
           <>
-            {darfBearbeiten ? (
+            {bearbeitbar ? (
               <EditableCell
                 type="number"
                 value={k.kw?.toString() ?? ""}
@@ -310,7 +343,7 @@ export function TabellenAnsicht({
       case "datum":
         return (
           <div>
-            {darfBearbeiten ? (
+            {bearbeitbar ? (
               <EditableCell
                 type="date"
                 value={k.weekStart ?? ""}
@@ -330,7 +363,7 @@ export function TabellenAnsicht({
           </div>
         );
       case "kampagne":
-        return darfBearbeiten ? (
+        return bearbeitbar ? (
           <EditableCell
             value={k.kampagne}
             vorschlaege={kampagneVorschlaege}
@@ -349,7 +382,7 @@ export function TabellenAnsicht({
           />
         );
       case "kanal":
-        return darfBearbeiten ? (
+        return bearbeitbar ? (
           <EditableCell
             value={k.kanal}
             vorschlaege={vorschlaege.kanal}
@@ -359,7 +392,7 @@ export function TabellenAnsicht({
           <span className="px-1.5">{k.kanal}</span>
         );
       case "subkanal":
-        return darfBearbeiten ? (
+        return bearbeitbar ? (
           <EditableCell
             value={k.subKanal}
             vorschlaege={subKanalVorschlaege}
@@ -379,13 +412,13 @@ export function TabellenAnsicht({
           </div>
         );
       case "verantwortung":
-        return darfBearbeiten ? (
+        return bearbeitbar ? (
           <EditableCell value={k.verantwortung} onCommit={(v) => onUpdate(k, { verantwortung: v })} />
         ) : (
           <span className="px-1.5 text-slate-600">{k.verantwortung}</span>
         );
       case "status":
-        return darfBearbeiten ? (
+        return bearbeitbar ? (
           <select
             value={k.status}
             onChange={(e) => onUpdate(k, { status: e.target.value as Status })}
@@ -546,6 +579,9 @@ export function TabellenAnsicht({
 
               const k = it.k;
               const gewaehlt = auswahl.has(k.id);
+              // Sperre durch anderen Nutzer -> Zeile read-only.
+              const sperrName = gesperrtVon?.(k.id) ?? null;
+              const bearbeitbar = darfBearbeiten && !sperrName;
               // Laufende Kampagne (Zeitraum) vs. Einzeltermin.
               const laufend = !!k.endDatum;
               // Überfällig: (effektives) Ende liegt in der Vergangenheit und nicht erledigt.
@@ -589,27 +625,36 @@ export function TabellenAnsicht({
                   </td>
                   {sichtbareReihenfolge.map((key) => (
                     <td key={key} className="overflow-hidden px-2 py-1">
-                      {zelle(key, k)}
+                      {zelle(key, k, bearbeitbar)}
                     </td>
                   ))}
                   {darfBearbeiten && (
                     <td className="whitespace-nowrap px-3 py-2">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => onEdit(k)}
-                          title="Bearbeiten (alle Felder, inkl. Bereiche)"
-                          className="rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                      {sperrName ? (
+                        <span
+                          title={`Wird gerade von ${sperrName} bearbeitet`}
+                          className="text-xs text-amber-600"
                         >
-                          <PencilIcon />
-                        </button>
-                        <button
-                          onClick={() => onDelete(k.id)}
-                          title="Löschen"
-                          className="rounded p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
-                        >
-                          <TrashIcon />
-                        </button>
-                      </div>
+                          🔒 {sperrName}
+                        </span>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => onEdit(k)}
+                            title="Bearbeiten (alle Felder, inkl. Bereiche)"
+                            className="rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                          >
+                            <PencilIcon />
+                          </button>
+                          <button
+                            onClick={() => onDelete(k.id)}
+                            title="Löschen"
+                            className="rounded p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                          >
+                            <TrashIcon />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   )}
                 </tr>
