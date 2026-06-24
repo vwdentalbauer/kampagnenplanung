@@ -12,12 +12,14 @@ interface Props {
   kanaele: string[];
   subKanaele: string[];
   owners: string[];
+  sparten: string[];
   kampagnen: string[];
   aktuelleKw: number;
   // „(leer)"-Option nur zeigen, wenn es auch leere Felder gibt
   leerKanaele: boolean;
   leerSubKanaele: boolean;
   leerOwners: boolean;
+  leerSparten: boolean;
   leerKampagnen: boolean;
 }
 
@@ -29,11 +31,13 @@ export function FilterBar({
   kanaele,
   subKanaele,
   owners,
+  sparten,
   kampagnen,
   aktuelleKw,
   leerKanaele,
   leerSubKanaele,
   leerOwners,
+  leerSparten,
   leerKampagnen,
 }: Props) {
   const sel =
@@ -92,6 +96,13 @@ export function FilterBar({
           onChange={(v) => upd({ owners: v })}
           withEmpty={leerOwners}
           suchbar
+        />
+        <MultiSelect
+          label="Sparten"
+          options={sparten}
+          selected={filter.sparten}
+          onChange={(v) => upd({ sparten: v })}
+          withEmpty={leerSparten}
         />
 
         {/* abgesetzte Schnellfilter PLULINE / WKZ */}

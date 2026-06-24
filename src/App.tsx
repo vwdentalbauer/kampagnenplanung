@@ -86,6 +86,7 @@ export default function App() {
       kanaele: facette(mandantKampagnen, filter, "kanaele"),
       subkanaele: facette(mandantKampagnen, filter, "subkanaele"),
       owners: facette(mandantKampagnen, filter, "owners"),
+      sparten: facette(mandantKampagnen, filter, "sparten"),
       kampagnen: facette(mandantKampagnen, filter, "kampagne"),
     }),
     [mandantKampagnen, filter],
@@ -97,6 +98,7 @@ export default function App() {
       kanaele: gibtLeere(mandantKampagnen, filter, "kanaele"),
       subKanaele: gibtLeere(mandantKampagnen, filter, "subkanaele"),
       owners: gibtLeere(mandantKampagnen, filter, "owners"),
+      sparten: gibtLeere(mandantKampagnen, filter, "sparten"),
       kampagnen: gibtLeere(mandantKampagnen, filter, "kampagne"),
     }),
     [mandantKampagnen, filter],
@@ -427,11 +429,13 @@ export default function App() {
           kanaele={facetten.kanaele}
           subKanaele={facetten.subkanaele}
           owners={facetten.owners}
+          sparten={facetten.sparten}
           kampagnen={facetten.kampagnen}
           aktuelleKw={aktuelleKw}
           leerKanaele={leer.kanaele}
           leerSubKanaele={leer.subKanaele}
           leerOwners={leer.owners}
+          leerSparten={leer.sparten}
           leerKampagnen={leer.kampagnen}
         />
       </div>
