@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { ROLLEN_LABELS } from "../constants";
-import type { Rolle } from "../types";
+import type { Rolle, Kampagne } from "../types";
+import { repository, normalisieren } from "../data/repository";
 
-type Tab = "nutzer" | "logs" | "backups";
+type Tab = "nutzer" | "logs" | "backups" | "lokal";
 
 interface ProfilRow {
   id: string;
@@ -69,6 +70,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
             ["nutzer", "👥 Nutzerverwaltung"],
             ["logs", "📜 User-Logs"],
             ["backups", "💾 Backups"],
+            ["lokal", "📥 Lokale Daten"],
           ] as [Tab, string][]).map(([id, label]) => (
             <button
               key={id}
@@ -88,6 +90,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
           {tab === "nutzer" && <Nutzerverwaltung />}
           {tab === "logs" && <UserLogs />}
           {tab === "backups" && <Backups />}
+          {tab === "lokal" && <LokaleDaten />}
         </div>
       </div>
     </div>
@@ -477,6 +480,177 @@ function Backups() {
           </tbody>
         </table>
       )}
+    </div>
+  );
+}
+
+// --- Lokale Daten übernehmen ----------------------------------------------
+// Einmalige Wiederherstellung: liest die im Browser (localStorage) noch
+// vorhandenen Daten dieses Geräts und überträgt sie in die gemeinsame
+// Supabase-Datenbank (Upsert). Gedacht für den Wechsel vom lokalen Modus
+// auf das gemeinsame Backend.
+interface SubEvent {
+  id: string;
+  name: string;
+  ort: string;
+  start: string | null;
+  ende: string | null;
+}
+interface EventMeta {
+  typ: string;
+  subs: SubEvent[];
+}
+type ProLand = Record<string, Record<string, EventMeta>>;
+
+function leseKampagnen(): Kampagne[] {
+  try {
+    const raw = localStorage.getItem("kampagnen.v1");
+    if (!raw) return [];
+    return normalisieren(JSON.parse(raw) as Kampagne[]);
+  } catch {
+    return [];
+  }
+}
+
+function migriereFlach(roh: Record<string, any>): Record<string, EventMeta> {
+  const out: Record<string, EventMeta> = {};
+  for (const [kat, m] of Object.entries(roh)) {
+    if (Array.isArray(m?.subs)) {
+      out[kat] = { typ: m.typ ?? "", subs: m.subs.map((s: any) => ({ ...s, name: s.name ?? "" })) };
+    } else {
+      const sub: SubEvent[] =
+        m?.ort || m?.start
+          ? [{ id: `s${Date.now()}_${kat}`, name: "", ort: m.ort ?? "", start: m.start ?? null, ende: m.ende ?? null }]
+          : [];
+      out[kat] = { typ: m?.typ ?? "", subs: sub };
+    }
+  }
+  return out;
+}
+
+function leseVeranstaltungen(): ProLand {
+  try {
+    const v3 = localStorage.getItem("kampagnen.veranstaltungen.v3");
+    if (v3) return JSON.parse(v3) as ProLand;
+    const alt = localStorage.getItem("kampagnen.veranstaltungen.v2") ??
+      localStorage.getItem("kampagnen.veranstaltungen.v1");
+    if (alt) return { DE: migriereFlach(JSON.parse(alt)) };
+    return {};
+  } catch {
+    return {};
+  }
+}
+
+function leseEpics(): Record<string, { start: string | null; ende: string | null }> {
+  try {
+    return JSON.parse(localStorage.getItem("kampagnen.epics.v1") ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function LokaleDaten() {
+  const [kampagnen] = useState<Kampagne[]>(leseKampagnen);
+  const [veranstaltungen] = useState<ProLand>(leseVeranstaltungen);
+  const [epics] = useState(leseEpics);
+  const [laeuft, setLaeuft] = useState(false);
+  const [fehler, setFehler] = useState<string | null>(null);
+  const [fertig, setFertig] = useState<string | null>(null);
+
+  const anzVeranstaltungen = Object.values(veranstaltungen).reduce(
+    (s, m) => s + Object.keys(m).length,
+    0,
+  );
+  const anzEpics = Object.keys(epics).length;
+  const nichts = kampagnen.length === 0 && anzVeranstaltungen === 0 && anzEpics === 0;
+
+  const uebernehmen = async () => {
+    if (
+      !confirm(
+        "Lokale Daten dieses Browsers in die gemeinsame Datenbank übernehmen?\n\n" +
+          "Vorhandene Einträge mit gleicher ID/Schlüssel werden überschrieben " +
+          "(deine lokale Version gewinnt). Neue Einträge werden ergänzt.",
+      )
+    )
+      return;
+    setLaeuft(true);
+    setFehler(null);
+    setFertig(null);
+    try {
+      // 1) Kampagnen (alle Länder)
+      if (kampagnen.length) await repository.speichernViele(kampagnen);
+
+      // 2) Veranstaltungen je Land/Kategorie
+      for (const [land, kats] of Object.entries(veranstaltungen)) {
+        for (const [kategorie, meta] of Object.entries(kats)) {
+          const { error } = await supabase!
+            .from("veranstaltung")
+            .upsert(
+              { land, kategorie, typ: meta.typ ?? "", subs: meta.subs ?? [] },
+              { onConflict: "land,kategorie" },
+            );
+          if (error) throw error;
+        }
+      }
+
+      // 3) Epics (Zeiträume)
+      for (const [name, z] of Object.entries(epics)) {
+        const { error } = await supabase!
+          .from("epic")
+          .upsert({ name, start: z.start, ende: z.ende }, { onConflict: "name" });
+        if (error) throw error;
+      }
+
+      setFertig(
+        `Übernommen: ${kampagnen.length} Kampagnen, ${anzVeranstaltungen} Veranstaltungen, ${anzEpics} Zeiträume. ` +
+          "Bitte die Seite neu laden.",
+      );
+    } catch (e) {
+      setFehler((e as Error).message);
+    } finally {
+      setLaeuft(false);
+    }
+  };
+
+  return (
+    <div>
+      <p className="mb-3 text-sm text-slate-500">
+        Überträgt die noch im <strong>localStorage dieses Browsers</strong>
+        {" "}gespeicherten Daten in die gemeinsame Supabase-Datenbank. Dies hilft,
+        wenn beim Umstieg auf das Backend Veranstaltungen oder eigene Änderungen
+        fehlen. Am besten von dem Gerät ausführen, das den vollständigsten Stand
+        hat. Mehrfaches Ausführen ist unkritisch (Upsert).
+      </p>
+
+      <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+        <div className="font-semibold text-slate-700">In diesem Browser gefunden:</div>
+        <ul className="mt-1 space-y-0.5 text-slate-600">
+          <li>📋 Kampagnen: <strong>{kampagnen.length}</strong></li>
+          <li>🎟 Veranstaltungen: <strong>{anzVeranstaltungen}</strong></li>
+          <li>🗓 Zeiträume (Epics): <strong>{anzEpics}</strong></li>
+        </ul>
+      </div>
+
+      {nichts && (
+        <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          In diesem Browser wurden keine lokalen Daten gefunden. Versuche es ggf.
+          auf einem anderen Gerät/Browser, auf dem zuletzt damit gearbeitet wurde.
+        </p>
+      )}
+      {fehler && (
+        <p className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{fehler}</p>
+      )}
+      {fertig && (
+        <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{fertig}</p>
+      )}
+
+      <button
+        onClick={uebernehmen}
+        disabled={laeuft || nichts}
+        className="rounded-lg bg-marke px-4 py-2 text-sm font-medium text-white hover:bg-marke-dark disabled:opacity-50"
+      >
+        {laeuft ? "Übernehme…" : "In Supabase übernehmen"}
+      </button>
     </div>
   );
 }
