@@ -10,6 +10,8 @@ import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } 
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
 import { AdminPanel } from "./admin/AdminPanel";
+import { PasswortAendern } from "./auth/PasswortAendern";
+import { supabaseAktiv } from "./lib/supabase";
 import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
@@ -57,6 +59,7 @@ export default function App() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [mehrOffen, setMehrOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
+  const [pwAendernOffen, setPwAendernOffen] = useState(false);
 
   // Name des Nutzers, der eine Kampagne sperrt (null = frei oder von uns selbst).
   const gesperrtVon = (id: string): string | null => {
@@ -332,6 +335,14 @@ export default function App() {
               ⚙ Administration
             </button>
           )}
+          {supabaseAktiv && (
+            <button
+              onClick={() => setPwAendernOffen(true)}
+              className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 hover:bg-slate-50"
+            >
+              🔑 Passwort
+            </button>
+          )}
           <button
             onClick={abmelden}
             className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 hover:bg-slate-50"
@@ -528,6 +539,8 @@ export default function App() {
       )}
 
       {adminOffen && <AdminPanel onClose={() => setAdminOffen(false)} />}
+
+      {pwAendernOffen && <PasswortAendern onClose={() => setPwAendernOffen(false)} />}
 
       {eventEditor.offen && (
         <VeranstaltungEditor
