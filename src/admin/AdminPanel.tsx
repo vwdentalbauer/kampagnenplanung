@@ -13,6 +13,7 @@ interface ProfilRow {
   rolle: Rolle;
   aktiv: boolean;
   created_at: string;
+  last_sign_in_at?: string | null;
 }
 
 interface LogRow {
@@ -192,6 +193,21 @@ function Nutzerverwaltung() {
     }
   };
 
+  const neuesPasswort = async (id: string, email: string) => {
+    const z = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    const arr = crypto.getRandomValues(new Uint32Array(12));
+    const pw = Array.from(arr, (n) => z[n % z.length]).join("");
+    if (!confirm(`Für ${email} ein neues Passwort erzeugen?`)) return;
+    setFehler(null);
+    setHinweis(null);
+    try {
+      await adminAktion({ action: "set_password", id, passwort: pw });
+      setHinweis(`Neues Passwort für ${email}: ${pw}  (bitte weitergeben)`);
+    } catch (e) {
+      setFehler((e as Error).message);
+    }
+  };
+
   return (
     <div>
       {/* Einladen / Anlegen */}
@@ -303,18 +319,40 @@ function Nutzerverwaltung() {
                   </select>
                 </td>
                 <td className="py-2">
-                  <button
-                    onClick={() => aktivSchalten(u.id, !u.aktiv)}
-                    className={`rounded px-2 py-1 text-xs font-medium ${
-                      u.aktiv
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {u.aktiv ? "aktiv" : "gesperrt"}
-                  </button>
+                  {(() => {
+                    // Login-Info nur auswerten, wenn der Server sie liefert
+                    // (Feld vorhanden). Sonst neutral „aktiv" zeigen.
+                    const hatLoginInfo = "last_sign_in_at" in u;
+                    const status = !u.aktiv
+                      ? { label: "gesperrt", cls: "bg-slate-100 text-slate-500" }
+                      : hatLoginInfo && !u.last_sign_in_at
+                        ? { label: "eingeladen", cls: "bg-amber-50 text-amber-700" }
+                        : { label: "aktiv", cls: "bg-emerald-50 text-emerald-700" };
+                    return (
+                      <button
+                        onClick={() => aktivSchalten(u.id, !u.aktiv)}
+                        title={
+                          u.aktiv
+                            ? (u.last_sign_in_at
+                                ? "Hat sich angemeldet · Klick zum Sperren"
+                                : "Eingeladen, noch nicht angemeldet · Klick zum Sperren")
+                            : "Gesperrt · Klick zum Freischalten"
+                        }
+                        className={`rounded px-2 py-1 text-xs font-medium ${status.cls}`}
+                      >
+                        {status.label}
+                      </button>
+                    );
+                  })()}
                 </td>
                 <td className="py-2 text-right">
+                  <button
+                    onClick={() => neuesPasswort(u.id, u.email)}
+                    className="mr-1 rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                    title="Neues Passwort erzeugen"
+                  >
+                    🔑
+                  </button>
                   <button
                     onClick={() => loeschen(u.id, u.email)}
                     className="rounded p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
@@ -337,6 +375,8 @@ function UserLogs() {
   const [logs, setLogs] = useState<LogRow[]>([]);
   const [laedt, setLaedt] = useState(true);
   const [fehler, setFehler] = useState<string | null>(null);
+  const [suche, setSuche] = useState("");
+  const [aktionFilter, setAktionFilter] = useState("");
 
   const laden = useCallback(async () => {
     setLaedt(true);
@@ -344,7 +384,7 @@ function UserLogs() {
       .from("audit_log")
       .select("id, ts, user_email, tabelle, datensatz_id, aktion, rueckgaengig_am")
       .order("ts", { ascending: false })
-      .limit(300);
+      .limit(2000);
     if (error) setFehler(error.message);
     else setLogs((data ?? []) as LogRow[]);
     setLaedt(false);
@@ -366,9 +406,76 @@ function UserLogs() {
     update: "geändert",
     delete: "gelöscht",
   };
+  const TABELLE: Record<string, string> = {
+    kampagne: "Kampagne",
+    veranstaltung: "Veranstaltung",
+    epic: "Zeitraum",
+  };
+
+  const gefiltert = logs.filter((l) => {
+    if (aktionFilter && l.aktion !== aktionFilter) return false;
+    if (!suche.trim()) return true;
+    const q = suche.toLowerCase();
+    return [
+      l.user_email ?? "",
+      TABELLE[l.tabelle] ?? l.tabelle,
+      AKTION[l.aktion] ?? l.aktion,
+      l.datensatz_id ?? "",
+      new Date(l.ts).toLocaleString("de-DE"),
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
+  });
+
+  const exportieren = async () => {
+    const XLSX = await import("xlsx");
+    const zeilen = gefiltert.map((l) => ({
+      Zeit: new Date(l.ts).toLocaleString("de-DE"),
+      Nutzer: l.user_email ?? "",
+      Aktion: AKTION[l.aktion] ?? l.aktion,
+      Bereich: TABELLE[l.tabelle] ?? l.tabelle,
+      Datensatz: l.datensatz_id ?? "",
+      Zurückgenommen: l.rueckgaengig_am
+        ? new Date(l.rueckgaengig_am).toLocaleString("de-DE")
+        : "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(zeilen);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "User-Logs");
+    const datum = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `User-Logs_${datum}.xlsx`);
+  };
 
   return (
     <div>
+      {/* Such-/Filterleiste */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <input
+          placeholder="Suchen (Nutzer, Bereich, Datensatz …)"
+          value={suche}
+          onChange={(e) => setSuche(e.target.value)}
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+        />
+        <select
+          value={aktionFilter}
+          onChange={(e) => setAktionFilter(e.target.value)}
+          className="rounded-lg border border-slate-300 px-2 py-2 text-sm"
+        >
+          <option value="">Alle Aktionen</option>
+          <option value="insert">erstellt</option>
+          <option value="update">geändert</option>
+          <option value="delete">gelöscht</option>
+        </select>
+        <button
+          onClick={exportieren}
+          disabled={gefiltert.length === 0}
+          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+        >
+          ⬇ Excel
+        </button>
+      </div>
+
       {fehler && (
         <p className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">
           {fehler}
@@ -377,51 +484,60 @@ function UserLogs() {
       {laedt ? (
         <p className="py-6 text-center text-slate-400">Lädt…</p>
       ) : (
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs uppercase text-slate-500">
-            <tr className="border-b border-slate-200">
-              <th className="py-2">Zeit</th>
-              <th className="py-2">Nutzer</th>
-              <th className="py-2">Aktion</th>
-              <th className="py-2">Datensatz</th>
-              <th className="py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((l) => (
-              <tr key={l.id} className="border-b border-slate-100">
-                <td className="py-2 text-xs text-slate-500">
-                  {new Date(l.ts).toLocaleString("de-DE")}
-                </td>
-                <td className="py-2 text-xs">{l.user_email ?? "—"}</td>
-                <td className="py-2">
-                  {AKTION[l.aktion] ?? l.aktion}{" "}
-                  <span className="text-xs text-slate-400">({l.tabelle})</span>
-                </td>
-                <td className="py-2 text-xs text-slate-400">{l.datensatz_id}</td>
-                <td className="py-2 text-right">
-                  {l.rueckgaengig_am ? (
-                    <span className="text-xs text-slate-400">zurückgenommen</span>
-                  ) : (
-                    <button
-                      onClick={() => rueckgaengig(l.id)}
-                      className="rounded border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
-                    >
-                      Rückgängig
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {logs.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-6 text-center text-slate-400">
-                  Noch keine Einträge.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <>
+          <p className="mb-2 text-xs text-slate-400">
+            {gefiltert.length} von {logs.length} Einträgen
+          </p>
+          <div className="max-h-[55vh] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-white text-left text-xs uppercase text-slate-500">
+                <tr className="border-b border-slate-200">
+                  <th className="py-2">Zeit</th>
+                  <th className="py-2">Nutzer</th>
+                  <th className="py-2">Aktion</th>
+                  <th className="py-2">Datensatz</th>
+                  <th className="py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {gefiltert.map((l) => (
+                  <tr key={l.id} className="border-b border-slate-100">
+                    <td className="py-2 text-xs text-slate-500">
+                      {new Date(l.ts).toLocaleString("de-DE")}
+                    </td>
+                    <td className="py-2 text-xs">{l.user_email ?? "—"}</td>
+                    <td className="py-2">
+                      {AKTION[l.aktion] ?? l.aktion}{" "}
+                      <span className="text-xs text-slate-400">
+                        ({TABELLE[l.tabelle] ?? l.tabelle})
+                      </span>
+                    </td>
+                    <td className="py-2 text-xs text-slate-400">{l.datensatz_id}</td>
+                    <td className="py-2 text-right">
+                      {l.rueckgaengig_am ? (
+                        <span className="text-xs text-slate-400">zurückgenommen</span>
+                      ) : (
+                        <button
+                          onClick={() => rueckgaengig(l.id)}
+                          className="rounded border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                        >
+                          Rückgängig
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {gefiltert.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-slate-400">
+                      Keine passenden Einträge.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

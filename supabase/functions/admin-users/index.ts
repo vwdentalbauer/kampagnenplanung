@@ -54,7 +54,16 @@ Deno.serve(async (req) => {
         .select("id, email, name, rolle, aktiv, created_at")
         .order("created_at", { ascending: true });
       if (error) throw error;
-      return json({ users: profiles });
+      // Login-Status aus auth.users ergänzen (last_sign_in_at).
+      const { data: authList } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      const letzterLogin = new Map(
+        (authList?.users ?? []).map((u) => [u.id, u.last_sign_in_at ?? null]),
+      );
+      const users = (profiles ?? []).map((p) => ({
+        ...p,
+        last_sign_in_at: letzterLogin.get(p.id) ?? null,
+      }));
+      return json({ users });
     }
 
     if (action === "invite") {
@@ -85,6 +94,16 @@ Deno.serve(async (req) => {
       });
       if (error) throw error;
       return json({ ok: true, user: data.user, modus: "einladung" });
+    }
+
+    if (action === "set_password") {
+      const id = String(body.id ?? "");
+      const passwort = String(body.passwort ?? "");
+      if (passwort.length < 8)
+        return json({ error: "Das Passwort muss mindestens 8 Zeichen haben." }, 400);
+      const { error } = await admin.auth.admin.updateUserById(id, { password: passwort });
+      if (error) throw error;
+      return json({ ok: true });
     }
 
     if (action === "set_role") {

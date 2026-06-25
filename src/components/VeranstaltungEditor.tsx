@@ -35,7 +35,8 @@ export function VeranstaltungEditor({ veranstaltung, orte, onSave, onDelete, onC
 
   const setSub = (id: string, teil: Partial<SubEvent>) =>
     setForm((f) => ({ ...f, subs: f.subs.map((s) => (s.id === id ? { ...s, ...teil } : s)) }));
-  const addSub = () => setForm((f) => ({ ...f, subs: [...f.subs, neueSub()] }));
+  // Neuen Ort/Termin oben einfügen, damit er sofort sichtbar ist.
+  const addSub = () => setForm((f) => ({ ...f, subs: [neueSub(), ...f.subs] }));
   const delSub = (id: string) => setForm((f) => ({ ...f, subs: f.subs.filter((s) => s.id !== id) }));
 
   const speichern = () => {
@@ -43,7 +44,11 @@ export function VeranstaltungEditor({ veranstaltung, orte, onSave, onDelete, onC
       setVersucht(true);
       return;
     }
-    onSave({ ...form, kategorie: form.kategorie.trim() }, vorher);
+    // Beim Speichern zeitlich sortieren (ohne Datum ans Ende).
+    const subs = [...form.subs].sort((a, b) =>
+      (a.start || "9999").localeCompare(b.start || "9999"),
+    );
+    onSave({ ...form, kategorie: form.kategorie.trim(), subs }, vorher);
   };
 
   return (
