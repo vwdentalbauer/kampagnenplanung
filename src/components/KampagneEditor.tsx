@@ -24,6 +24,8 @@ interface Props {
   onClose: () => void;
   /** Name des Nutzers, der den Eintrag gerade sperrt (null = frei). */
   gesperrtVon?: string | null;
+  /** Vorbelegung für einen NEUEN Eintrag (z.B. Veranstaltung/Termin). */
+  vorlage?: Partial<Kampagne>;
 }
 
 function leereKampagne(): Kampagne {
@@ -64,11 +66,16 @@ export function KampagneEditor({
   onSave,
   onClose,
   gesperrtVon = null,
+  vorlage,
 }: Props) {
   const readOnly = !!gesperrtVon;
-  const [form, setForm] = useState<Kampagne>(kampagne ?? { ...leereKampagne(), land: mandant });
+  const [form, setForm] = useState<Kampagne>(
+    kampagne ?? { ...leereKampagne(), land: mandant, ...vorlage },
+  );
   const [versucht, setVersucht] = useState(false);
-  const [eventAn, setEventAn] = useState<boolean>(() => !!(kampagne?.veranstaltung));
+  const [eventAn, setEventAn] = useState<boolean>(
+    () => !!(kampagne?.veranstaltung || vorlage?.veranstaltung),
+  );
   const [spiegeln, setSpiegeln] = useState<string[]>([]);
   const gewaehltesEvent = veranstaltungen.find((v) => v.kategorie === form.veranstaltung);
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { ROLLEN_LABELS } from "../constants";
 import type { Rolle, Kampagne } from "../types";
@@ -24,6 +24,8 @@ interface LogRow {
   datensatz_id: string | null;
   aktion: string;
   rueckgaengig_am: string | null;
+  alt: Record<string, unknown> | null;
+  neu: Record<string, unknown> | null;
 }
 
 interface SnapRow {
@@ -371,8 +373,48 @@ function Nutzerverwaltung() {
 }
 
 // --- User-Logs ------------------------------------------------------------
+const FELD_LABELS: Record<string, string> = {
+  land: "Land", quartal: "Quartal", kw: "KW", week_start: "Startdatum",
+  end_datum: "Enddatum", zielgruppe: "Zielgruppe", kanal: "Kanal",
+  sub_kanal: "Sub-Kanal", kampagne: "Kampagne", details: "Details", ziel: "Ziel",
+  kategorie: "Kategorie", bereiche: "Sparten", pluline: "PLULINE", wkz: "WKZ",
+  veranstaltung: "Veranstaltung", sub_event: "Sub-Event", verantwortung: "Verantwortung",
+  owners: "Verantwortliche", status: "Status", typ: "Typ", subs: "Orte/Termine",
+  name: "Name", start: "Start", ende: "Ende",
+};
+const IGNORE_FELDER = new Set(["updated_at", "updated_by", "id"]);
+
+function fmtWert(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
+  if (typeof v === "boolean") return v ? "ja" : "nein";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
+interface FeldDiff {
+  feld: string;
+  alt: unknown;
+  neu: unknown;
+}
+function diffFelder(
+  alt: Record<string, unknown> | null,
+  neu: Record<string, unknown> | null,
+): FeldDiff[] {
+  const keys = new Set([...Object.keys(alt ?? {}), ...Object.keys(neu ?? {})]);
+  const out: FeldDiff[] = [];
+  for (const k of keys) {
+    if (IGNORE_FELDER.has(k)) continue;
+    const a = alt?.[k];
+    const n = neu?.[k];
+    if (JSON.stringify(a) !== JSON.stringify(n)) out.push({ feld: k, alt: a, neu: n });
+  }
+  return out;
+}
+
 function UserLogs() {
   const [logs, setLogs] = useState<LogRow[]>([]);
+  const [offenIds, setOffenIds] = useState<Set<number>>(new Set());
   const [laedt, setLaedt] = useState(true);
   const [fehler, setFehler] = useState<string | null>(null);
   const [suche, setSuche] = useState("");
@@ -382,7 +424,7 @@ function UserLogs() {
     setLaedt(true);
     const { data, error } = await supabase!
       .from("audit_log")
-      .select("id, ts, user_email, tabelle, datensatz_id, aktion, rueckgaengig_am")
+      .select("id, ts, user_email, tabelle, datensatz_id, aktion, rueckgaengig_am, alt, neu")
       .order("ts", { ascending: false })
       .limit(2000);
     if (error) setFehler(error.message);
@@ -500,33 +542,95 @@ function UserLogs() {
                 </tr>
               </thead>
               <tbody>
-                {gefiltert.map((l) => (
-                  <tr key={l.id} className="border-b border-slate-100">
-                    <td className="py-2 text-xs text-slate-500">
-                      {new Date(l.ts).toLocaleString("de-DE")}
-                    </td>
-                    <td className="py-2 text-xs">{l.user_email ?? "—"}</td>
-                    <td className="py-2">
-                      {AKTION[l.aktion] ?? l.aktion}{" "}
-                      <span className="text-xs text-slate-400">
-                        ({TABELLE[l.tabelle] ?? l.tabelle})
-                      </span>
-                    </td>
-                    <td className="py-2 text-xs text-slate-400">{l.datensatz_id}</td>
-                    <td className="py-2 text-right">
-                      {l.rueckgaengig_am ? (
-                        <span className="text-xs text-slate-400">zurückgenommen</span>
-                      ) : (
-                        <button
-                          onClick={() => rueckgaengig(l.id)}
-                          className="rounded border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
-                        >
-                          Rückgängig
-                        </button>
+                {gefiltert.map((l) => {
+                  const offen = offenIds.has(l.id);
+                  const diff =
+                    l.aktion === "update"
+                      ? diffFelder(l.alt, l.neu)
+                      : l.aktion === "insert"
+                        ? diffFelder({}, l.neu)
+                        : diffFelder(l.alt, {});
+                  return (
+                    <Fragment key={l.id}>
+                      <tr className="border-b border-slate-100">
+                        <td className="py-2 text-xs text-slate-500">
+                          {new Date(l.ts).toLocaleString("de-DE")}
+                        </td>
+                        <td className="py-2 text-xs">{l.user_email ?? "—"}</td>
+                        <td className="py-2">
+                          <button
+                            onClick={() =>
+                              setOffenIds((s) => {
+                                const n = new Set(s);
+                                n.has(l.id) ? n.delete(l.id) : n.add(l.id);
+                                return n;
+                              })
+                            }
+                            className="text-left hover:text-marke-dark"
+                            title="Details ein-/ausblenden"
+                          >
+                            <span className={`mr-1 inline-block text-[10px] text-slate-400 ${offen ? "rotate-90" : ""}`}>▶</span>
+                            {AKTION[l.aktion] ?? l.aktion}{" "}
+                            <span className="text-xs text-slate-400">
+                              ({TABELLE[l.tabelle] ?? l.tabelle})
+                            </span>
+                          </button>
+                        </td>
+                        <td className="py-2 text-xs text-slate-400">{l.datensatz_id}</td>
+                        <td className="py-2 text-right">
+                          {l.rueckgaengig_am ? (
+                            <span className="text-xs text-slate-400">zurückgenommen</span>
+                          ) : (
+                            <button
+                              onClick={() => rueckgaengig(l.id)}
+                              className="rounded border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                            >
+                              Rückgängig
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                      {offen && (
+                        <tr className="border-b border-slate-100 bg-slate-50">
+                          <td colSpan={5} className="px-3 py-2">
+                            {diff.length === 0 ? (
+                              <p className="text-xs text-slate-400">Keine Feldänderungen.</p>
+                            ) : (
+                              <table className="w-full text-xs">
+                                <tbody>
+                                  {diff.map((d) => (
+                                    <tr key={d.feld}>
+                                      <td className="w-40 py-0.5 pr-2 align-top font-medium text-slate-600">
+                                        {FELD_LABELS[d.feld] ?? d.feld}
+                                      </td>
+                                      <td className="py-0.5">
+                                        {l.aktion === "update" ? (
+                                          <span>
+                                            <span className="text-rose-600 line-through">
+                                              {fmtWert(d.alt)}
+                                            </span>{" "}
+                                            <span className="text-slate-400">→</span>{" "}
+                                            <span className="text-emerald-700">
+                                              {fmtWert(d.neu)}
+                                            </span>
+                                          </span>
+                                        ) : l.aktion === "insert" ? (
+                                          <span className="text-emerald-700">{fmtWert(d.neu)}</span>
+                                        ) : (
+                                          <span className="text-slate-600">{fmtWert(d.alt)}</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            )}
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                  </tr>
-                ))}
+                    </Fragment>
+                  );
+                })}
                 {gefiltert.length === 0 && (
                   <tr>
                     <td colSpan={5} className="py-6 text-center text-slate-400">

@@ -19,6 +19,8 @@ interface Props {
   vorschlaege: Vorschlaege;
   events: Record<string, EventMeta>;
   onEditEvent: (kategorie: string) => void;
+  /** Neuen Eintrag direkt für eine Veranstaltung/Termin anlegen. */
+  onNeuerEintrag: (kategorie: string, subId: string | null) => void;
   onEdit: (k: Kampagne) => void;
   onDelete: (id: string) => void;
   onUpdate: (k: Kampagne, patch: Partial<Kampagne>) => void;
@@ -29,7 +31,23 @@ interface Props {
 type Modus = "datum" | "kategorie";
 
 export function VeranstaltungenAnsicht(props: Props) {
-  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, onEditEvent } = props;
+  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, onEditEvent, onNeuerEintrag } =
+    props;
+
+  // Kleiner „+ Eintrag"-Button (nur für Bearbeiter).
+  const plusEintrag = (kat: string, subId: string | null) =>
+    darfBearbeiten ? (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onNeuerEintrag(kat, subId);
+        }}
+        title="Eintrag zu diesem Termin anlegen"
+        className="shrink-0 rounded border border-marke px-2 py-0.5 text-xs font-medium text-marke-dark hover:bg-marke/10"
+      >
+        + Eintrag
+      </button>
+    ) : null;
   const [modus, setModus] = useState<Modus>("datum");
   const [offen, setOffen] = useState<Set<string>>(new Set());
   const toggle = (k: string) =>
@@ -135,27 +153,30 @@ export function VeranstaltungenAnsicht(props: Props) {
           const istOffen = offen.has(key);
           return (
             <section key={key} className="overflow-hidden rounded-lg border border-marke/30 bg-white">
-              <button
-                onClick={() => toggle(key)}
-                className="flex w-full items-center gap-3 px-3 py-3 text-left hover:bg-marke/5"
-              >
-                <ChevronIcon className={`h-4 w-4 shrink-0 text-slate-400 ${istOffen ? "rotate-90" : ""}`} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {sub.start && (
-                      <span className="text-sm font-semibold text-marke-dark">
-                        {formatDatum(sub.start)}
-                        {sub.ende && sub.ende !== sub.start ? `–${formatDatum(sub.ende)}` : ""}
-                      </span>
-                    )}
-                    <span className="font-medium text-slate-800">{kat}</span>
-                    {sub.name && <span className="text-sm text-slate-600">{sub.name}</span>}
-                    {sub.ort && <span className="text-xs text-slate-500">📍 {sub.ort}</span>}
-                    {typ && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{typ}</span>}
+              <div className="flex items-center gap-2 px-3 py-3">
+                <button
+                  onClick={() => toggle(key)}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left hover:opacity-80"
+                >
+                  <ChevronIcon className={`h-4 w-4 shrink-0 text-slate-400 ${istOffen ? "rotate-90" : ""}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {sub.start && (
+                        <span className="text-sm font-semibold text-marke-dark">
+                          {formatDatum(sub.start)}
+                          {sub.ende && sub.ende !== sub.start ? `–${formatDatum(sub.ende)}` : ""}
+                        </span>
+                      )}
+                      <span className="font-medium text-slate-800">{kat}</span>
+                      {sub.name && <span className="text-sm text-slate-600">{sub.name}</span>}
+                      {sub.ort && <span className="text-xs text-slate-500">📍 {sub.ort}</span>}
+                      {typ && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{typ}</span>}
+                    </div>
                   </div>
-                </div>
-                <span className="shrink-0 text-xs text-slate-400">{tasks.length} Einträge</span>
-              </button>
+                  <span className="shrink-0 text-xs text-slate-400">{tasks.length} Einträge</span>
+                </button>
+                {plusEintrag(kat, sub.id)}
+              </div>
               {istOffen && (
                 <div className="border-t border-marke/20 p-2">
                   {tasks.length === 0 ? (
@@ -223,14 +244,17 @@ export function VeranstaltungenAnsicht(props: Props) {
                       const tasks = eintraegeFuer(kat, s.id);
                       return (
                         <div key={s.id} className="rounded-lg border border-slate-200">
-                          <button
-                            onClick={() => toggle(subKey)}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-slate-50"
-                          >
-                            <ChevronIcon className={`h-3.5 w-3.5 shrink-0 text-slate-400 ${subOffen ? "rotate-90" : ""}`} />
-                            <span className="font-medium text-slate-700">{subLabel(s)}</span>
-                            <span className="ml-auto text-xs text-slate-400">{tasks.length} Einträge</span>
-                          </button>
+                          <div className="flex items-center gap-2 px-3 py-2">
+                            <button
+                              onClick={() => toggle(subKey)}
+                              className="flex min-w-0 flex-1 items-center gap-2 text-left hover:opacity-80"
+                            >
+                              <ChevronIcon className={`h-3.5 w-3.5 shrink-0 text-slate-400 ${subOffen ? "rotate-90" : ""}`} />
+                              <span className="font-medium text-slate-700">{subLabel(s)}</span>
+                              <span className="ml-auto text-xs text-slate-400">{tasks.length} Einträge</span>
+                            </button>
+                            {plusEintrag(kat, s.id)}
+                          </div>
                           {subOffen && (
                             <div className="border-t border-slate-100 p-2">
                               {tasks.length === 0 ? (
@@ -244,12 +268,17 @@ export function VeranstaltungenAnsicht(props: Props) {
                       );
                     })}
 
-                    {ohneTermin.length > 0 && (
-                      <div className="rounded-lg border border-dashed border-slate-300 p-2">
-                        <p className="mb-1 px-1 text-xs text-slate-500">Ohne Ort/Termin zugeordnet</p>
-                        {tabelle(ohneTermin)}
+                    <div className="rounded-lg border border-dashed border-slate-300 p-2">
+                      <div className="mb-1 flex items-center justify-between px-1">
+                        <p className="text-xs text-slate-500">Ohne Ort/Termin zugeordnet</p>
+                        {plusEintrag(kat, null)}
                       </div>
-                    )}
+                      {ohneTermin.length > 0 ? (
+                        tabelle(ohneTermin)
+                      ) : (
+                        <p className="px-1 py-2 text-xs text-slate-400">Noch keine Einträge.</p>
+                      )}
+                    </div>
                   </div>
                 )}
               </section>

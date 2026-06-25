@@ -52,7 +52,11 @@ export default function App() {
     ...LEERER_FILTER,
     kwVon: String(getISOWeek(new Date())),
   }));
-  const [editor, setEditor] = useState<{ offen: boolean; kampagne: Kampagne | null }>({
+  const [editor, setEditor] = useState<{
+    offen: boolean;
+    kampagne: Kampagne | null;
+    vorlage?: Partial<Kampagne>;
+  }>({
     offen: false,
     kampagne: null,
   });
@@ -71,6 +75,10 @@ export default function App() {
   const oeffneEditor = async (k: Kampagne | null) => {
     if (k) await sperren("kampagne", k.id);
     setEditor({ offen: true, kampagne: k });
+  };
+  // Neuen Eintrag mit Vorbelegung öffnen (z.B. aus einer Veranstaltung heraus).
+  const neuerEintragMitVorlage = (vorlage: Partial<Kampagne>) => {
+    setEditor({ offen: true, kampagne: null, vorlage: { land: mandant, ...vorlage } });
   };
   const schliesseEditor = () => {
     if (editor.kampagne) freigeben("kampagne", editor.kampagne.id);
@@ -512,6 +520,9 @@ export default function App() {
           vorschlaege={vorschlaege}
           events={events}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
+          onNeuerEintrag={(kat, subId) =>
+            neuerEintragMitVorlage({ veranstaltung: kat, subEvent: subId ?? "" })
+          }
           onEdit={oeffneEditor}
           onDelete={onDelete}
           onUpdate={onUpdate}
@@ -535,6 +546,7 @@ export default function App() {
           onSave={onSave}
           onClose={schliesseEditor}
           gesperrtVon={editor.kampagne ? gesperrtVon(editor.kampagne.id) : null}
+          vorlage={editor.vorlage}
         />
       )}
 
