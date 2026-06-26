@@ -16,11 +16,12 @@ import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
 import { VeranstaltungenAnsicht } from "./components/VeranstaltungenAnsicht";
+import { DiagrammAnsicht } from "./components/DiagrammAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
 import { VeranstaltungEditor } from "./components/VeranstaltungEditor";
 import { Logo } from "./components/Logo";
 
-type Ansicht = "tabelle" | "ziel" | "event";
+type Ansicht = "tabelle" | "ziel" | "event" | "diagramm";
 
 export default function App() {
   const { nutzer, userId, darfBearbeiten, istAdmin, abmelden } = useAuth();
@@ -379,6 +380,7 @@ export default function App() {
           {tab("tabelle", "📋 Tabelle")}
           {tab("ziel", "📣 Kampagne")}
           {tab("event", "🎟 Veranstaltungen")}
+          {tab("diagramm", "🧩 Diagramme")}
         </div>
         <div className="flex items-center gap-2">
           {/* Dezentes „Mehr"-Menü: Excel & Daten */}
@@ -512,7 +514,7 @@ export default function App() {
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
         />
-      ) : (
+      ) : ansicht === "event" ? (
         <VeranstaltungenAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
@@ -529,6 +531,8 @@ export default function App() {
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
         />
+      ) : (
+        <DiagrammAnsicht kampagnen={gefiltert} darfBearbeiten={darfBearbeiten} />
       )}
 
       {editor.offen && (
