@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { getISOWeek } from "date-fns";
 import type { Kampagne, Status } from "./types";
 import { useAuth } from "./auth/AuthContext";
@@ -183,25 +183,33 @@ export default function App() {
     [events],
   );
 
-  // In der Tabelle nur Events zeigen, die im aktiven Zeitraum liegen.
-  const subEventsImZeitraum = useMemo(() => {
-    const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
-    const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
-    const zeitAktiv = kwVon != null || kwBis != null || !!filter.datumVon || !!filter.datumBis;
-    return subEvents.filter((s) => {
+  // Prüft, ob ein (Sub-)Event im aktuell gefilterten Zeitraum liegt.
+  // Wird sowohl in der Tabelle als auch im Reiter „Veranstaltungen → Nach Datum"
+  // genutzt, damit der KW-/Datums-Filter überall gleich wirkt.
+  const eventImZeitraum = useCallback(
+    (start: string | null, ende: string | null) => {
+      const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
+      const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
+      const zeitAktiv = kwVon != null || kwBis != null || !!filter.datumVon || !!filter.datumBis;
       if (!zeitAktiv) return true;
-      const start = s.start;
-      const ende = s.ende ?? s.start;
       if (!start) return false; // ohne Datum nicht in einen Zeitraum einordbar
+      const e = ende ?? start;
       const startKw = kwAusDatum(start);
-      const endeKw = kwAusDatum(ende) ?? startKw;
+      const endeKw = kwAusDatum(e) ?? startKw;
       if (kwVon != null && (endeKw == null || endeKw < kwVon)) return false;
       if (kwBis != null && (startKw == null || startKw > kwBis)) return false;
-      if (filter.datumVon && (!ende || ende < filter.datumVon)) return false;
+      if (filter.datumVon && e < filter.datumVon) return false;
       if (filter.datumBis && start > filter.datumBis) return false;
       return true;
-    });
-  }, [subEvents, filter]);
+    },
+    [filter],
+  );
+
+  // In der Tabelle nur Events zeigen, die im aktiven Zeitraum liegen.
+  const subEventsImZeitraum = useMemo(
+    () => subEvents.filter((s) => eventImZeitraum(s.start, s.ende)),
+    [subEvents, eventImZeitraum],
+  );
   const alleOwners = useMemo(() => {
     const set = new Set<string>();
     mandantKampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
@@ -543,6 +551,7 @@ export default function App() {
           kanaele={alleKanaele}
           vorschlaege={vorschlaege}
           events={events}
+          imZeitraum={eventImZeitraum}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
           onNeuerEintrag={(kat, subId) =>
             neuerEintragMitVorlage({ veranstaltung: kat, subEvent: subId ?? "" })

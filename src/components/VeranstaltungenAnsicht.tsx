@@ -18,6 +18,8 @@ interface Props {
   kanaele: string[];
   vorschlaege: Vorschlaege;
   events: Record<string, EventMeta>;
+  /** Zeitraum-Filter (KW/Datum) – für „Nach Datum". */
+  imZeitraum: (start: string | null, ende: string | null) => boolean;
   onEditEvent: (kategorie: string) => void;
   /** Neuen Eintrag direkt für eine Veranstaltung/Termin anlegen. */
   onNeuerEintrag: (kategorie: string, subId: string | null) => void;
@@ -31,7 +33,7 @@ interface Props {
 type Modus = "datum" | "kategorie";
 
 export function VeranstaltungenAnsicht(props: Props) {
-  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, onEditEvent, onNeuerEintrag } =
+  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, imZeitraum, onEditEvent, onNeuerEintrag } =
     props;
 
   // Kleiner „+ Eintrag"-Button (nur für Bearbeiter).
@@ -97,9 +99,12 @@ export function VeranstaltungenAnsicht(props: Props) {
   }
 
   // ---- Ansicht „Nach Datum": alle Sub-Veranstaltungen flach, nach Datum ----
-  const datumItems = [...kategorien].flatMap((kat) =>
-    (events[kat]?.subs ?? []).map((s) => ({ kat, typ: events[kat]?.typ ?? "", sub: s })),
-  );
+  // Respektiert den aktiven KW-/Datums-Filter.
+  const datumItems = [...kategorien]
+    .flatMap((kat) =>
+      (events[kat]?.subs ?? []).map((s) => ({ kat, typ: events[kat]?.typ ?? "", sub: s })),
+    )
+    .filter((i) => imZeitraum(i.sub.start, i.sub.ende));
   datumItems.sort((a, b) => (a.sub.start || "9999").localeCompare(b.sub.start || "9999"));
 
   const umschalter = (
@@ -176,6 +181,18 @@ export function VeranstaltungenAnsicht(props: Props) {
                   <span className="shrink-0 text-xs text-slate-400">{tasks.length} Einträge</span>
                 </button>
                 {plusEintrag(kat, sub.id)}
+                {darfBearbeiten && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditEvent(kat);
+                    }}
+                    title="Veranstaltung bearbeiten"
+                    className="shrink-0 rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                  >
+                    <PencilIcon />
+                  </button>
+                )}
               </div>
               {istOffen && (
                 <div className="border-t border-marke/20 p-2">
