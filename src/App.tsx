@@ -552,6 +552,7 @@ export default function App() {
           vorschlaege={vorschlaege}
           events={events}
           imZeitraum={eventImZeitraum}
+          suche={filter.suche}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
           onNeuerEintrag={(kat, subId) =>
             neuerEintragMitVorlage({ veranstaltung: kat, subEvent: subId ?? "" })

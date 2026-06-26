@@ -3,7 +3,7 @@ import type { Kampagne } from "../types";
 import { TabellenAnsicht } from "./TabellenAnsicht";
 import { ChevronIcon, PencilIcon } from "./Icons";
 import { formatDatum } from "../lib/date";
-import type { EventMeta } from "../data/useVeranstaltungen";
+import type { EventMeta, SubEvent } from "../data/useVeranstaltungen";
 
 interface Vorschlaege {
   kanal: string[];
@@ -20,6 +20,8 @@ interface Props {
   events: Record<string, EventMeta>;
   /** Zeitraum-Filter (KW/Datum) – für „Nach Datum". */
   imZeitraum: (start: string | null, ende: string | null) => boolean;
+  /** Freitextsuche – matcht Kategorie, Typ, Event-Name und Ort. */
+  suche: string;
   onEditEvent: (kategorie: string) => void;
   /** Neuen Eintrag direkt für eine Veranstaltung/Termin anlegen. */
   onNeuerEintrag: (kategorie: string, subId: string | null) => void;
@@ -33,8 +35,15 @@ interface Props {
 type Modus = "datum" | "kategorie";
 
 export function VeranstaltungenAnsicht(props: Props) {
-  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, imZeitraum, onEditEvent, onNeuerEintrag } =
+  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, imZeitraum, suche, onEditEvent, onNeuerEintrag } =
     props;
+
+  // Freitextsuche (Ort, Event-Name, Kategorie, Typ).
+  const q = suche.trim().toLowerCase();
+  const treffer = (text: string | null | undefined) =>
+    !q || (text ?? "").toLowerCase().includes(q);
+  const subTrifft = (s: SubEvent) => treffer(s.name) || treffer(s.ort);
+  const katTrifft = (kat: string) => treffer(kat) || treffer(events[kat]?.typ);
 
   // Kleiner „+ Eintrag"-Button (nur für Bearbeiter).
   const plusEintrag = (kat: string, subId: string | null) =>
@@ -104,7 +113,8 @@ export function VeranstaltungenAnsicht(props: Props) {
     .flatMap((kat) =>
       (events[kat]?.subs ?? []).map((s) => ({ kat, typ: events[kat]?.typ ?? "", sub: s })),
     )
-    .filter((i) => imZeitraum(i.sub.start, i.sub.ende));
+    .filter((i) => imZeitraum(i.sub.start, i.sub.ende))
+    .filter((i) => katTrifft(i.kat) || subTrifft(i.sub));
   datumItems.sort((a, b) => (a.sub.start || "9999").localeCompare(b.sub.start || "9999"));
 
   const umschalter = (
@@ -217,11 +227,15 @@ export function VeranstaltungenAnsicht(props: Props) {
       {modus === "kategorie" &&
         [...kategorien]
           .sort((a, b) => a.localeCompare(b, "de"))
+          // Suche: nur Kategorien zeigen, die selbst oder über einen Ort/Termin passen.
+          .filter((kat) => katTrifft(kat) || (events[kat]?.subs ?? []).some(subTrifft))
           .map((kat) => {
             const meta = events[kat];
-            const subs = [...(meta?.subs ?? [])].sort((a, b) =>
+            const alleSubs = [...(meta?.subs ?? [])].sort((a, b) =>
               (a.start || "9999").localeCompare(b.start || "9999"),
             );
+            // Trifft die Kategorie selbst, alle Termine zeigen; sonst nur passende.
+            const subs = q && !katTrifft(kat) ? alleSubs.filter(subTrifft) : alleSubs;
             const ohneTermin = eintraegeFuer(kat, null);
             const catKey = `cat:${kat}`;
             const catOffen = offen.has(catKey);
@@ -301,6 +315,15 @@ export function VeranstaltungenAnsicht(props: Props) {
               </section>
             );
           })}
+
+      {modus === "kategorie" &&
+        q &&
+        [...kategorien].filter((kat) => katTrifft(kat) || (events[kat]?.subs ?? []).some(subTrifft))
+          .length === 0 && (
+          <p className="py-6 text-center text-sm text-slate-400">
+            Keine Veranstaltung gefunden für „{suche}".
+          </p>
+        )}
     </div>
   );
 }
