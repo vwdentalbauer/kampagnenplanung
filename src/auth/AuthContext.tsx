@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { Nutzer } from "../types";
 import { supabase, supabaseAktiv } from "../lib/supabase";
+import { setzeSitzung } from "../lib/session";
 import { LoginScreen } from "./LoginScreen";
 import { PasswortSetzen } from "./PasswortSetzen";
 
@@ -89,6 +90,11 @@ function SupabaseAuth({ children }: { children: ReactNode }) {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // Sitzung für Nicht-React-Code (Repository) spiegeln – für updated_by.
+  useEffect(() => {
+    setzeSitzung(userId, profil?.name ?? "");
+  }, [userId, profil]);
 
   const abmelden = () => {
     supabase!.auth.signOut();

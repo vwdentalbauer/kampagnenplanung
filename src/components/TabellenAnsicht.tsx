@@ -124,7 +124,8 @@ function sortWert(key: SpaltenKey, k: Kampagne): number | string {
     case "flags":
       return (k.pluline ? 2 : 0) + (k.wkz ? 1 : 0);
     case "datum":
-      return k.weekStart ?? "";
+      // Einträge ohne Datum ans Ende (statt nach vorne) sortieren.
+      return k.weekStart ?? "9999-99-99";
     case "status":
       return STATUS_REIHENFOLGE.indexOf(k.status);
     case "bereiche":
@@ -165,8 +166,8 @@ export function TabellenAnsicht({
   const [breiten, setBreiten] = useState<Record<SpaltenKey, number>>(ladeBreiten);
   const [auswahl, setAuswahl] = useState<Set<string>>(new Set());
   const [dragKey, setDragKey] = useState<SpaltenKey | null>(null);
-  // Standard: nach KW sortiert – so „startet" die Tabelle ohne Filter mit KW.
-  const [sort, setSort] = useState<SortZustand>({ key: "kw", dir: "asc" });
+  // Standard: chronologisch nach Datum (Einträge ohne Datum ans Ende).
+  const [sort, setSort] = useState<SortZustand>({ key: "datum", dir: "asc" });
   const selectAllRef = useRef<HTMLInputElement>(null);
 
   // Individuelle Ansicht des Nutzers aus Supabase laden (einmalig beim Start).
@@ -233,7 +234,7 @@ export function TabellenAnsicht({
   type Zeile = { typ: "task"; k: Kampagne } | { typ: "event"; e: EventZeile };
 
   const gemischt = useMemo<Zeile[]>(() => {
-    const key = sort.key ?? "kw";
+    const key = sort.key ?? "datum";
     const faktor = sort.dir === "asc" ? 1 : -1;
     const items: Zeile[] = kampagnen.map((k) => ({ typ: "task", k }));
     (eventZeilen ?? []).forEach((e) => items.push({ typ: "event", e }));
@@ -243,7 +244,7 @@ export function TabellenAnsicht({
         : key === "kw"
           ? (kwAusDatum(it.e.start) ?? Number.POSITIVE_INFINITY)
           : key === "datum"
-            ? (it.e.start ?? "")
+            ? (it.e.start ?? "9999-99-99")
             : "";
     return items.sort((a, b) => {
       const av = wert(a);

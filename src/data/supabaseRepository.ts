@@ -1,5 +1,6 @@
 import type { Kampagne, Status } from "../types";
 import { client } from "../lib/supabase";
+import { aktuelleSitzungUserId } from "../lib/session";
 import type { KampagnenRepository } from "./repository";
 import { seedDaten } from "./repository";
 
@@ -26,6 +27,9 @@ interface Row {
   verantwortung: string;
   owners: string[];
   status: Status;
+  // Wer/wann zuletzt geändert hat – Basis für Benachrichtigungen.
+  updated_at?: string;
+  updated_by?: string | null;
 }
 
 function vonRow(r: Row): Kampagne {
@@ -77,6 +81,9 @@ function zuRow(k: Kampagne): Row {
     verantwortung: k.verantwortung,
     owners: k.owners ?? [],
     status: k.status,
+    // Bei jeder Mutation aktualisieren, damit andere Nutzer informiert werden.
+    updated_at: new Date().toISOString(),
+    updated_by: aktuelleSitzungUserId(),
   };
 }
 

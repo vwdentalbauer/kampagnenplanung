@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase, supabaseAktiv } from "../lib/supabase";
+import { aktuelleSitzungUserId } from "../lib/session";
 
 export interface SubEvent {
   id: string;
@@ -121,7 +122,14 @@ export function useVeranstaltungen() {
         await supabase
           .from("veranstaltung")
           .upsert(
-            { land, kategorie: v.kategorie, typ: v.typ, subs: v.subs },
+            {
+              land,
+              kategorie: v.kategorie,
+              typ: v.typ,
+              subs: v.subs,
+              updated_at: new Date().toISOString(),
+              updated_by: aktuelleSitzungUserId(),
+            },
             { onConflict: "land,kategorie" },
           );
         await neuLaden();

@@ -9,6 +9,8 @@ import { MANDANTEN, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./co
 import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
+import { useBenachrichtigungen, type Benachrichtigung } from "./data/useBenachrichtigungen";
+import { Benachrichtigungen } from "./components/Benachrichtigungen";
 import { AdminPanel } from "./admin/AdminPanel";
 import { PasswortAendern } from "./auth/PasswortAendern";
 import { supabaseAktiv } from "./lib/supabase";
@@ -16,12 +18,11 @@ import { FilterBar } from "./components/FilterBar";
 import { TabellenAnsicht } from "./components/TabellenAnsicht";
 import { ZielAnsicht } from "./components/ZielAnsicht";
 import { VeranstaltungenAnsicht } from "./components/VeranstaltungenAnsicht";
-import { DiagrammAnsicht } from "./components/DiagrammAnsicht";
 import { KampagneEditor } from "./components/KampagneEditor";
 import { VeranstaltungEditor } from "./components/VeranstaltungEditor";
 import { Logo } from "./components/Logo";
 
-type Ansicht = "tabelle" | "ziel" | "event" | "diagramm";
+type Ansicht = "tabelle" | "ziel" | "event";
 
 export default function App() {
   const { nutzer, userId, darfBearbeiten, istAdmin, abmelden } = useAuth();
@@ -35,6 +36,7 @@ export default function App() {
     ersetzeAlle,
   } = useKampagnen();
   const { locks, sperren, freigeben } = useLocks(userId, nutzer.name);
+  const benachr = useBenachrichtigungen(userId, nutzer.name);
   const { epics, setZeitraum } = useEpics();
   const {
     alle: alleEvents,
@@ -92,6 +94,21 @@ export default function App() {
   const wechsleMandant = (code: string) => {
     setMandant(code);
     localStorage.setItem("kampagnen.mandant.v1", code);
+  };
+
+  // Benachrichtigung anklicken: zum betroffenen Datensatz springen.
+  const oeffneBenachrichtigung = (b: Benachrichtigung) => {
+    if (b.land) wechsleMandant(b.land);
+    if (b.art === "kampagne") {
+      const k = kampagnen.find((x) => x.id === b.refId);
+      if (k) {
+        setAnsicht("tabelle");
+        oeffneEditor(k);
+      }
+    } else {
+      setAnsicht("event");
+      if (b.kategorie) setEventEditor({ offen: true, kategorie: b.kategorie });
+    }
   };
 
   const aktuelleKw = getISOWeek(new Date());
@@ -335,6 +352,12 @@ export default function App() {
               ))}
             </select>
           </label>
+          <Benachrichtigungen
+            liste={benachr.liste}
+            ungelesen={benachr.ungelesen}
+            alsGelesenMarkieren={benachr.alsGelesenMarkieren}
+            onOeffnen={oeffneBenachrichtigung}
+          />
           <span className="text-slate-500">{nutzer.name}</span>
           {istAdmin && (
             <button
@@ -380,7 +403,6 @@ export default function App() {
           {tab("tabelle", "📋 Tabelle")}
           {tab("ziel", "📣 Kampagne")}
           {tab("event", "🎟 Veranstaltungen")}
-          {tab("diagramm", "🧩 Diagramme")}
         </div>
         <div className="flex items-center gap-2">
           {/* Dezentes „Mehr"-Menü: Excel & Daten */}
@@ -514,7 +536,7 @@ export default function App() {
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
         />
-      ) : ansicht === "event" ? (
+      ) : (
         <VeranstaltungenAnsicht
           kampagnen={gefiltert}
           darfBearbeiten={darfBearbeiten}
@@ -531,8 +553,6 @@ export default function App() {
           onBulkUpdate={onBulkUpdate}
           onBulkDelete={onBulkDelete}
         />
-      ) : (
-        <DiagrammAnsicht kampagnen={gefiltert} darfBearbeiten={darfBearbeiten} />
       )}
 
       {editor.offen && (
