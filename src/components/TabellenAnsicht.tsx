@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { Kampagne, Status } from "../types";
-import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
+import { ABGESCHLOSSEN, STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
 import { KampagneCell } from "./KampagneCell";
@@ -587,7 +587,7 @@ export function TabellenAnsicht({
               const laufend = !!k.endDatum;
               // Überfällig: (effektives) Ende liegt in der Vergangenheit und nicht erledigt.
               const effEnde = k.endDatum ?? k.weekStart;
-              const ueberfaellig = !!effEnde && effEnde < heute && k.status !== "erledigt";
+              const ueberfaellig = !!effEnde && effEnde < heute && !ABGESCHLOSSEN.includes(k.status);
               const rand = neueWoche
                 ? "border-t-2 border-marke/50"
                 : "border-t border-slate-100";

@@ -2,7 +2,7 @@
 // Diese Typen bilden die Excel-Spalten ab – bereinigt und um einen
 // echten Status erweitert (der in der Excel bisher fehlte).
 
-export type Status = "geplant" | "in_arbeit" | "erledigt" | "abgesagt";
+export type Status = "geplant" | "in_arbeit" | "erledigt" | "abgesagt" | "storniert";
 
 export type Rolle = "viewer" | "editor" | "admin";
 

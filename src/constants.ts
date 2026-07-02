@@ -6,6 +6,7 @@ export const STATUS_LABELS: Record<Status, string> = {
   in_arbeit: "In Arbeit",
   erledigt: "Erledigt",
   abgesagt: "On Hold",
+  storniert: "Storniert/Verworfen",
 };
 
 export const STATUS_REIHENFOLGE: Status[] = [
@@ -13,6 +14,7 @@ export const STATUS_REIHENFOLGE: Status[] = [
   "in_arbeit",
   "erledigt",
   "abgesagt",
+  "storniert",
 ];
 
 /** Tailwind-Klassen je Status (Badge) – an dental bauer CI angelehnt. */
@@ -21,7 +23,11 @@ export const STATUS_STYLE: Record<Status, string> = {
   in_arbeit: "bg-[#FDEFA8] text-[#806c10] border-[#ecd877]",
   erledigt: "bg-[#B1D9CF] text-[#1f5147] border-[#8fc7ba]",
   abgesagt: "bg-[#B4B1D9] text-[#3c3768] border-[#9b97c9]",
+  storniert: "bg-[#E2E2E2] text-[#6b6b6b] border-[#c9c9c9] line-through",
 };
+
+/** Status, die als „abgeschlossen" gelten (nicht überfällig, zählen als fertig). */
+export const ABGESCHLOSSEN: Status[] = ["erledigt", "storniert"];
 
 export const ROLLEN_LABELS: Record<Rolle, string> = {
   viewer: "Leserechte",

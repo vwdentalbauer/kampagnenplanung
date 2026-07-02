@@ -229,7 +229,13 @@ export default function App() {
   }, [mandantKampagnen, alleKanaele, alleSubKanaele, alleKampagnen]);
 
   const statusZaehler = useMemo(() => {
-    const z: Record<Status, number> = { geplant: 0, in_arbeit: 0, erledigt: 0, abgesagt: 0 };
+    const z: Record<Status, number> = {
+      geplant: 0,
+      in_arbeit: 0,
+      erledigt: 0,
+      abgesagt: 0,
+      storniert: 0,
+    };
     gefiltert.forEach((k) => z[k.status]++);
     return z;
   }, [gefiltert]);

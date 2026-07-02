@@ -124,9 +124,17 @@ export function ZielAnsicht({
     const kwBis = kwAusDatum(g.ende);
     const istOffen = offen.has(g.name);
 
-    const zaehler: Record<Status, number> = { geplant: 0, in_arbeit: 0, erledigt: 0, abgesagt: 0 };
+    const zaehler: Record<Status, number> = {
+      geplant: 0,
+      in_arbeit: 0,
+      erledigt: 0,
+      abgesagt: 0,
+      storniert: 0,
+    };
     g.tasks.forEach((t) => zaehler[t.status]++);
-    const fortschritt = Math.round((zaehler.erledigt / g.tasks.length) * 100);
+    // „Storniert/Verworfen" zählt wie „Erledigt" als abgeschlossen.
+    const fertig = zaehler.erledigt + zaehler.storniert;
+    const fortschritt = Math.round((fertig / g.tasks.length) * 100);
 
     return (
       <section key={g.name} className="overflow-hidden rounded-lg border border-marke/30 bg-white">
@@ -161,7 +169,7 @@ export function ZielAnsicht({
               <div className="h-full bg-marke" style={{ width: `${fortschritt}%` }} />
             </div>
             <span className="whitespace-nowrap text-xs text-slate-400">
-              {zaehler.erledigt}/{g.tasks.length}
+              {fertig}/{g.tasks.length}
             </span>
           </div>
         </button>
