@@ -23,6 +23,12 @@ interface Props {
   imZeitraum: (start: string | null, ende: string | null) => boolean;
   /** Freitextsuche – matcht Kategorie, Typ, Event-Name und Ort. */
   suche: string;
+  // Event-Filter (Reiter „Veranstaltungen"):
+  evKategorie: string[];
+  evTyp: string[];
+  evAngemeldet: boolean;
+  evAnsprechpartner: string;
+  evNiederlassung: string[];
   onEditEvent: (kategorie: string) => void;
   /** Neuen Eintrag direkt für eine Veranstaltung/Termin anlegen. */
   onNeuerEintrag: (kategorie: string, subId: string | null) => void;
@@ -36,8 +42,22 @@ interface Props {
 type Modus = "datum" | "kategorie";
 
 export function VeranstaltungenAnsicht(props: Props) {
-  const { kampagnen, darfBearbeiten, kanaele, vorschlaege, events, imZeitraum, suche, onEditEvent, onNeuerEintrag } =
-    props;
+  const {
+    kampagnen,
+    darfBearbeiten,
+    kanaele,
+    vorschlaege,
+    events,
+    imZeitraum,
+    suche,
+    evKategorie,
+    evTyp,
+    evAngemeldet,
+    evAnsprechpartner,
+    evNiederlassung,
+    onEditEvent,
+    onNeuerEintrag,
+  } = props;
 
   // Freitextsuche (Ort, Event-Name, Kategorie, Typ).
   const q = suche.trim().toLowerCase();
@@ -45,6 +65,17 @@ export function VeranstaltungenAnsicht(props: Props) {
     !q || (text ?? "").toLowerCase().includes(q);
   const subTrifft = (s: SubEvent) => treffer(s.name) || treffer(s.ort);
   const katTrifft = (kat: string) => treffer(kat) || treffer(events[kat]?.typ);
+
+  // Event-Filter (aus der FilterBar). Greifen auf Kategorie- und Sub-Ebene.
+  const evKatOk = (kat: string) => evKategorie.length === 0 || evKategorie.includes(kat);
+  const evTypOk = (kat: string) => evTyp.length === 0 || evTyp.includes(events[kat]?.typ ?? "");
+  const ansprech = evAnsprechpartner.trim().toLowerCase();
+  const evSubOk = (s: SubEvent) =>
+    (!evAngemeldet || !!s.angemeldet) &&
+    (!ansprech || (s.ansprechpartner ?? "").toLowerCase().includes(ansprech)) &&
+    (evNiederlassung.length === 0 || evNiederlassung.includes(s.niederlassung ?? ""));
+  // Sub-Ebenen-Filter aktiv? Dann nur passende Termine (und keine „ohne Termin").
+  const subFilterAktiv = evAngemeldet || !!ansprech || evNiederlassung.length > 0;
 
   // Kleiner „+ Eintrag"-Button (nur für Bearbeiter).
   const plusEintrag = (kat: string, subId: string | null) =>
@@ -115,7 +146,8 @@ export function VeranstaltungenAnsicht(props: Props) {
       (events[kat]?.subs ?? []).map((s) => ({ kat, typ: events[kat]?.typ ?? "", sub: s })),
     )
     .filter((i) => imZeitraum(i.sub.start, i.sub.ende))
-    .filter((i) => katTrifft(i.kat) || subTrifft(i.sub));
+    .filter((i) => katTrifft(i.kat) || subTrifft(i.sub))
+    .filter((i) => evKatOk(i.kat) && evTypOk(i.kat) && evSubOk(i.sub));
   datumItems.sort((a, b) => (a.sub.start || "9999").localeCompare(b.sub.start || "9999"));
 
   const umschalter = (
@@ -230,14 +262,20 @@ export function VeranstaltungenAnsicht(props: Props) {
           .sort((a, b) => a.localeCompare(b, "de"))
           // Suche: nur Kategorien zeigen, die selbst oder über einen Ort/Termin passen.
           .filter((kat) => katTrifft(kat) || (events[kat]?.subs ?? []).some(subTrifft))
+          // Event-Filter auf Kategorie-Ebene (Veranstaltung/Kategorie & Typ).
+          .filter((kat) => evKatOk(kat) && evTypOk(kat))
+          // Sub-Filter aktiv: nur Kategorien mit mindestens einem passenden Termin.
+          .filter((kat) => !subFilterAktiv || (events[kat]?.subs ?? []).some(evSubOk))
           .map((kat) => {
             const meta = events[kat];
             const alleSubs = [...(meta?.subs ?? [])].sort((a, b) =>
               (a.start || "9999").localeCompare(b.start || "9999"),
             );
             // Trifft die Kategorie selbst, alle Termine zeigen; sonst nur passende.
-            const subs = q && !katTrifft(kat) ? alleSubs.filter(subTrifft) : alleSubs;
-            const ohneTermin = eintraegeFuer(kat, null);
+            const subsRoh = q && !katTrifft(kat) ? alleSubs.filter(subTrifft) : alleSubs;
+            const subs = subFilterAktiv ? subsRoh.filter(evSubOk) : subsRoh;
+            // Bei aktivem Sub-Filter keine „ohne Ort/Termin"-Einträge zeigen.
+            const ohneTermin = subFilterAktiv ? [] : eintraegeFuer(kat, null);
             const catKey = `cat:${kat}`;
             const catOffen = offen.has(catKey);
             const anzahl =
@@ -310,17 +348,19 @@ export function VeranstaltungenAnsicht(props: Props) {
                       );
                     })}
 
-                    <div className="rounded-lg border border-dashed border-slate-300 p-2">
-                      <div className="mb-1 flex items-center justify-between px-1">
-                        <p className="text-xs text-slate-500">Ohne Ort/Termin zugeordnet</p>
-                        {plusEintrag(kat, null)}
+                    {!subFilterAktiv && (
+                      <div className="rounded-lg border border-dashed border-slate-300 p-2">
+                        <div className="mb-1 flex items-center justify-between px-1">
+                          <p className="text-xs text-slate-500">Ohne Ort/Termin zugeordnet</p>
+                          {plusEintrag(kat, null)}
+                        </div>
+                        {ohneTermin.length > 0 ? (
+                          tabelle(ohneTermin)
+                        ) : (
+                          <p className="px-1 py-2 text-xs text-slate-400">Noch keine Einträge.</p>
+                        )}
                       </div>
-                      {ohneTermin.length > 0 ? (
-                        tabelle(ohneTermin)
-                      ) : (
-                        <p className="px-1 py-2 text-xs text-slate-400">Noch keine Einträge.</p>
-                      )}
-                    </div>
+                    )}
                   </div>
                 )}
               </section>

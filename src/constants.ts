@@ -23,7 +23,7 @@ export const STATUS_STYLE: Record<Status, string> = {
   in_arbeit: "bg-[#FDEFA8] text-[#806c10] border-[#ecd877]",
   erledigt: "bg-[#B1D9CF] text-[#1f5147] border-[#8fc7ba]",
   abgesagt: "bg-[#B4B1D9] text-[#3c3768] border-[#9b97c9]",
-  storniert: "bg-[#E2E2E2] text-[#6b6b6b] border-[#c9c9c9] line-through",
+  storniert: "bg-[#E2E2E2] text-[#6b6b6b] border-[#c9c9c9]",
 };
 
 /** Status, die als „abgeschlossen" gelten (nicht überfällig, zählen als fertig). */

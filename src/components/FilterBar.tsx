@@ -1,11 +1,19 @@
 import type { Status } from "../types";
 import { STATUS_LABELS } from "../constants";
-import { aktiveAnzahl, LEERER_FILTER, type Filter } from "../lib/filter";
+import {
+  aktiveAnzahl,
+  aktiveAnzahlEvent,
+  LEERER_FILTER,
+  ohneEventFilter,
+  type Filter,
+} from "../lib/filter";
 import { MultiSelect } from "./MultiSelect";
 
 interface Props {
   filter: Filter;
   setFilter: (f: Filter) => void;
+  /** „kampagne" = Kampagnen-Filter, „event" = Veranstaltungs-Filter. */
+  modus: "kampagne" | "event";
   // Verfügbare (von den übrigen Filtern abhängige) Werte:
   quartale: string[];
   status: Status[];
@@ -21,11 +29,16 @@ interface Props {
   leerOwners: boolean;
   leerSparten: boolean;
   leerKampagnen: boolean;
+  // Event-Facetten (Reiter „Veranstaltungen"):
+  evKategorien: string[];
+  evTypen: string[];
+  evNiederlassungen: string[];
 }
 
 export function FilterBar({
   filter,
   setFilter,
+  modus,
   quartale,
   status,
   kanaele,
@@ -39,18 +52,22 @@ export function FilterBar({
   leerOwners,
   leerSparten,
   leerKampagnen,
+  evKategorien,
+  evTypen,
+  evNiederlassungen,
 }: Props) {
   const sel =
     "rounded border px-2 py-1.5 text-sm focus:border-marke focus:outline-none";
   const upd = (teil: Partial<Filter>) => setFilter({ ...filter, ...teil });
-  const anzahl = aktiveAnzahl(filter);
+  const istEvent = modus === "event";
+  const anzahl = istEvent ? aktiveAnzahlEvent(filter) : aktiveAnzahl(filter);
 
   const dieseWoche = () =>
     upd({ kwVon: String(aktuelleKw), kwBis: String(aktuelleKw), datumVon: "", datumBis: "" });
 
   return (
     <div className="space-y-2">
-      {/* Zeile 1: Suche & Kategorien (umbricht bei Bedarf in zwei Zeilen) */}
+      {/* Zeile 1: Suche & (kontextabhängige) Filter */}
       <div className="flex flex-wrap items-center gap-2">
         <input
           className={`${sel} w-56 border-slate-300 bg-white`}
@@ -58,83 +75,128 @@ export function FilterBar({
           value={filter.suche}
           onChange={(e) => upd({ suche: e.target.value })}
         />
-        <MultiSelect
-          label="Kampagnen"
-          options={kampagnen}
-          selected={filter.kampagnen}
-          onChange={(v) => upd({ kampagnen: v })}
-          withEmpty={leerKampagnen}
-          suchbar
-        />
-        <MultiSelect
-          label="Status"
-          options={status}
-          selected={filter.status}
-          onChange={(v) => upd({ status: v as Status[] })}
-          anzeige={(s) => STATUS_LABELS[s as Status]}
-        />
-        <MultiSelect
-          label="Kanäle"
-          options={kanaele}
-          selected={filter.kanaele}
-          onChange={(v) => upd({ kanaele: v })}
-          withEmpty={leerKanaele}
-          suchbar
-        />
-        <MultiSelect
-          label="Sub-Kanäle"
-          options={subKanaele}
-          selected={filter.subKanaele}
-          onChange={(v) => upd({ subKanaele: v })}
-          withEmpty={leerSubKanaele}
-          suchbar
-        />
-        <MultiSelect
-          label="Verantwortliche"
-          options={owners}
-          selected={filter.owners}
-          onChange={(v) => upd({ owners: v })}
-          withEmpty={leerOwners}
-          suchbar
-        />
-        <MultiSelect
-          label="Sparten"
-          options={sparten}
-          selected={filter.sparten}
-          onChange={(v) => upd({ sparten: v })}
-          withEmpty={leerSparten}
-        />
 
-        {/* abgesetzte Schnellfilter PLULINE / WKZ */}
-        <span className="mx-1 h-7 w-px bg-slate-300" />
-        <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-2 py-1">
-          <button
-            onClick={() => upd({ pluline: !filter.pluline })}
-            title="Nur PLULINE-Einträge"
-            className={`rounded border px-2 py-1 text-sm font-medium ${
-              filter.pluline
-                ? "border-[#00a2d3] bg-[#00a2d3] text-white"
-                : "border-slate-300 bg-white text-[#00a2d3]"
-            }`}
-          >
-            PLU°LINE
-          </button>
-          <button
-            onClick={() => upd({ wkz: !filter.wkz })}
-            title="Nur WKZ-Einträge"
-            className={`rounded border px-2 py-1 text-sm font-medium ${
-              filter.wkz
-                ? "border-slate-700 bg-slate-700 text-white"
-                : "border-slate-300 bg-white text-slate-700"
-            }`}
-          >
-            WKZ
-          </button>
-        </div>
+        {istEvent ? (
+          <>
+            <MultiSelect
+              label="Veranstaltung / Kategorie"
+              options={evKategorien}
+              selected={filter.evKategorie}
+              onChange={(v) => upd({ evKategorie: v })}
+              suchbar
+            />
+            <MultiSelect
+              label="Typ"
+              options={evTypen}
+              selected={filter.evTyp}
+              onChange={(v) => upd({ evTyp: v })}
+            />
+            <MultiSelect
+              label="Zuständige Niederlassung"
+              options={evNiederlassungen}
+              selected={filter.evNiederlassung}
+              onChange={(v) => upd({ evNiederlassung: v })}
+              suchbar
+            />
+            <input
+              className={`${sel} w-48 border-slate-300 bg-white`}
+              placeholder="Ansprechpartner…"
+              value={filter.evAnsprechpartner}
+              onChange={(e) => upd({ evAnsprechpartner: e.target.value })}
+            />
+            <button
+              onClick={() => upd({ evAngemeldet: !filter.evAngemeldet })}
+              title="Nur angemeldete Termine"
+              className={`rounded border px-2 py-1.5 text-sm font-medium ${
+                filter.evAngemeldet
+                  ? "border-emerald-600 bg-emerald-600 text-white"
+                  : "border-slate-300 bg-white text-emerald-700"
+              }`}
+            >
+              ✓ angemeldet
+            </button>
+          </>
+        ) : (
+          <>
+            <MultiSelect
+              label="Kampagnen"
+              options={kampagnen}
+              selected={filter.kampagnen}
+              onChange={(v) => upd({ kampagnen: v })}
+              withEmpty={leerKampagnen}
+              suchbar
+            />
+            <MultiSelect
+              label="Status"
+              options={status}
+              selected={filter.status}
+              onChange={(v) => upd({ status: v as Status[] })}
+              anzeige={(s) => STATUS_LABELS[s as Status]}
+            />
+            <MultiSelect
+              label="Kanäle"
+              options={kanaele}
+              selected={filter.kanaele}
+              onChange={(v) => upd({ kanaele: v })}
+              withEmpty={leerKanaele}
+              suchbar
+            />
+            <MultiSelect
+              label="Sub-Kanäle"
+              options={subKanaele}
+              selected={filter.subKanaele}
+              onChange={(v) => upd({ subKanaele: v })}
+              withEmpty={leerSubKanaele}
+              suchbar
+            />
+            <MultiSelect
+              label="Verantwortliche"
+              options={owners}
+              selected={filter.owners}
+              onChange={(v) => upd({ owners: v })}
+              withEmpty={leerOwners}
+              suchbar
+            />
+            <MultiSelect
+              label="Sparten"
+              options={sparten}
+              selected={filter.sparten}
+              onChange={(v) => upd({ sparten: v })}
+              withEmpty={leerSparten}
+            />
+
+            {/* abgesetzte Schnellfilter PLULINE / WKZ */}
+            <span className="mx-1 h-7 w-px bg-slate-300" />
+            <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-2 py-1">
+              <button
+                onClick={() => upd({ pluline: !filter.pluline })}
+                title="Nur PLULINE-Einträge"
+                className={`rounded border px-2 py-1 text-sm font-medium ${
+                  filter.pluline
+                    ? "border-[#00a2d3] bg-[#00a2d3] text-white"
+                    : "border-slate-300 bg-white text-[#00a2d3]"
+                }`}
+              >
+                PLU°LINE
+              </button>
+              <button
+                onClick={() => upd({ wkz: !filter.wkz })}
+                title="Nur WKZ-Einträge"
+                className={`rounded border px-2 py-1 text-sm font-medium ${
+                  filter.wkz
+                    ? "border-slate-700 bg-slate-700 text-white"
+                    : "border-slate-300 bg-white text-slate-700"
+                }`}
+              >
+                WKZ
+              </button>
+            </div>
+          </>
+        )}
 
         {anzahl > 0 && (
           <button
-            onClick={() => setFilter(LEERER_FILTER)}
+            onClick={() => setFilter(istEvent ? ohneEventFilter(filter) : LEERER_FILTER)}
             className="flex items-center gap-1 rounded border border-rose-300 bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-100"
           >
             ✕ Filter löschen ({anzahl})

@@ -185,12 +185,18 @@ export default function App() {
     () => Object.keys(events).sort((a, b) => a.localeCompare(b, "de")),
     [events],
   );
-  // Bereits verwendete Niederlassungen (Vorschläge im Sub-Editor).
+  // Bereits verwendete Niederlassungen (Vorschläge im Sub-Editor + Filter).
   const niederlassungen = useMemo(() => {
     const set = new Set<string>();
     Object.values(events).forEach((m) =>
       m.subs.forEach((s) => s.niederlassung && set.add(s.niederlassung)),
     );
+    return [...set].sort((a, b) => a.localeCompare(b, "de"));
+  }, [events]);
+  // Vorhandene Veranstaltungs-Typen (für den Event-Filter).
+  const eventTypen = useMemo(() => {
+    const set = new Set<string>();
+    Object.values(events).forEach((m) => m.typ && set.add(m.typ));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [events]);
   // Flache Liste aller Sub-Veranstaltungen (für die Tabelle).
@@ -419,18 +425,20 @@ export default function App() {
         </div>
       </header>
 
-      {/* KPI-Leiste */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {STATUS_REIHENFOLGE.map((s) => (
-          <div
-            key={s}
-            className={`rounded-lg border px-3 py-2 text-sm ${STATUS_STYLE[s]}`}
-          >
-            <span className="text-lg font-bold">{statusZaehler[s]}</span>{" "}
-            {STATUS_LABELS[s]}
-          </div>
-        ))}
-      </div>
+      {/* KPI-Leiste (Status) – im Veranstaltungs-Reiter nicht relevant. */}
+      {ansicht !== "event" && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {STATUS_REIHENFOLGE.map((s) => (
+            <div
+              key={s}
+              className={`rounded-lg border px-3 py-2 text-sm ${STATUS_STYLE[s]}`}
+            >
+              <span className="text-lg font-bold">{statusZaehler[s]}</span>{" "}
+              {STATUS_LABELS[s]}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Steuerleiste */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -507,6 +515,7 @@ export default function App() {
         <FilterBar
           filter={filter}
           setFilter={setFilter}
+          modus={ansicht === "event" ? "event" : "kampagne"}
           quartale={facetten.quartale}
           status={facetten.status}
           kanaele={facetten.kanaele}
@@ -520,6 +529,9 @@ export default function App() {
           leerOwners={leer.owners}
           leerSparten={leer.sparten}
           leerKampagnen={leer.kampagnen}
+          evKategorien={eventKategorien}
+          evTypen={eventTypen}
+          evNiederlassungen={niederlassungen}
         />
       </div>
 
@@ -580,6 +592,11 @@ export default function App() {
           events={events}
           imZeitraum={eventImZeitraum}
           suche={filter.suche}
+          evKategorie={filter.evKategorie}
+          evTyp={filter.evTyp}
+          evAngemeldet={filter.evAngemeldet}
+          evAnsprechpartner={filter.evAnsprechpartner}
+          evNiederlassung={filter.evNiederlassung}
           onEditEvent={(kategorie) => setEventEditor({ offen: true, kategorie })}
           onNeuerEintrag={(kat, subId) =>
             neuerEintragMitVorlage({ veranstaltung: kat, subEvent: subId ?? "" })
