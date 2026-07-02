@@ -87,6 +87,11 @@ export default function App() {
     if (editor.kampagne) freigeben("kampagne", editor.kampagne.id);
     setEditor({ offen: false, kampagne: null });
   };
+  // Beim Duplizieren: Sperre des Originals freigeben, Editor als neuer Eintrag.
+  const onDuplikatStart = () => {
+    if (editor.kampagne) freigeben("kampagne", editor.kampagne.id);
+    setEditor((e) => ({ ...e, kampagne: null }));
+  };
   const [eventBand, setEventBand] = useState(true);
   const [mandant, setMandant] = useState<string>(
     () => localStorage.getItem("kampagnen.mandant.v1") ?? "DE",
@@ -587,6 +592,7 @@ export default function App() {
           onClose={schliesseEditor}
           gesperrtVon={editor.kampagne ? gesperrtVon(editor.kampagne.id) : null}
           vorlage={editor.vorlage}
+          onDuplikatStart={onDuplikatStart}
         />
       )}
 

@@ -25,6 +25,8 @@ interface Props {
   gesperrtVon?: string | null;
   /** Vorbelegung für einen NEUEN Eintrag (z.B. Veranstaltung/Termin). */
   vorlage?: Partial<Kampagne>;
+  /** Wird beim Duplizieren aufgerufen (App gibt Sperre des Originals frei). */
+  onDuplikatStart?: () => void;
 }
 
 function leereKampagne(): Kampagne {
@@ -66,11 +68,16 @@ export function KampagneEditor({
   onClose,
   gesperrtVon = null,
   vorlage,
+  onDuplikatStart,
 }: Props) {
   const readOnly = !!gesperrtVon;
   const [form, setForm] = useState<Kampagne>(
     kampagne ?? { ...leereKampagne(), land: mandant, ...vorlage },
   );
+  // Duplikat-Modus: Kopie eines bestehenden Eintrags, darf nur mit mindestens
+  // einer Änderung gespeichert werden.
+  const [istDuplikat, setIstDuplikat] = useState(false);
+  const [basis, setBasis] = useState<Kampagne | null>(null);
   const [versucht, setVersucht] = useState(false);
   const [eventAn, setEventAn] = useState<boolean>(
     () => !!(kampagne?.veranstaltung || vorlage?.veranstaltung),
@@ -100,8 +107,22 @@ export function KampagneEditor({
   const abgeleiteteKw = form.weekStart ? kwAusDatum(form.weekStart) : null;
   const abgeleitetesQuartal = form.weekStart ? quartalAusDatum(form.weekStart) : "";
 
+  // Im Duplikat-Modus: nur speicherbar, wenn mind. ein Feld geändert wurde.
+  const unveraendert = istDuplikat && !!basis && JSON.stringify(form) === JSON.stringify(basis);
+
+  // Aktuellen Eintrag als neuen (Duplikat) übernehmen.
+  const duplizieren = () => {
+    const kopie: Kampagne = { ...form, id: `c${Date.now()}` };
+    setBasis(kopie);
+    setForm(kopie);
+    setIstDuplikat(true);
+    setVersucht(false);
+    setSpiegeln([]);
+    onDuplikatStart?.();
+  };
+
   const speichern = () => {
-    if (unvollstaendig) {
+    if (unvollstaendig || unveraendert) {
       setVersucht(true);
       return;
     }
@@ -134,7 +155,7 @@ export function KampagneEditor({
       <div className="my-8 w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-b px-5 py-3">
           <h2 className="text-lg font-semibold">
-            {kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
+            {istDuplikat ? "Eintrag duplizieren" : kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
           </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
             ✕
@@ -481,13 +502,29 @@ export function KampagneEditor({
         </fieldset>
 
         <div className="flex items-center justify-between gap-2 border-t px-5 py-3">
-          <span className="text-xs text-slate-400">
-            {versucht && unvollstaendig ? (
-              <span className="text-rose-500">Bitte Details und Startdatum ausfüllen.</span>
-            ) : (
-              <>{stern} Pflichtfeld</>
+          <div className="flex min-w-0 items-center gap-3">
+            {/* Duplizieren: nur bei bereits gespeicherten Einträgen. */}
+            {kampagne && !istDuplikat && !readOnly && (
+              <button
+                onClick={duplizieren}
+                title="Kopie dieses Eintrags anlegen"
+                className="whitespace-nowrap rounded border border-marke px-3 py-1.5 text-sm font-medium text-marke-dark hover:bg-marke/10"
+              >
+                ⧉ Duplizieren
+              </button>
             )}
-          </span>
+            <span className="truncate text-xs text-slate-400">
+              {versucht && unvollstaendig ? (
+                <span className="text-rose-500">Bitte Details und Startdatum ausfüllen.</span>
+              ) : unveraendert ? (
+                <span className="text-amber-600">
+                  Duplikat: bitte mindestens ein Feld ändern.
+                </span>
+              ) : (
+                <>{stern} Pflichtfeld</>
+              )}
+            </span>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={onClose}
@@ -497,7 +534,7 @@ export function KampagneEditor({
             </button>
             <button
               onClick={speichern}
-              disabled={readOnly}
+              disabled={readOnly || unveraendert}
               className="rounded bg-marke px-4 py-1.5 text-sm font-medium text-white hover:bg-marke-dark disabled:opacity-50"
             >
               Speichern
