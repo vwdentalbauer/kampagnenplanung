@@ -10,6 +10,7 @@ import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } 
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
 import { useBenachrichtigungen, type Benachrichtigung } from "./data/useBenachrichtigungen";
+import { useNutzerListe } from "./data/useNutzerListe";
 import { Benachrichtigungen } from "./components/Benachrichtigungen";
 import { AdminPanel } from "./admin/AdminPanel";
 import { PasswortAendern } from "./auth/PasswortAendern";
@@ -37,6 +38,7 @@ export default function App() {
   } = useKampagnen();
   const { locks, sperren, freigeben } = useLocks(userId, nutzer.name);
   const benachr = useBenachrichtigungen(userId, nutzer.name);
+  const nutzerListe = useNutzerListe();
   const { epics, setZeitraum } = useEpics();
   const {
     alle: alleEvents,
@@ -178,6 +180,19 @@ export default function App() {
     Object.values(events).forEach((m) => m.subs.forEach((s) => s.ort && set.add(s.ort)));
     return [...set].sort();
   }, [events]);
+  // Bereits angelegte Veranstaltungs-Kategorien (für das Dropdown im Editor).
+  const eventKategorien = useMemo(
+    () => Object.keys(events).sort((a, b) => a.localeCompare(b, "de")),
+    [events],
+  );
+  // Bereits verwendete Niederlassungen (Vorschläge im Sub-Editor).
+  const niederlassungen = useMemo(() => {
+    const set = new Set<string>();
+    Object.values(events).forEach((m) =>
+      m.subs.forEach((s) => s.niederlassung && set.add(s.niederlassung)),
+    );
+    return [...set].sort((a, b) => a.localeCompare(b, "de"));
+  }, [events]);
   // Flache Liste aller Sub-Veranstaltungen (für die Tabelle).
   const subEvents = useMemo(
     () =>
@@ -215,11 +230,11 @@ export default function App() {
     () => subEvents.filter((s) => eventImZeitraum(s.start, s.ende)),
     [subEvents, eventImZeitraum],
   );
-  const alleOwners = useMemo(() => {
-    const set = new Set<string>();
-    mandantKampagnen.forEach((k) => k.owners.forEach((o) => set.add(o)));
-    return [...set].sort((a, b) => a.localeCompare(b, "de"));
-  }, [mandantKampagnen]);
+  // Verantwortliche = Anzeigenamen der angelegten Nutzer (Nutzerverwaltung).
+  const verantwortlicheNamen = useMemo(
+    () => nutzerListe.map((n) => n.anzeige),
+    [nutzerListe],
+  );
 
   // Vollständige Vorschläge für die Inline-Bearbeitung – unabhängig vom Filter.
   const vorschlaege = useMemo(() => {
@@ -583,7 +598,7 @@ export default function App() {
           kanaele={alleKanaele}
           subKanaele={alleSubKanaele}
           kampagnen={alleKampagnen}
-          verantwortliche={alleOwners}
+          verantwortliche={verantwortlicheNamen}
           veranstaltungen={veranstaltungenListe}
           onNeueVeranstaltung={(kategorie) =>
             setEventEditor({ offen: true, kategorie: kategorie ?? null })
@@ -608,6 +623,8 @@ export default function App() {
               : null
           }
           orte={eventOrte}
+          kategorien={eventKategorien}
+          niederlassungen={niederlassungen}
           onSave={onSaveEvent}
           onDelete={(kat) => loeschenEvent(mandant, kat)}
           onClose={() => setEventEditor({ offen: false, kategorie: null })}

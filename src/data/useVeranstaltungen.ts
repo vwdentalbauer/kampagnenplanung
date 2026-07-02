@@ -8,6 +8,12 @@ export interface SubEvent {
   ort: string;
   start: string | null;
   ende: string | null;
+  /** Fix angemeldet? */
+  angemeldet?: boolean;
+  /** Verantwortlicher / Ansprechpartner (Freitext). */
+  ansprechpartner?: string;
+  /** Zuständige Niederlassung (Freitext mit Vorschlägen). */
+  niederlassung?: string;
 }
 
 export interface EventMeta {

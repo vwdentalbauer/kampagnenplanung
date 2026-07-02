@@ -281,8 +281,18 @@ export function VeranstaltungenAnsicht(props: Props) {
                               className="flex min-w-0 flex-1 items-center gap-2 text-left hover:opacity-80"
                             >
                               <ChevronIcon className={`h-3.5 w-3.5 shrink-0 text-slate-400 ${subOffen ? "rotate-90" : ""}`} />
-                              <span className="font-medium text-slate-700">{subLabel(s)}</span>
-                              <span className="ml-auto text-xs text-slate-400">{tasks.length} Einträge</span>
+                              <span className="truncate font-medium text-slate-700">{subLabel(s)}</span>
+                              {s.angemeldet && (
+                                <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                                  ✓ angemeldet
+                                </span>
+                              )}
+                              {s.niederlassung && (
+                                <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
+                                  📍 {s.niederlassung}
+                                </span>
+                              )}
+                              <span className="ml-auto shrink-0 text-xs text-slate-400">{tasks.length} Einträge</span>
                             </button>
                             {plusEintrag(kat, s.id)}
                           </div>

@@ -9,6 +9,7 @@ import {
 } from "../constants";
 import { kwAusDatum, quartalAusDatum, formatDatum } from "../lib/date";
 import type { Veranstaltung } from "../data/useVeranstaltungen";
+import { MultiSelect } from "./MultiSelect";
 
 interface Props {
   kampagne: Kampagne | null; // null = neue Kampagne
@@ -316,18 +317,27 @@ export function KampagneEditor({
             </select>
           </div>
           <div>
-            <label className={label}>Verantwortung (mit / oder , trennen)</label>
-            <input
-              className={input}
-              list="dl-verantwortung"
-              value={form.verantwortung}
-              onChange={(e) => set("verantwortung", e.target.value)}
-            />
-            <datalist id="dl-verantwortung">
-              {verantwortliche.map((v) => (
-                <option key={v} value={v} />
-              ))}
-            </datalist>
+            <label className={label}>Verantwortung</label>
+            {(() => {
+              const ausgewaehlt = form.verantwortung
+                .split(/[/,]/)
+                .map((s) => s.trim())
+                .filter(Boolean);
+              // Auswählbar: angelegte Nutzer + evtl. am Eintrag bereits
+              // vorhandene (alte) Werte, damit nichts verloren geht.
+              const optionen = [...new Set([...verantwortliche, ...ausgewaehlt])].sort(
+                (a, b) => a.localeCompare(b, "de"),
+              );
+              return (
+                <MultiSelect
+                  label="Verantwortliche wählen"
+                  options={optionen}
+                  selected={ausgewaehlt}
+                  onChange={(vals) => set("verantwortung", vals.join(" / "))}
+                  suchbar
+                />
+              );
+            })()}
           </div>
 
           <div className="col-span-2">
