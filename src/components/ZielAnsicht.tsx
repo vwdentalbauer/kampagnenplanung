@@ -10,7 +10,13 @@ interface Props {
   kampagnen: Kampagne[];
   darfBearbeiten: boolean;
   kanaele: string[];
-  vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
+  vorschlaege: {
+    kanal: string[];
+    subKanal: string[];
+    kampagne: string[];
+    details: string[];
+    verantwortliche: string[];
+  };
   epics: Record<string, EpicMeta>;
   onZeitraum: (name: string, start: string | null, ende: string | null) => void;
   onEdit: (k: Kampagne) => void;

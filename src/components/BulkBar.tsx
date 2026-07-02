@@ -2,10 +2,13 @@ import { useState } from "react";
 import type { Kampagne, Status } from "../types";
 import { STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { TrashIcon } from "./Icons";
+import { MultiSelect } from "./MultiSelect";
 
 interface Props {
   anzahl: number;
   kanaele: string[];
+  /** Anzeigenamen der angelegten Nutzer (für „Verantwortung"). */
+  verantwortliche: string[];
   onApply: (patch: Partial<Kampagne>) => void;
   onDelete: () => void;
   onClear: () => void;
@@ -16,9 +19,9 @@ interface Props {
  * Checkbox ausgewählt sind. Jede Änderung wird auf alle ausgewählten
  * Kampagnen angewendet.
  */
-export function BulkBar({ anzahl, kanaele, onApply, onDelete, onClear }: Props) {
+export function BulkBar({ anzahl, kanaele, verantwortliche, onApply, onDelete, onClear }: Props) {
   const [datum, setDatum] = useState("");
-  const [verant, setVerant] = useState("");
+  const [verantSel, setVerantSel] = useState<string[]>([]);
 
   const sel =
     "rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:border-marke focus:outline-none";
@@ -88,17 +91,18 @@ export function BulkBar({ anzahl, kanaele, onApply, onDelete, onClear }: Props) 
       {/* Verantwortung setzen */}
       <label className="flex items-center gap-1 text-sm text-slate-600">
         Verantw.
-        <input
-          className={`${sel} w-32`}
-          placeholder="Name(n)"
-          value={verant}
-          onChange={(e) => setVerant(e.target.value)}
+        <MultiSelect
+          label="wählen"
+          options={verantwortliche}
+          selected={verantSel}
+          onChange={setVerantSel}
+          suchbar
         />
         <button
-          disabled={!verant.trim()}
+          disabled={verantSel.length === 0}
           onClick={() => {
-            onApply({ verantwortung: verant.trim() });
-            setVerant("");
+            onApply({ verantwortung: verantSel.join(" / ") });
+            setVerantSel([]);
           }}
           className="rounded bg-marke px-2 py-1 text-xs font-medium text-white hover:bg-marke-dark disabled:opacity-40"
         >

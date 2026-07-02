@@ -3,6 +3,7 @@ import type { Kampagne, Status } from "../types";
 import { ABGESCHLOSSEN, STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
+import { MultiSelect } from "./MultiSelect";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
@@ -24,7 +25,14 @@ interface Props {
   onBulkUpdate: (ids: string[], patch: Partial<Kampagne>) => void;
   onBulkDelete: (ids: string[]) => void;
   /** Vollständige Vorschlagslisten (unabhängig vom aktiven Filter). */
-  vorschlaege: { kanal: string[]; subKanal: string[]; kampagne: string[]; details: string[] };
+  vorschlaege: {
+    kanal: string[];
+    subKanal: string[];
+    kampagne: string[];
+    details: string[];
+    /** Anzeigenamen der angelegten Nutzer (für „Verantwortung"). */
+    verantwortliche: string[];
+  };
   /** Spalten, die in dieser Instanz ausgeblendet werden (z.B. im Kampagne-Reiter). */
   ausblenden?: SpaltenKey[];
   /** Sub-Veranstaltungen als halbhohe Zeilen einsortieren (nur Haupttabelle). */
@@ -412,12 +420,26 @@ export function TabellenAnsicht({
             ))}
           </div>
         );
-      case "verantwortung":
-        return bearbeitbar ? (
-          <EditableCell value={k.verantwortung} onCommit={(v) => onUpdate(k, { verantwortung: v })} />
-        ) : (
-          <span className="px-1.5 text-slate-600">{k.verantwortung}</span>
+      case "verantwortung": {
+        if (!bearbeitbar)
+          return <span className="px-1.5 text-slate-600">{k.verantwortung}</span>;
+        const ausgewaehlt = k.verantwortung
+          .split(/[/,]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const optionen = [...new Set([...vorschlaege.verantwortliche, ...ausgewaehlt])].sort(
+          (a, b) => a.localeCompare(b, "de"),
         );
+        return (
+          <MultiSelect
+            label="wählen"
+            options={optionen}
+            selected={ausgewaehlt}
+            onChange={(vals) => onUpdate(k, { verantwortung: vals.join(" / ") })}
+            suchbar
+          />
+        );
+      }
       case "status":
         return bearbeitbar ? (
           <select
@@ -451,6 +473,7 @@ export function TabellenAnsicht({
         <BulkBar
           anzahl={ausgewaehlteSichtbar.length}
           kanaele={kanaele}
+          verantwortliche={vorschlaege.verantwortliche}
           onApply={bulkApply}
           onDelete={bulkDelete}
           onClear={auswahlAufheben}

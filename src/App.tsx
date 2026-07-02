@@ -245,8 +245,9 @@ export default function App() {
       subKanal: alleSubKanaele,
       kampagne: alleKampagnen,
       details: [...details].sort((a, b) => a.localeCompare(b, "de")),
+      verantwortliche: verantwortlicheNamen,
     };
-  }, [mandantKampagnen, alleKanaele, alleSubKanaele, alleKampagnen]);
+  }, [mandantKampagnen, alleKanaele, alleSubKanaele, alleKampagnen, verantwortlicheNamen]);
 
   const statusZaehler = useMemo(() => {
     const z: Record<Status, number> = {

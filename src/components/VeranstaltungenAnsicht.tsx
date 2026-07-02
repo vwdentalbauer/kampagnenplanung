@@ -10,6 +10,7 @@ interface Vorschlaege {
   subKanal: string[];
   kampagne: string[];
   details: string[];
+  verantwortliche: string[];
 }
 
 interface Props {
