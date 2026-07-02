@@ -4,7 +4,6 @@ import {
   BEREICHE,
   KATEGORIEN,
   MANDANTEN,
-  QUARTALE,
   STATUS_LABELS,
   STATUS_REIHENFOLGE,
 } from "../constants";
@@ -97,6 +96,10 @@ export function KampagneEditor({
   const fehltDatum = !form.weekStart;
   const unvollstaendig = fehltDetails || fehltDatum;
 
+  // KW und Quartal werden immer aus dem Startdatum abgeleitet (nicht editierbar).
+  const abgeleiteteKw = form.weekStart ? kwAusDatum(form.weekStart) : null;
+  const abgeleitetesQuartal = form.weekStart ? quartalAusDatum(form.weekStart) : "";
+
   const speichern = () => {
     if (unvollstaendig) {
       setVersucht(true);
@@ -106,7 +109,16 @@ export function KampagneEditor({
       .split(/[/,]/)
       .map((o) => o.trim())
       .filter(Boolean);
-    onSave({ ...form, owners }, spiegeln);
+    // KW/Quartal immer aus dem Startdatum berechnen.
+    onSave(
+      {
+        ...form,
+        owners,
+        kw: abgeleiteteKw ?? form.kw,
+        quartal: abgeleitetesQuartal || form.quartal,
+      },
+      spiegeln,
+    );
   };
 
   const label = "block text-sm font-medium text-slate-600 mb-1";
@@ -189,26 +201,26 @@ export function KampagneEditor({
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className={label}>Quartal</label>
-              <select
-                className={input}
-                value={form.quartal}
-                onChange={(e) => set("quartal", e.target.value)}
+              <div
+                className={`${input} bg-slate-50 text-slate-600`}
+                title="Wird automatisch aus dem Startdatum berechnet"
               >
-                {QUARTALE.map((q) => (
-                  <option key={q}>{q}</option>
-                ))}
-              </select>
+                {abgeleitetesQuartal || "—"}
+              </div>
             </div>
             <div>
               <label className={label}>KW</label>
-              <input
-                type="number"
-                className={input}
-                value={form.kw ?? ""}
-                onChange={(e) => set("kw", e.target.value ? Number(e.target.value) : null)}
-              />
+              <div
+                className={`${input} bg-slate-50 text-slate-600`}
+                title="Wird automatisch aus dem Startdatum berechnet"
+              >
+                {abgeleiteteKw ?? "—"}
+              </div>
             </div>
           </div>
+          <p className="col-span-2 -mt-2 text-xs text-slate-400">
+            KW und Quartal werden automatisch aus dem Startdatum übernommen.
+          </p>
           <div className="hidden sm:block" />
 
           <div>
