@@ -353,7 +353,7 @@ export function KampagneEditor({
                   if (!e.target.checked) setForm((f) => ({ ...f, veranstaltung: "", subEvent: "" }));
                 }}
               />
-              Event – gehört zu einer Veranstaltung
+              Eintrag – gehört zu einer Veranstaltung
             </label>
 
             {eventAn && (
