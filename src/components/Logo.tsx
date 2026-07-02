@@ -7,6 +7,7 @@ interface Props {
 // Reihenfolge der Datei-Kandidaten aus dem public-Ordner.
 // Sobald eine dieser Dateien existiert, wird sie automatisch verwendet.
 const KANDIDATEN = [
+  `${import.meta.env.BASE_URL}db_logo4C_solo.svg`,
   `${import.meta.env.BASE_URL}logo.svg`,
   `${import.meta.env.BASE_URL}logo.png`,
 ];
