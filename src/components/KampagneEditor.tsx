@@ -198,29 +198,31 @@ export function KampagneEditor({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className={label}>Quartal</label>
-              <div
-                className={`${input} bg-slate-50 text-slate-600`}
-                title="Wird automatisch aus dem Startdatum berechnet"
-              >
-                {abgeleitetesQuartal || "—"}
+          <div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className={label}>Quartal</label>
+                <div
+                  className={`${input} bg-slate-50 text-slate-600`}
+                  title="Wird automatisch aus dem Startdatum berechnet"
+                >
+                  {abgeleitetesQuartal || "—"}
+                </div>
+              </div>
+              <div>
+                <label className={label}>KW</label>
+                <div
+                  className={`${input} bg-slate-50 text-slate-600`}
+                  title="Wird automatisch aus dem Startdatum berechnet"
+                >
+                  {abgeleiteteKw ?? "—"}
+                </div>
               </div>
             </div>
-            <div>
-              <label className={label}>KW</label>
-              <div
-                className={`${input} bg-slate-50 text-slate-600`}
-                title="Wird automatisch aus dem Startdatum berechnet"
-              >
-                {abgeleiteteKw ?? "—"}
-              </div>
-            </div>
+            <p className="mt-1 text-xs text-slate-400">
+              KW und Quartal werden automatisch aus dem Startdatum übernommen.
+            </p>
           </div>
-          <p className="col-span-2 -mt-2 text-xs text-slate-400">
-            KW und Quartal werden automatisch aus dem Startdatum übernommen.
-          </p>
           <div className="hidden sm:block" />
 
           <div>
