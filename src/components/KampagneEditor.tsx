@@ -154,13 +154,26 @@ export function KampagneEditor({
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
       <div className="my-8 w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="flex items-center justify-between border-b px-5 py-3">
-          <h2 className="text-lg font-semibold">
-            {istDuplikat ? "Eintrag duplizieren" : kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            {istDuplikat ? "Neuer Eintrag" : kampagne ? "Eintrag bearbeiten" : "Neuer Eintrag"}
+            {istDuplikat && (
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                ✦ Neu · Duplikat
+              </span>
+            )}
           </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
             ✕
           </button>
         </div>
+
+        {istDuplikat && (
+          <div className="border-b border-emerald-200 bg-emerald-50 px-5 py-2 text-sm text-emerald-800">
+            Dies ist ein <strong>neuer Eintrag</strong> (Kopie). Ändere mindestens
+            ein Feld – dann kannst du ihn als eigenständigen Eintrag speichern.
+            Das Original bleibt unverändert.
+          </div>
+        )}
 
         {readOnly && (
           <div className="border-b border-amber-200 bg-amber-50 px-5 py-2 text-sm text-amber-800">
@@ -517,8 +530,8 @@ export function KampagneEditor({
               {versucht && unvollstaendig ? (
                 <span className="text-rose-500">Bitte Details und Startdatum ausfüllen.</span>
               ) : unveraendert ? (
-                <span className="text-amber-600">
-                  Duplikat: bitte mindestens ein Feld ändern.
+                <span className="text-emerald-700">
+                  Neuer Eintrag – ändere ein Feld, um zu speichern.
                 </span>
               ) : (
                 <>{stern} Pflichtfeld</>
