@@ -3,7 +3,7 @@ import type { Kampagne, Status } from "../types";
 import { ABGESCHLOSSEN, STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
-import { MultiSelect } from "./MultiSelect";
+import { PersonenCell } from "./PersonenCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
@@ -431,12 +431,10 @@ export function TabellenAnsicht({
           (a, b) => a.localeCompare(b, "de"),
         );
         return (
-          <MultiSelect
-            label="wählen"
+          <PersonenCell
             options={optionen}
             selected={ausgewaehlt}
             onChange={(vals) => onUpdate(k, { verantwortung: vals.join(" / ") })}
-            suchbar
           />
         );
       }
