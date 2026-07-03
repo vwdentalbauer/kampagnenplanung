@@ -117,6 +117,40 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === "set_profil") {
+      const id = String(body.id ?? "");
+      if (!id) return json({ error: "ID fehlt." }, 400);
+      const name = body.name !== undefined ? String(body.name) : undefined;
+      const email =
+        body.email !== undefined
+          ? String(body.email).trim().toLowerCase()
+          : undefined;
+      if (email !== undefined && (!email || !email.includes("@")))
+        return json({ error: "Ungültige E-Mail-Adresse." }, 400);
+
+      // Auth-Konto aktualisieren (E-Mail direkt bestätigen, Name in Metadaten).
+      const authPatch: Record<string, unknown> = {};
+      if (email !== undefined) {
+        authPatch.email = email;
+        authPatch.email_confirm = true;
+      }
+      if (name !== undefined) authPatch.user_metadata = { name };
+      if (Object.keys(authPatch).length) {
+        const { error } = await admin.auth.admin.updateUserById(id, authPatch);
+        if (error) throw error;
+      }
+
+      // Profil-Tabelle aktualisieren.
+      const profilPatch: Record<string, unknown> = {};
+      if (name !== undefined) profilPatch.name = name;
+      if (email !== undefined) profilPatch.email = email;
+      if (Object.keys(profilPatch).length) {
+        const { error } = await admin.from("profile").update(profilPatch).eq("id", id);
+        if (error) throw error;
+      }
+      return json({ ok: true });
+    }
+
     if (action === "set_aktiv") {
       const id = String(body.id ?? "");
       const aktiv = Boolean(body.aktiv);

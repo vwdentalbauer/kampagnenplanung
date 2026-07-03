@@ -110,6 +110,10 @@ function Nutzerverwaltung() {
   const [rolle, setRolle] = useState<Rolle>("viewer");
   const [passwort, setPasswort] = useState("");
   const [hinweis, setHinweis] = useState<string | null>(null);
+  // Inline-Bearbeitung von Name/E-Mail.
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
 
   const laden = useCallback(async () => {
     setLaedt(true);
@@ -170,6 +174,34 @@ function Nutzerverwaltung() {
   const rolleAendern = async (id: string, neu: Rolle) => {
     try {
       await adminAktion({ action: "set_role", id, rolle: neu });
+      await laden();
+    } catch (e) {
+      setFehler((e as Error).message);
+    }
+  };
+
+  const starteBearbeiten = (u: ProfilRow) => {
+    setFehler(null);
+    setHinweis(null);
+    setEditId(u.id);
+    setEditName(u.name ?? "");
+    setEditEmail(u.email ?? "");
+  };
+
+  const profilSpeichern = async () => {
+    if (!editId) return;
+    if (!editEmail.trim() || !editEmail.includes("@")) {
+      setFehler("Bitte eine gültige E-Mail-Adresse angeben.");
+      return;
+    }
+    try {
+      await adminAktion({
+        action: "set_profil",
+        id: editId,
+        name: editName,
+        email: editEmail.trim().toLowerCase(),
+      });
+      setEditId(null);
       await laden();
     } catch (e) {
       setFehler((e as Error).message);
@@ -303,9 +335,29 @@ function Nutzerverwaltung() {
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-b border-slate-100">
-                <td className="py-2">
-                  <div className="font-medium">{u.name || "—"}</div>
-                  <div className="text-xs text-slate-400">{u.email}</div>
+                <td className="py-2 pr-2">
+                  {editId === u.id ? (
+                    <div className="flex flex-col gap-1">
+                      <input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="Name"
+                        className="rounded border border-slate-300 px-2 py-1 text-sm"
+                      />
+                      <input
+                        type="email"
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        placeholder="E-Mail"
+                        className="rounded border border-slate-300 px-2 py-1 text-sm"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="font-medium">{u.name || "—"}</div>
+                      <div className="text-xs text-slate-400">{u.email}</div>
+                    </>
+                  )}
                 </td>
                 <td className="py-2">
                   <select
@@ -348,20 +400,48 @@ function Nutzerverwaltung() {
                   })()}
                 </td>
                 <td className="py-2 text-right">
-                  <button
-                    onClick={() => neuesPasswort(u.id, u.email)}
-                    className="mr-1 rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
-                    title="Neues Passwort erzeugen"
-                  >
-                    🔑
-                  </button>
-                  <button
-                    onClick={() => loeschen(u.id, u.email)}
-                    className="rounded p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
-                    title="Löschen"
-                  >
-                    🗑
-                  </button>
+                  {editId === u.id ? (
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={profilSpeichern}
+                        className="rounded bg-marke px-2 py-1 text-xs font-medium text-white hover:bg-marke-dark"
+                        title="Name/E-Mail speichern"
+                      >
+                        Speichern
+                      </button>
+                      <button
+                        onClick={() => setEditId(null)}
+                        className="rounded border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-50"
+                        title="Abbrechen"
+                      >
+                        Abbrechen
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => starteBearbeiten(u)}
+                        className="mr-1 rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                        title="Name/E-Mail bearbeiten"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => neuesPasswort(u.id, u.email)}
+                        className="mr-1 rounded p-1.5 text-slate-400 hover:bg-marke/10 hover:text-marke-dark"
+                        title="Neues Passwort erzeugen"
+                      >
+                        🔑
+                      </button>
+                      <button
+                        onClick={() => loeschen(u.id, u.email)}
+                        className="rounded p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                        title="Löschen"
+                      >
+                        🗑
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

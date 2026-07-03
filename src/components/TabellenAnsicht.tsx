@@ -4,6 +4,7 @@ import { ABGESCHLOSSEN, STATUS_LABELS, STATUS_REIHENFOLGE } from "../constants";
 import { StatusBadge } from "./StatusBadge";
 import { EditableCell } from "./EditableCell";
 import { PersonenCell } from "./PersonenCell";
+import { AuswahlCell } from "./AuswahlCell";
 import { KampagneCell } from "./KampagneCell";
 import { BulkBar } from "./BulkBar";
 import { PencilIcon, TrashIcon, GripIcon } from "./Icons";
@@ -390,26 +391,41 @@ export function TabellenAnsicht({
             onCommit={(v) => onUpdate(k, { details: v })}
           />
         );
-      case "kanal":
-        return bearbeitbar ? (
-          <EditableCell
-            value={k.kanal}
-            vorschlaege={vorschlaege.kanal}
-            onCommit={(v) => onUpdate(k, { kanal: v })}
+      case "kanal": {
+        if (!bearbeitbar) return <span className="px-1.5">{k.kanal}</span>;
+        const optionen = [
+          ...new Set([...vorschlaege.kanal, ...(k.kanal.trim() ? [k.kanal.trim()] : [])]),
+        ].sort((a, b) => a.localeCompare(b, "de"));
+        return (
+          <AuswahlCell
+            options={optionen}
+            selected={k.kanal.trim() ? [k.kanal.trim()] : []}
+            onChange={(vals) => onUpdate(k, { kanal: vals[0] ?? "" })}
+            multi={false}
+            freitext
+            titel="Kanal wählen"
           />
-        ) : (
-          <span className="px-1.5">{k.kanal}</span>
         );
-      case "subkanal":
-        return bearbeitbar ? (
-          <EditableCell
-            value={k.subKanal}
-            vorschlaege={subKanalVorschlaege}
-            onCommit={(v) => onUpdate(k, { subKanal: v })}
+      }
+      case "subkanal": {
+        if (!bearbeitbar) return <span className="px-1.5">{k.subKanal}</span>;
+        const ausgewaehlt = k.subKanal
+          .split(/[/,]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const optionen = [...new Set([...subKanalVorschlaege, ...ausgewaehlt])].sort((a, b) =>
+          a.localeCompare(b, "de"),
+        );
+        return (
+          <AuswahlCell
+            options={optionen}
+            selected={ausgewaehlt}
+            onChange={(vals) => onUpdate(k, { subKanal: vals.join(" / ") })}
+            freitext
+            titel="Sub-Kanäle wählen"
           />
-        ) : (
-          <span className="px-1.5">{k.subKanal}</span>
         );
+      }
       case "bereiche":
         return (
           <div className="flex flex-wrap gap-1 px-1.5">
