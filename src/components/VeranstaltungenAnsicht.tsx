@@ -219,6 +219,21 @@ export function VeranstaltungenAnsicht(props: Props) {
                       {sub.name && <span className="text-sm text-slate-600">{sub.name}</span>}
                       {sub.ort && <span className="text-xs text-slate-500">📍 {sub.ort}</span>}
                       {typ && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{typ}</span>}
+                      {sub.angemeldet && (
+                        <span
+                          title="Wir sind angemeldet"
+                          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                        >
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0l-3.5-3.5a1 1 0 111.4-1.4l2.8 2.79 6.8-6.79a1 1 0 011.4 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          angemeldet
+                        </span>
+                      )}
                     </div>
                   </div>
                   <span className="shrink-0 text-xs text-slate-400">{tasks.length} Einträge</span>
@@ -322,8 +337,18 @@ export function VeranstaltungenAnsicht(props: Props) {
                               <ChevronIcon className={`h-3.5 w-3.5 shrink-0 text-slate-400 ${subOffen ? "rotate-90" : ""}`} />
                               <span className="truncate font-medium text-slate-700">{subLabel(s)}</span>
                               {s.angemeldet && (
-                                <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-                                  ✓ angemeldet
+                                <span
+                                  title="Wir sind angemeldet"
+                                  className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
+                                >
+                                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0l-3.5-3.5a1 1 0 111.4-1.4l2.8 2.79 6.8-6.79a1 1 0 011.4 0z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  angemeldet
                                 </span>
                               )}
                               {s.niederlassung && (
