@@ -6,7 +6,15 @@ import { useKampagnen, eindeutigeWerte } from "./data/useKampagnen";
 import { useLocks } from "./data/useLock";
 import { kwAusDatum, quartalAusDatum } from "./lib/date";
 import { MANDANTEN, STATUS_LABELS, STATUS_REIHENFOLGE, STATUS_STYLE } from "./constants";
-import { LEERER_FILTER, passt, facette, gibtLeere, subKanalListe, type Filter } from "./lib/filter";
+import {
+  LEERER_FILTER,
+  passt,
+  facette,
+  gibtLeere,
+  subKanalListe,
+  jahreUeberlappen,
+  type Filter,
+} from "./lib/filter";
 import { useEpics } from "./data/useEpics";
 import { useVeranstaltungen, type Veranstaltung } from "./data/useVeranstaltungen";
 import { useBenachrichtigungen, type Benachrichtigung } from "./data/useBenachrichtigungen";
@@ -199,6 +207,25 @@ export default function App() {
     Object.values(events).forEach((m) => m.typ && set.add(m.typ));
     return [...set].sort((a, b) => a.localeCompare(b, "de"));
   }, [events]);
+  // Verfügbare Jahre (aus Kampagnen- und Event-Daten) für den Jahres-Filter.
+  const verfuegbareJahre = useMemo(() => {
+    const set = new Set<string>();
+    const add = (d: string | null | undefined) => d && set.add(d.slice(0, 4));
+    mandantKampagnen.forEach((k) => {
+      add(k.weekStart);
+      add(k.endDatum);
+    });
+    Object.values(events).forEach((m) =>
+      m.subs.forEach((s) => {
+        add(s.start);
+        add(s.ende);
+      }),
+    );
+    // Aktuelles Jahr immer anbieten.
+    set.add(String(new Date().getFullYear()));
+    return [...set].filter(Boolean).sort((a, b) => b.localeCompare(a));
+  }, [mandantKampagnen, events]);
+
   // Flache Liste aller Sub-Veranstaltungen (für die Tabelle).
   const subEvents = useMemo(
     () =>
@@ -216,10 +243,16 @@ export default function App() {
     (start: string | null, ende: string | null) => {
       const kwVon = filter.kwVon ? Number(filter.kwVon) : null;
       const kwBis = filter.kwBis ? Number(filter.kwBis) : null;
-      const zeitAktiv = kwVon != null || kwBis != null || !!filter.datumVon || !!filter.datumBis;
+      const zeitAktiv =
+        kwVon != null ||
+        kwBis != null ||
+        !!filter.datumVon ||
+        !!filter.datumBis ||
+        filter.jahre.length > 0;
       if (!zeitAktiv) return true;
       if (!start) return false; // ohne Datum nicht in einen Zeitraum einordbar
       const e = ende ?? start;
+      if (!jahreUeberlappen(start, ende, filter.jahre)) return false;
       const startKw = kwAusDatum(start);
       const endeKw = kwAusDatum(e) ?? startKw;
       if (kwVon != null && (endeKw == null || endeKw < kwVon)) return false;
@@ -524,6 +557,7 @@ export default function App() {
           sparten={facetten.sparten}
           kampagnen={facetten.kampagnen}
           aktuelleKw={aktuelleKw}
+          jahre={verfuegbareJahre}
           leerKanaele={leer.kanaele}
           leerSubKanaele={leer.subKanaele}
           leerOwners={leer.owners}

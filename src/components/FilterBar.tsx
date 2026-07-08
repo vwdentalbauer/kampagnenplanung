@@ -23,6 +23,8 @@ interface Props {
   sparten: string[];
   kampagnen: string[];
   aktuelleKw: number;
+  /** Verfügbare Jahre für den Jahres-Filter (z.B. „2026"). */
+  jahre: string[];
   // „(leer)"-Option nur zeigen, wenn es auch leere Felder gibt
   leerKanaele: boolean;
   leerSubKanaele: boolean;
@@ -47,6 +49,7 @@ export function FilterBar({
   sparten,
   kampagnen,
   aktuelleKw,
+  jahre,
   leerKanaele,
   leerSubKanaele,
   leerOwners,
@@ -207,6 +210,13 @@ export function FilterBar({
       {/* Zeile 2: Zeitraum (inkl. Quartal & „Diese Woche") */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
         <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Zeitraum</span>
+
+        <MultiSelect
+          label="Jahr"
+          options={jahre}
+          selected={filter.jahre}
+          onChange={(v) => upd({ jahre: v })}
+        />
 
         <MultiSelect
           label="Quartale"

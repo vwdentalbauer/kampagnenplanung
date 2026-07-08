@@ -14,6 +14,8 @@ export interface SubEvent {
   ansprechpartner?: string;
   /** Zuständige Niederlassung (Freitext mit Vorschlägen). */
   niederlassung?: string;
+  /** Freies Kommentarfeld zum konkreten Termin/Ort. */
+  kommentar?: string;
 }
 
 export interface EventMeta {

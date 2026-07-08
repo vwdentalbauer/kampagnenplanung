@@ -28,7 +28,16 @@ function neueSub(): SubEvent {
     angemeldet: false,
     ansprechpartner: "",
     niederlassung: "",
+    kommentar: "",
   };
+}
+
+/** Heutiges Datum als ISO-String (lokal). */
+function heuteISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
 }
 
 export function VeranstaltungEditor({
@@ -43,7 +52,14 @@ export function VeranstaltungEditor({
   const [form, setForm] = useState<Veranstaltung>(veranstaltung ?? leer());
   const [versucht, setVersucht] = useState(false);
   const [subSuche, setSubSuche] = useState("");
+  // Vergangene Termine standardmäßig ausblenden (übersichtlicher bei vielen).
+  const [vergangeneAus, setVergangeneAus] = useState(true);
   const vorher = veranstaltung?.kategorie;
+  const heute = heuteISO();
+  const istVergangen = (s: SubEvent) => {
+    const e = s.ende ?? s.start;
+    return !!e && e < heute;
+  };
 
   const label = "block text-sm font-medium text-slate-600 mb-1";
   const input =
@@ -69,13 +85,16 @@ export function VeranstaltungEditor({
 
   // Für die Übersicht bei vielen Terminen: Suche über Name/Ort/Niederlassung/Ansprechpartner.
   const q = subSuche.trim().toLowerCase();
-  const sichtbareSubs = q
-    ? form.subs.filter((s) =>
-        [s.name, s.ort, s.niederlassung, s.ansprechpartner].some((x) =>
+  const anzahlVergangen = form.subs.filter(istVergangen).length;
+  const sichtbareSubs = form.subs
+    .filter((s) => !vergangeneAus || !istVergangen(s))
+    .filter(
+      (s) =>
+        !q ||
+        [s.name, s.ort, s.niederlassung, s.ansprechpartner, s.kommentar].some((x) =>
           (x ?? "").toLowerCase().includes(q),
         ),
-      )
-    : form.subs;
+    );
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
@@ -139,7 +158,9 @@ export function VeranstaltungEditor({
                 Termine / Orte
                 {form.subs.length > 0 && (
                   <span className="ml-1 text-xs font-normal text-slate-400">
-                    ({q ? `${sichtbareSubs.length} von ${form.subs.length}` : form.subs.length})
+                    ({q || (vergangeneAus && anzahlVergangen > 0)
+                      ? `${sichtbareSubs.length} von ${form.subs.length}`
+                      : form.subs.length})
                   </span>
                 )}
               </span>
@@ -151,14 +172,31 @@ export function VeranstaltungEditor({
               </button>
             </div>
 
-            {/* Suche – hilft, wenn viele Termine gepflegt sind (z.B. Zahnärztetag). */}
+            {/* Suche & Filter – hilft, wenn viele Termine gepflegt sind (z.B. Zahnärztetag). */}
             {form.subs.length > 3 && (
-              <input
-                className={`${input} mb-2`}
-                placeholder="🔍 Termine durchsuchen (Name, Ort, Niederlassung, Ansprechpartner)…"
-                value={subSuche}
-                onChange={(e) => setSubSuche(e.target.value)}
-              />
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <input
+                  className={`${input} flex-1`}
+                  placeholder="🔍 Termine durchsuchen (Name, Ort, Niederlassung, Ansprechpartner, Kommentar)…"
+                  value={subSuche}
+                  onChange={(e) => setSubSuche(e.target.value)}
+                />
+                <label
+                  className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded border border-slate-300 px-2 py-1.5 text-sm text-slate-600"
+                  title="Termine, deren Datum in der Vergangenheit liegt, ausblenden"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-marke"
+                    checked={vergangeneAus}
+                    onChange={(e) => setVergangeneAus(e.target.checked)}
+                  />
+                  Vergangene ausblenden
+                  {anzahlVergangen > 0 && (
+                    <span className="text-xs text-slate-400">({anzahlVergangen})</span>
+                  )}
+                </label>
+              </div>
             )}
 
             {form.subs.length === 0 && (
@@ -253,11 +291,25 @@ export function VeranstaltungEditor({
                       />
                     </div>
                   </div>
+
+                  {/* Zeile 3: freies Kommentarfeld zum konkreten Termin/Ort */}
+                  <div className="mt-2">
+                    <label className="mb-0.5 block text-xs text-slate-500">Kommentar</label>
+                    <textarea
+                      rows={2}
+                      className={`${input} resize-y`}
+                      placeholder="Notizen zu diesem Termin/Ort…"
+                      value={s.kommentar ?? ""}
+                      onChange={(e) => setSub(s.id, { kommentar: e.target.value })}
+                    />
+                  </div>
                 </div>
               ))}
-              {q && sichtbareSubs.length === 0 && (
+              {sichtbareSubs.length === 0 && form.subs.length > 0 && (
                 <p className="px-1 py-3 text-center text-xs text-slate-400">
-                  Kein Termin passt zur Suche.
+                  {q
+                    ? "Kein Termin passt zur Suche."
+                    : `Alle Termine liegen in der Vergangenheit – „Vergangene ausblenden" deaktivieren, um sie zu sehen.`}
                 </p>
               )}
             </div>
