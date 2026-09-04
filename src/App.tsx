@@ -446,7 +446,7 @@ export default function App() {
               onClick={() => setPwAendernOffen(true)}
               className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 hover:bg-slate-50"
             >
-              🔑 Passwort
+              🔒 Passwort ändern
             </button>
           )}
           <button
