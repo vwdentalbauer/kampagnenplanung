@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { anzeigeNamen } from "./useNutzerListe";
+import { anzeigeNamen } from "./namen";
 
 describe("anzeigeNamen", () => {
   it("zeigt bei eindeutigen Vornamen nur den Vornamen", () => {

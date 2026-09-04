@@ -26,12 +26,24 @@ wird. Ein fehlgeschlagener Test ist ein Befund, kein Hindernis.
 - Getestet wird die reine Logik ohne Browser/DOM:
   - `src/lib/filter.test.ts` – `passt()`, Facetten, Zeit-/Jahresfilter
   - `src/lib/date.test.ts` – Kalenderwoche, Quartal, Wochenstart, Zeiträume
-  - `src/data/useNutzerListe.test.ts` – Anzeigenamen der Nutzer
+  - `src/lib/namen.test.ts` – Anzeigenamen der Nutzer
 - Einzeln laufen lassen: `npx vitest run src/lib/filter.test.ts`
 - Während der Entwicklung: `npm run test:watch`
 
 **Bei Änderungen an der Logik gehören passende Tests dazu.** Besonders
 `src/lib/filter.ts` ist kritisch – dort hängen alle Ansichten dran.
+
+### Tests dürfen keinen Supabase-Client hochziehen
+
+`src/lib/supabase.ts` erzeugt den Client **beim Import** (es sind Standard-
+Zugangsdaten hinterlegt, `supabaseAktiv` ist also immer wahr). Ein Test, der
+direkt oder indirekt dieses Modul importiert, baut damit eine echte Verbindung
+auf und schlägt je nach Node-Version fehl.
+
+Deshalb: zu testende Logik gehört in ein Modul **ohne** Supabase-Import.
+`src/lib/namen.ts` ist genau aus diesem Grund von `data/useNutzerListe.ts`
+getrennt – letzteres reicht die Funktion nur weiter. Fällt eine Funktion aus
+einer Datei mit Supabase-Import zum Testen an, zuerst herauslösen.
 
 ## Deploy
 
