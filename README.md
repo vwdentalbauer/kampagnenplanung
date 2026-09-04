@@ -23,8 +23,10 @@ npm run pruefen  # Typprüfung + Tests (vor jedem Push)
 
 ## Tests
 
-Die Kernlogik ist mit **Vitest** abgesichert – Filter, Datums-/Kalenderwochen-
-Berechnung und die Anzeigenamen der Nutzer:
+Die Kernlogik ist mit **Vitest** abgesichert (60 Tests) – Filterlogik,
+Datums-/Kalenderwochen-Berechnung, Anzeigenamen, die Zuordnung zwischen
+App-Feldern und Datenbankspalten sowie der Excel-Rundlauf (exportieren und
+wieder importieren, ohne dass Felder verloren gehen):
 
 ```bash
 npm test         # einmalig durchlaufen

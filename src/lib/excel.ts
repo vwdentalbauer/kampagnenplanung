@@ -51,8 +51,13 @@ function wochentage(weekStart: string | null): Record<string, string> {
   return out;
 }
 
-/** Exportiert alle Kampagnen als Excel-Datei (Download). */
-export function exportExcel(kampagnen: Kampagne[]) {
+/**
+ * Baut die Arbeitsmappe zu den Kampagnen – ohne Datei-Zugriff.
+ *
+ * Getrennt von `exportExcel`, damit der Export ohne Download testbar ist:
+ * Mappe bauen, schreiben, wieder einlesen und vergleichen.
+ */
+export function arbeitsmappe(kampagnen: Kampagne[]): XLSX.WorkBook {
   const zeilen = kampagnen.map((k) => {
     const tage = wochentage(k.weekStart);
     const bereiche: Record<string, string> = {};
@@ -83,8 +88,13 @@ export function exportExcel(kampagnen: Kampagne[]) {
   const ws = XLSX.utils.json_to_sheet(zeilen, { header: KOPF as unknown as string[] });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, SHEET);
+  return wb;
+}
+
+/** Exportiert alle Kampagnen als Excel-Datei (Download). */
+export function exportExcel(kampagnen: Kampagne[]) {
   const datum = format(new Date(), "yyyy-MM-dd");
-  XLSX.writeFile(wb, `Kampagnenplan_${datum}.xlsx`);
+  XLSX.writeFile(arbeitsmappe(kampagnen), `Kampagnenplan_${datum}.xlsx`);
 }
 
 // --- Import -------------------------------------------------------------
@@ -111,7 +121,14 @@ function zuIso(v: unknown): string | null {
 
 /** Liest eine Excel-Datei und gibt Kampagnen zurück. */
 export async function importExcel(file: File): Promise<Kampagne[]> {
-  const buf = await file.arrayBuffer();
+  return importAusPuffer(await file.arrayBuffer());
+}
+
+/**
+ * Liest Kampagnen aus einem bereits geladenen Puffer – ohne File-API, damit
+ * der Import testbar ist (siehe `arbeitsmappe`).
+ */
+export function importAusPuffer(buf: ArrayBuffer | Uint8Array): Kampagne[] {
   const wb = XLSX.read(buf, { cellDates: true });
   const ws = wb.Sheets[SHEET] ?? wb.Sheets[wb.SheetNames[0]];
   if (!ws) return [];

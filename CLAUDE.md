@@ -27,6 +27,8 @@ wird. Ein fehlgeschlagener Test ist ein Befund, kein Hindernis.
   - `src/lib/filter.test.ts` – `passt()`, Facetten, Zeit-/Jahresfilter
   - `src/lib/date.test.ts` – Kalenderwoche, Quartal, Wochenstart, Zeiträume
   - `src/lib/namen.test.ts` – Anzeigenamen der Nutzer
+  - `src/lib/kampagneRow.test.ts` – Zuordnung App-Felder <-> DB-Spalten
+  - `src/lib/excel.test.ts` – Excel-Rundlauf (Export → Import ohne Verlust)
 - Einzeln laufen lassen: `npx vitest run src/lib/filter.test.ts`
 - Während der Entwicklung: `npm run test:watch`
 
@@ -46,6 +48,10 @@ getrennt – letzteres reicht die Funktion nur weiter. Fällt eine Funktion aus
 einer Datei mit Supabase-Import zum Testen an, zuerst herauslösen.
 
 ## Deploy
+
+**Zum Veröffentlichen den Skill `deploy` nutzen** (`.claude/skills/deploy/`) –
+er führt durch Prüfung, Push, CI-Überwachung und die Verifikation, dass die
+Live-Seite den neuen Stand ausliefert.
 
 - Es gibt **keinen `main`-Branch**. Produktiv-Branch ist
   **`claude/great-noether-bhev0p`**.
