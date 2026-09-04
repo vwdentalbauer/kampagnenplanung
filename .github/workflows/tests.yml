@@ -1,0 +1,24 @@
+name: Tests
+
+# Läuft auf allen Branches außer dem Produktiv-Branch (dort prüft der
+# Deploy-Workflow bereits) und zusätzlich bei jedem Pull Request.
+on:
+  push:
+    branches-ignore: ["claude/great-noether-bhev0p"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typprüfung
+        run: npm run lint
+      - name: Tests
+        run: npm test

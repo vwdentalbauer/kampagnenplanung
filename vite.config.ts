@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -15,5 +16,11 @@ export default defineConfig({
   base: "/kampagnenplanung/",
   define: {
     __BUILD_TIME__: JSON.stringify(buildZeit),
+  },
+  // Tests laufen mit `npm test` (einmalig) bzw. `npm run test:watch`.
+  // Getestet wird die reine Logik (Filter, Datum, Namen) – ohne Browser/DOM.
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts"],
   },
 });

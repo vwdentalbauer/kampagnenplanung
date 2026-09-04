@@ -24,6 +24,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Erst prüfen, dann bauen: schlägt Typprüfung oder ein Test fehl,
+      # bricht der Job ab und es wird nichts veröffentlicht.
+      - name: Typprüfung
+        run: npm run lint
+      - name: Tests
+        run: npm test
       - run: npm run build
         env:
           # Supabase-Zugang (öffentlich-sicher; Schutz über Row Level Security).

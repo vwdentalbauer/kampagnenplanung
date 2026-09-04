@@ -18,7 +18,22 @@ Nutzerverwaltung über **Supabase**.
 npm install
 npm run dev      # lokal unter http://localhost:5173
 npm run build    # Produktions-Build nach dist/
+npm run pruefen  # Typprüfung + Tests (vor jedem Push)
 ```
+
+## Tests
+
+Die Kernlogik ist mit **Vitest** abgesichert – Filter, Datums-/Kalenderwochen-
+Berechnung und die Anzeigenamen der Nutzer:
+
+```bash
+npm test         # einmalig durchlaufen
+npm run test:watch
+```
+
+Die Tests laufen automatisch in GitHub Actions: bei jedem Push und Pull Request
+(`tests.yml`) und **vor jedem Deploy** (`deploy.yml`). Schlägt ein Test fehl,
+wird nichts veröffentlicht.
 
 ## Was die App heute kann
 
