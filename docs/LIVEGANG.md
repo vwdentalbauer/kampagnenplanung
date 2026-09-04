@@ -11,14 +11,20 @@ Reihenfolge ist so gewählt, dass nach jedem Block etwas Vorzeigbares existiert.
 - [x] Rollenmodell (viewer/editor/admin) in der UI
 - [x] Build + GitHub-Actions-Workflow für GitHub Pages
 
-## 🔜 Phase 1.5 – GitHub Pages live schalten
+## ✅ Phase 1.5 – GitHub Pages live schalten (erledigt)
 
-- [ ] Repository auf GitHub anlegen/prüfen (`kampagnenplanung`)
-- [ ] In **Settings → Pages**: Source = „GitHub Actions"
-- [ ] Auf `main` pushen → Workflow deployt automatisch
-- [ ] URL prüfen: `https://<organisation>.github.io/kampagnenplanung/`
-- [ ] Falls Repo-Name abweicht: `base` in `vite.config.ts` anpassen
+- [x] Repository auf GitHub angelegt (`vwdentalbauer/kampagnenplanung`)
+- [x] In **Settings → Pages**: Source = „GitHub Actions"
+- [x] Deploy läuft automatisch (siehe „Deploy & Branches" unten)
 - [ ] Mit dem Team durchklicken, offene Punkte aus `RUECKFRAGEN.md` klären
+
+### Deploy & Branches
+
+Wichtig: Das Repository hat **keinen `main`-Branch**. Produktiv-Branch ist
+**`claude/great-noether-bhev0p`** – jeder Push dorthin startet den Workflow
+`.github/workflows/deploy.yml` und veröffentlicht den neuen Stand auf GitHub
+Pages. Ein Deploy ohne Code-Änderung lässt sich unter **Actions → „Deploy auf
+GitHub Pages" → „Run workflow"** manuell auslösen (`workflow_dispatch`).
 
 ## ✅ Phase 2 – Supabase (gemeinsame Daten + Anmeldung) – umgesetzt
 
