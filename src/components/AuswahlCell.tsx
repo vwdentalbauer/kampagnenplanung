@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ankerSichtbar, dropdownPosition } from "../lib/dropdown";
 
 interface Props {
   options: string[];
@@ -40,11 +41,7 @@ export function AuswahlCell({
 
   const oeffnen = () => {
     const r = btnRef.current?.getBoundingClientRect();
-    if (r) {
-      const platzUnten = window.innerHeight - r.bottom;
-      const top = platzUnten < 280 && r.top > 280 ? r.top - 4 - 264 : r.bottom + 4;
-      setPos({ top, left: r.left });
-    }
+    if (r) setPos(dropdownPosition(r, window.innerHeight));
     setSuche("");
     setOffen(true);
   };
@@ -55,14 +52,30 @@ export function AuswahlCell({
       const t = e.target as Node;
       if (!popRef.current?.contains(t) && !btnRef.current?.contains(t)) setOffen(false);
     };
-    const schliessen = () => setOffen(false);
+    // Position der Zelle nachführen, damit das `fixed` Dropdown beim Scrollen
+    // der Seite nicht stehen bleibt. Ist die Zelle aus dem Bild gescrollt,
+    // schließen – ein Dropdown ohne sichtbaren Bezug hilft niemandem.
+    const nachfuehren = () => {
+      const r = btnRef.current?.getBoundingClientRect();
+      if (!r || !ankerSichtbar(r, window.innerHeight)) {
+        setOffen(false);
+        return;
+      }
+      setPos(dropdownPosition(r, window.innerHeight));
+    };
+    const beiScroll = (e: Event) => {
+      // Scrollen *innerhalb* der Liste ist normale Bedienung und darf sie
+      // weder schließen noch verschieben.
+      if (popRef.current?.contains(e.target as Node)) return;
+      nachfuehren();
+    };
     document.addEventListener("mousedown", klick);
-    window.addEventListener("scroll", schliessen, true);
-    window.addEventListener("resize", schliessen);
+    window.addEventListener("scroll", beiScroll, true);
+    window.addEventListener("resize", nachfuehren);
     return () => {
       document.removeEventListener("mousedown", klick);
-      window.removeEventListener("scroll", schliessen, true);
-      window.removeEventListener("resize", schliessen);
+      window.removeEventListener("scroll", beiScroll, true);
+      window.removeEventListener("resize", nachfuehren);
     };
   }, [offen]);
 
@@ -110,7 +123,7 @@ export function AuswahlCell({
         <div
           ref={popRef}
           style={{ position: "fixed", top: pos.top, left: pos.left, width: 224 }}
-          className="z-50 max-h-64 overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-xl"
+          className="z-50 max-h-64 overflow-auto overscroll-contain rounded-lg border border-slate-200 bg-white py-1 shadow-xl"
         >
           <input
             autoFocus
