@@ -32,6 +32,7 @@ wird. Ein fehlgeschlagener Test ist ein Befund, kein Hindernis.
   - `src/lib/dropdown.test.ts` – Positionierung der Inline-Dropdowns
   - `src/lib/roadmap.test.ts` – Wochen-/Monatsraster der Roadmap-Ansicht
   - `src/lib/kampagneGruppe.test.ts` – wann eine Kampagne abgeschlossen ist
+  - `src/lib/zeitfenster.test.ts` – Zeitraum-Leiste zu konkretem Zeitfenster
 - Einzeln laufen lassen: `npx vitest run src/lib/filter.test.ts`
 - Während der Entwicklung: `npm run test:watch`
 

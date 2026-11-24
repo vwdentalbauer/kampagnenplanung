@@ -609,6 +609,7 @@ export default function App() {
       ) : ansicht === "ziel" ? (
         <ZielAnsicht
           kampagnen={gefiltert}
+          filter={filter}
           darfBearbeiten={darfBearbeiten}
           kanaele={alleKanaele}
           vorschlaege={vorschlaege}

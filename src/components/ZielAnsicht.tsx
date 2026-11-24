@@ -7,10 +7,14 @@ import { MultiSelect } from "./MultiSelect";
 import { ChevronIcon } from "./Icons";
 import { kwAusDatum, formatDatum } from "../lib/date";
 import { istAbgeschlossen } from "../lib/kampagneGruppe";
+import { bezugsJahrAus, filterZeitraum } from "../lib/zeitfenster";
+import type { Filter } from "../lib/filter";
 import type { EpicMeta } from "../data/useEpics";
 
 interface Props {
   kampagnen: Kampagne[];
+  /** Zeitraum-Leiste: begrenzt die Zeitachse der Roadmap. */
+  filter: Filter;
   darfBearbeiten: boolean;
   kanaele: string[];
   vorschlaege: {
@@ -45,6 +49,7 @@ function spanne(werte: (string | null)[]): { von: string | null; bis: string | n
 
 export function ZielAnsicht({
   kampagnen,
+  filter,
   darfBearbeiten,
   kanaele,
   vorschlaege,
@@ -327,6 +332,12 @@ export function ZielAnsicht({
               ende: epics[g.name]?.ende ?? null,
             }))}
             onEdit={onEdit}
+            // Zeitfenster aus der Zeitraum-Leiste: Was oben eingestellt ist,
+            // bestimmt auch die Achse unten.
+            fenster={filterZeitraum(
+              filter,
+              bezugsJahrAus(kampagnen.map((k) => k.weekStart)),
+            )}
           />
         ) : (
           <p className="py-10 text-center text-slate-400">Keine Kampagnen für diese Auswahl.</p>

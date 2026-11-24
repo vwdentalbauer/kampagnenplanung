@@ -29,6 +29,11 @@ export interface RoadmapKampagne {
 
 interface Props {
   kampagnen: RoadmapKampagne[];
+  /**
+   * Zeitfenster aus der Zeitraum-Leiste. Ist eines gesetzt, zeigt die Achse
+   * genau diesen Ausschnitt – sonst richtet sie sich nach den Maßnahmen.
+   */
+  fenster?: Zeitraum | null;
   onEdit: (k: Kampagne) => void;
 }
 
@@ -43,17 +48,21 @@ const kurz = (iso: string) => formatDatum(iso).slice(0, 6);
  * Mehrere Kampagnen werden untereinander gruppiert auf derselben Zeitachse
  * gezeigt – so lassen sich Überschneidungen erkennen.
  */
-export function RoadmapAnsicht({ kampagnen, onEdit }: Props) {
+export function RoadmapAnsicht({ kampagnen, fenster = null, onEdit }: Props) {
   const [ausgeblendet, setAusgeblendet] = useState<Set<string>>(new Set());
   const [raster, setRaster] = useState<Zeitraster>("woche");
   const [monatsfilter, setMonatsfilter] = useState<string>("alle");
 
   const alleTasks = useMemo(() => kampagnen.flatMap((k) => k.tasks), [kampagnen]);
 
-  // Gemeinsame Achse über alle gewählten Kampagnen.
+  // Gemeinsame Achse über alle gewählten Kampagnen. Das Zeitfenster aus der
+  // Zeitraum-Leiste hat Vorrang: Wer oben „KW 40 bis 53" einstellt, soll
+  // unten genau diese Spalten sehen – auch dort, wo keine Maßnahmen liegen.
   const zeitraum = useMemo(
-    () => vereinige(kampagnen.map((k) => roadmapZeitraum(k.tasks, k.start, k.ende))),
-    [kampagnen],
+    () =>
+      fenster ??
+      vereinige(kampagnen.map((k) => roadmapZeitraum(k.tasks, k.start, k.ende))),
+    [fenster, kampagnen],
   );
   const spalten = useMemo(
     () => (zeitraum ? spaltenImZeitraum(raster, zeitraum.von, zeitraum.bis) : []),
@@ -298,8 +307,10 @@ export function RoadmapAnsicht({ kampagnen, onEdit }: Props) {
             className="grid"
             style={{ gridTemplateColumns: gridSpalten, minWidth: mindestBreite }}
           >
-            {/* Kopfgruppen: Monate über Wochen bzw. Jahre über Monaten */}
-            <div className="border-b-2 border-marke px-2 py-1.5" />
+            {/* Kopfgruppen: Monate über Wochen bzw. Jahre über Monaten.
+                Die erste Spalte bleibt beim Scrollen nach rechts stehen,
+                sonst verliert man bei vielen Wochen die Kanalnamen. */}
+            <div className="sticky left-0 z-20 border-b-2 border-marke bg-white px-2 py-1.5" />
             {gruppen.map((g) => (
               <div
                 key={g.key}
@@ -311,7 +322,7 @@ export function RoadmapAnsicht({ kampagnen, onEdit }: Props) {
             ))}
 
             {/* Spaltenkopf */}
-            <div className="border-b border-slate-200 px-2 py-1.5" />
+            <div className="sticky left-0 z-20 border-b border-slate-200 bg-white px-2 py-1.5" />
             {spalten.map((s) => (
               <div
                 key={s.key}
@@ -414,13 +425,13 @@ function KampagnenBlock({
           style={{ gridColumn: `1 / span ${spalten.length + 1}` }}
           className="border-b border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-semibold text-marke"
         >
-          {kampagne.name}
+          <span className="sticky left-2 inline-block">{kampagne.name}</span>
         </div>
       )}
 
       {pos && (
         <>
-          <div className="flex items-center border-b border-slate-200 px-2 py-1.5 text-xs text-slate-500">
+          <div className="sticky left-0 z-20 flex items-center border-b border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-500">
             Zeitraum
           </div>
           <div
@@ -439,7 +450,9 @@ function KampagnenBlock({
 
       {eigene.length === 0 && (
         <>
-          <div className="border-b border-slate-200 px-2 py-2.5 text-sm text-slate-400">—</div>
+          <div className="sticky left-0 z-20 border-b border-slate-200 bg-white px-2 py-2.5 text-sm text-slate-400">
+            —
+          </div>
           <div
             style={{ gridColumn: `2 / span ${spalten.length}` }}
             className="border-b border-l border-slate-200 px-2 py-2.5 text-xs text-slate-400"
@@ -486,7 +499,7 @@ function Spur({
 }) {
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-slate-200 px-2 py-2.5 text-sm font-medium text-slate-700">
+      <div className="sticky left-0 z-20 flex items-center gap-2 border-b border-r border-slate-200 bg-white px-2 py-2.5 text-sm font-medium text-slate-700">
         <i className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: farbe }} aria-hidden />
         <span className="truncate" title={kanal}>
           {kanal}
