@@ -310,6 +310,17 @@ export function ZielAnsicht({
             onChange={setGewaehlt}
             suchbar
           />
+          {/* Leeren direkt in der Zeile – im Dropdown ist es zu versteckt,
+              wenn man zügig eine andere Kampagne ansehen will. */}
+          {auswahl.length > 0 && (
+            <button
+              onClick={() => setGewaehlt([])}
+              title="Auswahl aufheben"
+              className="flex items-center gap-1 rounded border border-rose-300 bg-rose-50 px-2.5 py-1 text-sm font-medium text-rose-600 hover:bg-rose-100"
+            >
+              ✕ Leeren
+            </button>
+          )}
           <span className="text-xs text-slate-400">
             {aktuelle.length === 1
               ? aktuelle[0].name
