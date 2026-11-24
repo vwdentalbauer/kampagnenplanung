@@ -5,74 +5,78 @@ import { formatDatum, wochentagKurz } from "../lib/date";
 import {
   bandPosition,
   kanalFarben,
-  monateAusWochen,
-  rasterDaten,
+  kanalVon,
+  kopfgruppen,
   roadmapZeitraum,
-  wocheImBand,
-  wochenImZeitraum,
-  type RoadmapWoche,
+  spalteImBand,
+  spaltenImZeitraum,
+  spaltenKey,
+  vereinige,
+  zuordnen,
+  type Spalte,
+  type Zeitraster,
+  type Zeitraum,
 } from "../lib/roadmap";
 
-interface Props {
-  /** Name der Kampagne (Überschrift). */
+/** Eine Kampagne, wie die Roadmap sie braucht. */
+export interface RoadmapKampagne {
   name: string;
   tasks: Kampagne[];
-  /** Gepflegter Gesamtzeitraum der Kampagne. */
+  /** Gepflegter Gesamtzeitraum; ohne Pflege null (dann kein Balken). */
   start: string | null;
   ende: string | null;
+}
+
+interface Props {
+  kampagnen: RoadmapKampagne[];
   onEdit: (k: Kampagne) => void;
 }
 
-const LANE_BREITE = 150;
+const LANE_BREITE = 170;
 const SPALTEN_BREITE = 92;
 
-/** Kurzform „18.05." für die Wochenköpfe. */
+/** „18.05." – Kurzform für die Monatskarten. */
 const kurz = (iso: string) => formatDatum(iso).slice(0, 6);
 
 /**
- * Roadmap einer Kampagne: Swimlanes nach Kanal, Spalten nach Kalenderwoche,
- * darunter die Monate mit den einzelnen Maßnahmen.
+ * Roadmap: Swimlanes nach Kanal, Spalten nach Kalenderwoche oder Monat.
+ * Mehrere Kampagnen werden untereinander gruppiert auf derselben Zeitachse
+ * gezeigt – so lassen sich Überschneidungen erkennen.
  */
-export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
+export function RoadmapAnsicht({ kampagnen, onEdit }: Props) {
   const [ausgeblendet, setAusgeblendet] = useState<Set<string>>(new Set());
-  const [monat, setMonat] = useState<string>("alle");
+  const [raster, setRaster] = useState<Zeitraster>("woche");
+  const [monatsfilter, setMonatsfilter] = useState<string>("alle");
 
-  const zeitraum = useMemo(() => roadmapZeitraum(tasks, start, ende), [tasks, start, ende]);
-  const band = useMemo(
-    () => (start && ende ? { von: start, bis: ende } : null),
-    [start, ende],
-  );
-  const wochen = useMemo(
-    () => (zeitraum ? wochenImZeitraum(zeitraum.von, zeitraum.bis) : []),
-    [zeitraum],
-  );
-  const monate = useMemo(() => monateAusWochen(wochen), [wochen]);
+  const alleTasks = useMemo(() => kampagnen.flatMap((k) => k.tasks), [kampagnen]);
 
-  const alleKanaele = useMemo(
-    () => [...new Set(tasks.map((t) => t.kanal.trim() || "Ohne Kanal"))],
-    [tasks],
+  // Gemeinsame Achse über alle gewählten Kampagnen.
+  const zeitraum = useMemo(
+    () => vereinige(kampagnen.map((k) => roadmapZeitraum(k.tasks, k.start, k.ende))),
+    [kampagnen],
   );
+  const spalten = useMemo(
+    () => (zeitraum ? spaltenImZeitraum(raster, zeitraum.von, zeitraum.bis) : []),
+    [raster, zeitraum],
+  );
+  const gruppen = useMemo(() => kopfgruppen(raster, spalten), [raster, spalten]);
+
+  const alleKanaele = useMemo(() => [...new Set(alleTasks.map(kanalVon))], [alleTasks]);
   const farben = useMemo(() => kanalFarben(alleKanaele), [alleKanaele]);
 
   const sichtbar = useMemo(
-    () => tasks.filter((t) => !ausgeblendet.has(t.kanal.trim() || "Ohne Kanal")),
-    [tasks, ausgeblendet],
-  );
-  const raster = useMemo(() => rasterDaten(sichtbar, wochen), [sichtbar, wochen]);
-  const bandPos = useMemo(() => bandPosition(band, wochen), [band, wochen]);
-
-  const kanaeleImRaster = useMemo(
-    () =>
-      [...new Set(alleKanaele)]
-        .filter((k) => !ausgeblendet.has(k))
-        .sort((a, b) => a.localeCompare(b, "de")),
-    [alleKanaele, ausgeblendet],
+    () => alleTasks.filter((t) => !ausgeblendet.has(kanalVon(t))),
+    [alleTasks, ausgeblendet],
   );
 
-  if (!zeitraum || wochen.length === 0) {
+  if (kampagnen.length === 0) {
+    return <p className="py-10 text-center text-slate-400">Bitte eine Kampagne auswählen.</p>;
+  }
+  if (!zeitraum || spalten.length === 0) {
     return (
       <p className="py-10 text-center text-slate-400">
-        Für „{name}" sind keine Termine hinterlegt – ohne Datum lässt sich keine Roadmap zeigen.
+        Für diese Auswahl sind keine Termine hinterlegt – ohne Datum lässt sich keine Roadmap
+        zeigen.
       </p>
     );
   }
@@ -87,9 +91,10 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
 
   const verantwortliche = new Set(sichtbar.flatMap((t) => t.owners));
   const fertig = sichtbar.filter((t) => ABGESCHLOSSEN.includes(t.status)).length;
+  const kanaeleSichtbar = alleKanaele.filter((k) => !ausgeblendet.has(k));
 
-  const spalten = `${LANE_BREITE}px repeat(${wochen.length}, minmax(${SPALTEN_BREITE}px, 1fr))`;
-  const mindestBreite = LANE_BREITE + wochen.length * SPALTEN_BREITE;
+  const gridSpalten = `${LANE_BREITE}px repeat(${spalten.length}, minmax(${SPALTEN_BREITE}px, 1fr))`;
+  const mindestBreite = LANE_BREITE + spalten.length * SPALTEN_BREITE;
 
   const kennzahl = (wert: string, text: string) => (
     <div className="min-w-[110px] rounded-lg border border-slate-200 bg-white px-3.5 py-2.5">
@@ -102,16 +107,15 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
   const tooltip = (eintraege: Kampagne[]) =>
     eintraege
       .map((e) => {
-        const titel = e.details.split("\n")[0].trim() || e.kampagne || "Ohne Titel";
-        return `${e.weekStart ? formatDatum(e.weekStart) : "—"} ${titel}${
+        const t = titelVon(e);
+        return `${e.weekStart ? formatDatum(e.weekStart) : "—"} ${t}${
           e.verantwortung ? ` (${e.verantwortung})` : ""
         }`;
       })
       .join("\n");
 
   const massnahme = (e: Kampagne) => {
-    const kanal = e.kanal.trim() || "Ohne Kanal";
-    const titel = e.details.split("\n")[0].trim() || e.kampagne || "Ohne Titel";
+    const kanal = kanalVon(e);
     return (
       <button
         key={e.id}
@@ -119,7 +123,7 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
         style={{ borderLeftColor: farben.get(kanal) }}
         className="mb-1.5 w-full rounded-lg border border-slate-200 border-l-4 bg-white px-2.5 py-2 text-left hover:bg-slate-50"
       >
-        <div className="text-[13.5px] font-semibold text-slate-800">{titel}</div>
+        <div className="text-[13.5px] font-semibold text-slate-800">{titelVon(e)}</div>
         <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500">
           <span>
             {wochentagKurz(e.weekStart)} {e.weekStart ? formatDatum(e.weekStart) : "—"}
@@ -128,6 +132,9 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
             {kanal}
             {e.subKanal ? ` · ${e.subKanal}` : ""}
           </span>
+          {kampagnen.length > 1 && e.kampagne && (
+            <span className="rounded bg-slate-100 px-1.5 text-slate-600">{e.kampagne}</span>
+          )}
           {e.verantwortung && <span>👤 {e.verantwortung}</span>}
           <span className={`rounded border px-1.5 ${STATUS_STYLE[e.status]}`}>
             {STATUS_LABELS[e.status]}
@@ -140,14 +147,21 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
     );
   };
 
-  const monatsKarte = (m: (typeof monate)[number]) => {
-    const monatsWochen = wochen.filter((w) => w.start.startsWith(m.key));
-    const drin = sichtbar.filter((t) =>
-      monatsWochen.some((w) => rasterHat(raster, t, w)),
-    );
-    const proKanal = kanaeleImRaster
-      .map((k) => [k, drin.filter((t) => (t.kanal.trim() || "Ohne Kanal") === k).length] as const)
+  // Die Monatskarten bleiben immer monatsweise, unabhängig vom Rasterschalter.
+  const monatsSpalten = zeitraum
+    ? spaltenImZeitraum("monat", zeitraum.von, zeitraum.bis)
+    : [];
+  const sichtbareMonate =
+    monatsfilter === "alle" ? monatsSpalten : monatsSpalten.filter((m) => m.key === monatsfilter);
+
+  const monatsKarte = (m: Spalte) => {
+    const drin = sichtbar.filter((t) => t.weekStart && spaltenKey("monat", t.weekStart) === m.key);
+    const proKanal = kanaeleSichtbar
+      .map((k) => [k, drin.filter((t) => kanalVon(t) === k).length] as const)
       .filter(([, n]) => n > 0);
+    const wochen = spaltenImZeitraum("woche", m.start, m.ende).filter(
+      (w) => w.start.slice(0, 7) === m.key,
+    );
 
     return (
       <div
@@ -155,7 +169,9 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
         className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white"
       >
         <div className="bg-marke px-4 py-3.5 text-white">
-          <h3 className="text-lg font-semibold">{m.name}</h3>
+          <h3 className="text-lg font-semibold">
+            {m.titel} {m.unter}
+          </h3>
           <div className="mt-0.5 text-xs opacity-80">
             {drin.length} {drin.length === 1 ? "Maßnahme" : "Maßnahmen"}
           </div>
@@ -163,7 +179,6 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
             {proKanal.map(([k, n]) => `${n}× ${k}`).join(" · ") || "keine Maßnahmen"}
           </div>
         </div>
-        {/* Verteilungsbalken nach Kanal */}
         <div className="flex h-1.5">
           {proKanal.length ? (
             proKanal.map(([k, n]) => (
@@ -174,16 +189,21 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
           )}
         </div>
         <div className="flex-1 px-3.5 pb-4 pt-3">
-          {monatsWochen.map((w) => {
-            const drinWoche = sichtbar.filter((t) => rasterHat(raster, t, w));
+          {wochen.map((w) => {
+            const drinWoche = sichtbar.filter(
+              (t) => t.weekStart && spaltenKey("woche", t.weekStart) === w.key,
+            );
+            const imBand = kampagnen.some(
+              (k) => k.start && k.ende && spalteImBand(w, { von: k.start, bis: k.ende }),
+            );
             return (
-              <div key={w.start} className="mt-2.5">
+              <div key={w.key} className="mt-2.5">
                 <div className="mb-2 flex items-baseline justify-between border-b border-slate-200 pb-1 text-xs text-slate-500">
                   <span>
-                    <b className="text-[13px] text-slate-700">KW {w.kw}</b> · {kurz(w.start)}–
+                    <b className="text-[13px] text-slate-700">{w.titel}</b> · {kurz(w.start)}–
                     {kurz(w.ende)}
                   </span>
-                  {wocheImBand(w, band) && (
+                  {imBand && (
                     <span className="rounded bg-ci-human px-1.5 text-[11px] text-[#806c10]">
                       im Zeitraum
                     </span>
@@ -204,14 +224,12 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
     );
   };
 
-  const sichtbareMonate = monat === "alle" ? monate : monate.filter((m) => m.key === monat);
-
   return (
     <div className="space-y-4">
       {/* Kennzahlen */}
       <div className="flex flex-wrap gap-2.5">
         {kennzahl(String(sichtbar.length), sichtbar.length === 1 ? "Maßnahme" : "Maßnahmen")}
-        {kennzahl(String(kanaeleImRaster.length), "Kanäle")}
+        {kennzahl(String(kanaeleSichtbar.length), "Kanäle")}
         {kennzahl(String(verantwortliche.size), "Verantwortliche")}
         {kennzahl(`${fertig}/${sichtbar.length}`, "erledigt")}
       </div>
@@ -221,7 +239,7 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
         <span className="mr-1 text-xs uppercase tracking-wider text-slate-400">Kanal</span>
         {[...alleKanaele].sort((a, b) => a.localeCompare(b, "de")).map((k) => {
           const aus = ausgeblendet.has(k);
-          const anzahl = tasks.filter((t) => (t.kanal.trim() || "Ohne Kanal") === k).length;
+          const anzahl = alleTasks.filter((t) => kanalVon(t) === k).length;
           return (
             <button
               key={k}
@@ -243,67 +261,77 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
 
       {/* Raster */}
       <section className="rounded-xl border border-slate-200 bg-white px-5 py-4">
-        <h2 className="text-base font-semibold text-slate-800">Roadmap-Übersicht</h2>
-        <p className="mb-3.5 text-xs text-slate-500">
-          Swimlanes nach Kanal, Spalten nach Kalenderwoche. Zahl = Anzahl Maßnahmen (beim
-          Darüberfahren erscheinen die Titel).
-          {band && " Gelb markiert den Gesamtzeitraum der Kampagne."}
-        </p>
+        <div className="mb-3.5 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-slate-800">Roadmap-Übersicht</h2>
+            <p className="text-xs text-slate-500">
+              Swimlanes nach Kanal, Spalten nach{" "}
+              {raster === "monat" ? "Monat" : "Kalenderwoche"}. Zahl = Anzahl Maßnahmen (beim
+              Darüberfahren erscheinen die Titel). Gelb markiert den Gesamtzeitraum, sofern einer
+              gepflegt ist.
+            </p>
+          </div>
+          {/* Wochen- oder Monatsraster: bei langen Zeiträumen wird die
+              Wochenansicht sonst sehr breit und unübersichtlich. */}
+          <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
+            {(
+              [
+                ["woche", "Wochen"],
+                ["monat", "Monate"],
+              ] as const
+            ).map(([r, label]) => (
+              <button
+                key={r}
+                onClick={() => setRaster(r)}
+                className={`rounded-md px-3 py-1 text-sm font-medium ${
+                  raster === r ? "bg-white text-slate-800 shadow-sm" : "text-slate-600"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
-          <div className="grid" style={{ gridTemplateColumns: spalten, minWidth: mindestBreite }}>
-            {/* Monatskopf */}
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: gridSpalten, minWidth: mindestBreite }}
+          >
+            {/* Kopfgruppen: Monate über Wochen bzw. Jahre über Monaten */}
             <div className="border-b-2 border-marke px-2 py-1.5" />
-            {monate.map((m) => (
+            {gruppen.map((g) => (
               <div
-                key={m.key}
-                style={{ gridColumn: `span ${m.wochen}` }}
+                key={g.key}
+                style={{ gridColumn: `span ${g.spalten}` }}
                 className="border-b-2 border-marke px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-marke"
               >
-                {m.name}
+                {g.name}
               </div>
             ))}
 
-            {/* Wochenkopf */}
+            {/* Spaltenkopf */}
             <div className="border-b border-slate-200 px-2 py-1.5" />
-            {wochen.map((w) => (
+            {spalten.map((s) => (
               <div
-                key={w.start}
+                key={s.key}
                 className="border-b border-l border-slate-200 px-2 py-1.5 text-xs text-slate-500"
               >
-                <b className="block text-[13px] text-slate-700">KW {w.kw}</b>
-                {kurz(w.start)}–{kurz(w.ende)}
+                <b className="block text-[13px] text-slate-700">{s.titel}</b>
+                {s.unter}
               </div>
             ))}
 
-            {/* Zeitraum-Balken */}
-            {bandPos && (
-              <>
-                <div className="flex items-center border-b border-slate-200 px-2 py-1.5 text-xs text-slate-500">
-                  Zeitraum
-                </div>
-                <div
-                  className="relative h-[30px] border-b border-slate-200"
-                  style={{ gridColumn: `2 / span ${wochen.length}` }}
-                >
-                  <div
-                    className="absolute top-[5px] flex h-5 items-center whitespace-nowrap rounded border border-[#ecd877] bg-ci-human px-2 text-xs font-semibold text-[#806c10]"
-                    style={{ left: `${bandPos.links}%`, width: `${bandPos.breite}%` }}
-                  >
-                    {formatDatum(band!.von)} – {formatDatum(band!.bis)}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Spuren */}
-            {kanaeleImRaster.map((kanal) => (
-              <Spur
-                key={kanal}
-                kanal={kanal}
-                farbe={farben.get(kanal)!}
-                wochen={wochen}
-                band={band}
-                proWoche={raster.get(kanal)}
+            {/* Je Kampagne ein Block: Überschrift, Zeitraum-Balken, Kanal-Spuren */}
+            {kampagnen.map((kamp) => (
+              <KampagnenBlock
+                key={kamp.name}
+                kampagne={kamp}
+                mehrere={kampagnen.length > 1}
+                spalten={spalten}
+                kanaele={kanaeleSichtbar}
+                farben={farben}
+                tasks={sichtbar.filter((t) => t.kampagne === kamp.name)}
                 tooltip={tooltip}
               />
             ))}
@@ -311,26 +339,26 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
         </div>
       </section>
 
-      {/* Monatsumschalter */}
-      {monate.length > 1 && (
-        <div className="flex w-max gap-1 rounded-lg bg-slate-100 p-1">
+      {/* Monatsumschalter für die Karten */}
+      {monatsSpalten.length > 1 && (
+        <div className="flex w-max max-w-full flex-wrap gap-1 rounded-lg bg-slate-100 p-1">
           <button
-            onClick={() => setMonat("alle")}
+            onClick={() => setMonatsfilter("alle")}
             className={`rounded-md px-3.5 py-1.5 text-sm font-medium ${
-              monat === "alle" ? "bg-white text-slate-800 shadow-sm" : "text-slate-600"
+              monatsfilter === "alle" ? "bg-white text-slate-800 shadow-sm" : "text-slate-600"
             }`}
           >
             Alle Monate
           </button>
-          {monate.map((m) => (
+          {monatsSpalten.map((m) => (
             <button
               key={m.key}
-              onClick={() => setMonat(m.key)}
+              onClick={() => setMonatsfilter(m.key)}
               className={`rounded-md px-3.5 py-1.5 text-sm font-medium ${
-                monat === m.key ? "bg-white text-slate-800 shadow-sm" : "text-slate-600"
+                monatsfilter === m.key ? "bg-white text-slate-800 shadow-sm" : "text-slate-600"
               }`}
             >
-              {m.name.replace(/ \d{4}$/, "")}
+              {m.titel}
             </button>
           ))}
         </div>
@@ -348,29 +376,112 @@ export function RoadmapAnsicht({ name, tasks, start, ende, onEdit }: Props) {
   );
 }
 
-/** Gehört die Maßnahme laut Raster in diese Woche? */
-function rasterHat(
-  raster: Map<string, Map<string, Kampagne[]>>,
-  t: Kampagne,
-  w: RoadmapWoche,
-): boolean {
-  const kanal = t.kanal.trim() || "Ohne Kanal";
-  return !!raster.get(kanal)?.get(w.start)?.some((x) => x.id === t.id);
+/** Erste Zeile der Details als Titel; sonst der Kampagnenname. */
+function titelVon(e: Kampagne): string {
+  return e.details.split("\n")[0].trim() || e.kampagne || "Ohne Titel";
+}
+
+/** Ein Kampagnen-Block im Raster: Überschrift, Zeitraum-Balken, Kanal-Spuren. */
+function KampagnenBlock({
+  kampagne,
+  mehrere,
+  spalten,
+  kanaele,
+  farben,
+  tasks,
+  tooltip,
+}: {
+  kampagne: RoadmapKampagne;
+  mehrere: boolean;
+  spalten: Spalte[];
+  kanaele: string[];
+  farben: Map<string, string>;
+  tasks: Kampagne[];
+  tooltip: (e: Kampagne[]) => string;
+}) {
+  const band: Zeitraum | null =
+    kampagne.start && kampagne.ende ? { von: kampagne.start, bis: kampagne.ende } : null;
+  const pos = bandPosition(band, spalten);
+  const raster = zuordnen(tasks, spaltenRaster(spalten), spalten);
+  // Nur Kanäle zeigen, in denen diese Kampagne auch etwas hat – sonst stehen
+  // bei mehreren Kampagnen überall leere Spuren.
+  const eigene = kanaele.filter((k) => raster.has(k));
+
+  return (
+    <>
+      {mehrere && (
+        <div
+          style={{ gridColumn: `1 / span ${spalten.length + 1}` }}
+          className="border-b border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-semibold text-marke"
+        >
+          {kampagne.name}
+        </div>
+      )}
+
+      {pos && (
+        <>
+          <div className="flex items-center border-b border-slate-200 px-2 py-1.5 text-xs text-slate-500">
+            Zeitraum
+          </div>
+          <div
+            className="relative h-[30px] border-b border-slate-200"
+            style={{ gridColumn: `2 / span ${spalten.length}` }}
+          >
+            <div
+              className="absolute top-[5px] flex h-5 items-center overflow-hidden whitespace-nowrap rounded border border-[#ecd877] bg-ci-human px-2 text-xs font-semibold text-[#806c10]"
+              style={{ left: `${pos.links}%`, width: `${pos.breite}%` }}
+            >
+              {formatDatum(band!.von)} – {formatDatum(band!.bis)}
+            </div>
+          </div>
+        </>
+      )}
+
+      {eigene.length === 0 && (
+        <>
+          <div className="border-b border-slate-200 px-2 py-2.5 text-sm text-slate-400">—</div>
+          <div
+            style={{ gridColumn: `2 / span ${spalten.length}` }}
+            className="border-b border-l border-slate-200 px-2 py-2.5 text-xs text-slate-400"
+          >
+            Keine Maßnahmen in den eingeblendeten Kanälen.
+          </div>
+        </>
+      )}
+
+      {eigene.map((kanal) => (
+        <Spur
+          key={`${kampagne.name}-${kanal}`}
+          kanal={kanal}
+          farbe={farben.get(kanal)!}
+          spalten={spalten}
+          band={band}
+          proSpalte={raster.get(kanal)}
+          tooltip={tooltip}
+        />
+      ))}
+    </>
+  );
+}
+
+/** Aus den Spalten ablesen, welches Raster gerade aktiv ist. */
+function spaltenRaster(spalten: Spalte[]): Zeitraster {
+  return spalten[0]?.key.length === 7 ? "monat" : "woche";
 }
 
 function Spur({
   kanal,
   farbe,
-  wochen,
+  spalten,
   band,
-  proWoche,
+  proSpalte,
   tooltip,
 }: {
   kanal: string;
   farbe: string;
-  wochen: RoadmapWoche[];
-  band: { von: string; bis: string } | null;
-  proWoche?: Map<string, Kampagne[]>;
+  spalten: Spalte[];
+  band: Zeitraum | null;
+  proSpalte?: Map<string, Kampagne[]>;
   tooltip: (e: Kampagne[]) => string;
 }) {
   return (
@@ -381,13 +492,13 @@ function Spur({
           {kanal}
         </span>
       </div>
-      {wochen.map((w) => {
-        const eintraege = proWoche?.get(w.start) ?? [];
+      {spalten.map((s) => {
+        const eintraege = proSpalte?.get(s.key) ?? [];
         return (
           <div
-            key={w.start}
+            key={s.key}
             className={`flex min-h-[42px] flex-wrap content-start gap-1 border-b border-l border-slate-200 p-1.5 ${
-              wocheImBand(w, band) ? "bg-ci-human/50" : ""
+              spalteImBand(s, band) ? "bg-ci-human/50" : ""
             }`}
           >
             {eintraege.length > 0 && (

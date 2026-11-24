@@ -3,8 +3,10 @@ import type { Kampagne, Status } from "../types";
 import { STATUS_REIHENFOLGE, STATUS_LABELS, STATUS_STYLE } from "../constants";
 import { TabellenAnsicht } from "./TabellenAnsicht";
 import { RoadmapAnsicht } from "./RoadmapAnsicht";
+import { MultiSelect } from "./MultiSelect";
 import { ChevronIcon } from "./Icons";
 import { kwAusDatum, formatDatum } from "../lib/date";
+import { istAbgeschlossen } from "../lib/kampagneGruppe";
 import type { EpicMeta } from "../data/useEpics";
 
 interface Props {
@@ -41,8 +43,6 @@ function spanne(werte: (string | null)[]): { von: string | null; bis: string | n
   return { von: da[0] ?? null, bis: da[da.length - 1] ?? null };
 }
 
-const heute = new Date().toISOString().slice(0, 10);
-
 export function ZielAnsicht({
   kampagnen,
   darfBearbeiten,
@@ -58,7 +58,7 @@ export function ZielAnsicht({
 }: Props) {
   const [modus, setModus] = useState<Modus>("laufend");
   const [darstellung, setDarstellung] = useState<Darstellung>("liste");
-  const [gewaehlt, setGewaehlt] = useState<string | null>(null);
+  const [gewaehlt, setGewaehlt] = useState<string[]>([]);
   const [offen, setOffen] = useState<Set<string>>(new Set());
 
   const toggle = (name: string) =>
@@ -87,7 +87,10 @@ export function ZielAnsicht({
     const meta = epics[name];
     const start = meta?.start ?? spanne(tasks.map((t) => t.weekStart)).von;
     const ende = meta?.ende ?? spanne(tasks.map((t) => t.endDatum ?? t.weekStart)).bis;
-    return { name, tasks, start, ende, abgeschlossen: !!ende && ende < heute };
+    // Maßgeblich ist der Stand der Arbeit, nicht der Kalender: Eine Kampagne
+    // mit offenen Maßnahmen bleibt „laufend", auch wenn ihre Termine schon
+    // vorbei sind.
+    return { name, tasks, start, ende, abgeschlossen: istAbgeschlossen(tasks) };
   });
   alle.sort((a, b) => (a.start ?? "9999").localeCompare(b.start ?? "9999"));
 
@@ -127,9 +130,14 @@ export function ZielAnsicht({
   const laufendN = alle.filter((g) => !g.abgeschlossen).length;
   const fertigN = alle.filter((g) => g.abgeschlossen).length;
 
-  // In der Roadmap wird genau eine Kampagne gezeigt. Ist die gemerkte Auswahl
-  // durch Filter oder Moduswechsel verschwunden, auf die erste zurückfallen.
-  const aktuelle = sichtbar.find((g) => g.name === gewaehlt) ?? sichtbar[0] ?? null;
+  // In der Roadmap lassen sich mehrere Kampagnen gleichzeitig zeigen. Sind
+  // gemerkte Auswahlen durch Filter oder Moduswechsel verschwunden, auf die
+  // erste sichtbare zurückfallen, damit die Ansicht nie leer dasteht.
+  const auswahl = gewaehlt.filter((n) => sichtbar.some((g) => g.name === n));
+  const aktuelle =
+    auswahl.length > 0
+      ? sichtbar.filter((g) => auswahl.includes(g.name))
+      : sichtbar.slice(0, 1);
 
   const karte = (g: (typeof sichtbar)[number]) => {
     const meta = epics[g.name];
@@ -265,21 +273,6 @@ export function ZielAnsicht({
           ))}
         </div>
 
-        {darstellung === "roadmap" && sichtbar.length > 0 && (
-          <select
-            value={aktuelle?.name ?? ""}
-            onChange={(e) => setGewaehlt(e.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-marke focus:outline-none"
-            title="Kampagne für die Roadmap wählen"
-          >
-            {sichtbar.map((g) => (
-              <option key={g.name} value={g.name}>
-                {g.name} ({g.tasks.length})
-              </option>
-            ))}
-          </select>
-        )}
-
         {darstellung === "liste" && sichtbar.length > 1 && (
           <div className="ml-auto flex gap-2 text-xs">
             <button
@@ -298,16 +291,41 @@ export function ZielAnsicht({
         )}
       </div>
 
+      {/* Kampagnenauswahl für die Roadmap – eigene Zeile mit Beschriftung,
+          damit sie nicht je nach Bildschirmbreite irgendwo landet. */}
+      {darstellung === "roadmap" && sichtbar.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
+          <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+            Kampagne
+          </span>
+          <MultiSelect
+            label="Kampagnen"
+            options={sichtbar.map((g) => g.name)}
+            selected={auswahl}
+            onChange={setGewaehlt}
+            suchbar
+          />
+          <span className="text-xs text-slate-400">
+            {aktuelle.length === 1
+              ? aktuelle[0].name
+              : `${aktuelle.length} Kampagnen im Vergleich`}
+            {auswahl.length === 0 && sichtbar.length > 1 && " · mehrere wählbar"}
+          </span>
+        </div>
+      )}
+
       {darstellung === "roadmap" ? (
-        aktuelle ? (
+        aktuelle.length > 0 ? (
           <RoadmapAnsicht
-            name={aktuelle.name}
-            tasks={aktuelle.tasks}
-            // Nur der gepflegte Gesamtzeitraum wird als Balken markiert. Der
-            // aus den Maßnahmen abgeleitete Zeitraum würde das ganze Raster
-            // einfärben und damit nichts mehr aussagen.
-            start={epics[aktuelle.name]?.start ?? null}
-            ende={epics[aktuelle.name]?.ende ?? null}
+            kampagnen={aktuelle.map((g) => ({
+              name: g.name,
+              tasks: g.tasks,
+              // Nur der gepflegte Gesamtzeitraum wird als Balken markiert. Der
+              // aus den Maßnahmen abgeleitete Zeitraum würde das ganze Raster
+              // einfärben und damit nichts mehr aussagen.
+              start: epics[g.name]?.start ?? null,
+              ende: epics[g.name]?.ende ?? null,
+            }))}
             onEdit={onEdit}
           />
         ) : (

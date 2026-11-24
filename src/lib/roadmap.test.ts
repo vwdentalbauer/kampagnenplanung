@@ -3,11 +3,15 @@ import type { Kampagne } from "../types";
 import {
   bandPosition,
   kanalFarben,
-  monateAusWochen,
-  rasterDaten,
+  kopfgruppen,
+  monateImZeitraum,
+  spalteImBand,
+  spaltenImZeitraum,
+  spaltenKey,
   roadmapZeitraum,
-  wocheImBand,
+  vereinige,
   wochenImZeitraum,
+  zuordnen,
 } from "./roadmap";
 
 function k(ueberschreiben: Partial<Kampagne> = {}): Kampagne {
@@ -39,7 +43,6 @@ function k(ueberschreiben: Partial<Kampagne> = {}): Kampagne {
 
 describe("roadmapZeitraum", () => {
   it("umfasst Maßnahmen und gepflegten Gesamtzeitraum", () => {
-    // Wie im Vorbild: Aktivitäten laufen der eigentlichen Aktion voraus.
     const tasks = [k({ weekStart: "2026-05-18" }), k({ weekStart: "2026-06-01" })];
     expect(roadmapZeitraum(tasks, "2026-06-25", "2026-07-19")).toEqual({
       von: "2026-05-18",
@@ -68,16 +71,53 @@ describe("roadmapZeitraum", () => {
   });
 });
 
+describe("vereinige", () => {
+  it("spannt die Achse über mehrere Kampagnen", () => {
+    expect(
+      vereinige([
+        { von: "2026-05-18", bis: "2026-07-19" },
+        { von: "2026-03-02", bis: "2026-04-10" },
+      ]),
+    ).toEqual({ von: "2026-03-02", bis: "2026-07-19" });
+  });
+
+  it("übergeht Kampagnen ohne Termine", () => {
+    expect(vereinige([null, { von: "2026-05-18", bis: "2026-06-01" }, null])).toEqual({
+      von: "2026-05-18",
+      bis: "2026-06-01",
+    });
+  });
+
+  it("liefert nichts, wenn keine Kampagne Termine hat", () => {
+    expect(vereinige([null, null])).toBeNull();
+    expect(vereinige([])).toBeNull();
+  });
+});
+
 describe("wochenImZeitraum", () => {
   it("liefert die Wochen des Vorbilds (KW 21 bis 29)", () => {
     const wochen = wochenImZeitraum("2026-05-18", "2026-07-19");
-    expect(wochen.map((w) => w.kw)).toEqual([21, 22, 23, 24, 25, 26, 27, 28, 29]);
-    expect(wochen[0]).toEqual({ kw: 21, start: "2026-05-18", ende: "2026-05-24" });
-    expect(wochen[8]).toEqual({ kw: 29, start: "2026-07-13", ende: "2026-07-19" });
+    expect(wochen.map((w) => w.titel)).toEqual([
+      "KW 21",
+      "KW 22",
+      "KW 23",
+      "KW 24",
+      "KW 25",
+      "KW 26",
+      "KW 27",
+      "KW 28",
+      "KW 29",
+    ]);
+    expect(wochen[0]).toEqual({
+      key: "2026-05-18",
+      titel: "KW 21",
+      unter: "18.05.–24.05.",
+      start: "2026-05-18",
+      ende: "2026-05-24",
+    });
   });
 
   it("beginnt immer beim Montag der ersten Woche", () => {
-    // Donnerstag als Start -> Raster beginnt trotzdem am Montag.
     expect(wochenImZeitraum("2026-05-21", "2026-05-21")[0].start).toBe("2026-05-18");
   });
 
@@ -87,7 +127,7 @@ describe("wochenImZeitraum", () => {
 
   it("zählt über den Jahreswechsel korrekt weiter", () => {
     const wochen = wochenImZeitraum("2026-12-21", "2027-01-10");
-    expect(wochen.map((w) => w.kw)).toEqual([52, 53, 1]);
+    expect(wochen.map((w) => w.titel)).toEqual(["KW 52", "KW 53", "KW 1"]);
   });
 
   it("begrenzt unsinnig große Zeiträume", () => {
@@ -95,51 +135,109 @@ describe("wochenImZeitraum", () => {
   });
 });
 
-describe("monateAusWochen", () => {
-  it("fasst die Wochen zu Monatsspalten zusammen", () => {
-    const monate = monateAusWochen(wochenImZeitraum("2026-05-18", "2026-07-19"));
-    expect(monate).toEqual([
-      { key: "2026-05", name: "Mai 2026", wochen: 2 },
-      // KW 27 beginnt am 29.06. und zählt damit noch zum Juni.
-      { key: "2026-06", name: "Juni 2026", wochen: 5 },
-      { key: "2026-07", name: "Juli 2026", wochen: 2 },
+describe("monateImZeitraum", () => {
+  it("liefert je Monat eine Spalte", () => {
+    const monate = monateImZeitraum("2026-05-18", "2026-07-19");
+    expect(monate.map((m) => m.titel)).toEqual(["Mai", "Juni", "Juli"]);
+    expect(monate[0]).toEqual({
+      key: "2026-05",
+      titel: "Mai",
+      unter: "2026",
+      start: "2026-05-01",
+      ende: "2026-05-31",
+    });
+  });
+
+  it("beginnt immer am Monatsersten und endet am Monatsletzten", () => {
+    const [februar] = monateImZeitraum("2028-02-10", "2028-02-20");
+    // 2028 ist ein Schaltjahr.
+    expect(februar.start).toBe("2028-02-01");
+    expect(februar.ende).toBe("2028-02-29");
+  });
+
+  it("läuft über den Jahreswechsel", () => {
+    const monate = monateImZeitraum("2026-11-15", "2027-01-05");
+    expect(monate.map((m) => `${m.titel} ${m.unter}`)).toEqual([
+      "November 2026",
+      "Dezember 2026",
+      "Januar 2027",
     ]);
   });
 
-  it("ordnet eine Woche dem Monat ihres Montags zu", () => {
-    // Woche vom 29.06. bis 05.07. gehört zum Juni.
-    const monate = monateAusWochen(wochenImZeitraum("2026-06-29", "2026-07-05"));
-    expect(monate).toEqual([{ key: "2026-06", name: "Juni 2026", wochen: 1 }]);
-  });
-
-  it("deckt zusammen genau alle Wochen ab", () => {
-    const wochen = wochenImZeitraum("2026-01-01", "2026-12-31");
-    const summe = monateAusWochen(wochen).reduce((n, m) => n + m.wochen, 0);
-    expect(summe).toBe(wochen.length);
-  });
-
-  it("liefert nichts bei leerem Raster", () => {
-    expect(monateAusWochen([])).toEqual([]);
+  it("begrenzt unsinnig große Zeiträume", () => {
+    expect(monateImZeitraum("2020-01-01", "2030-01-01")).toHaveLength(36);
   });
 });
 
-describe("wocheImBand", () => {
+describe("spaltenImZeitraum", () => {
+  it("wählt das angeforderte Raster", () => {
+    expect(spaltenImZeitraum("woche", "2026-05-18", "2026-06-14")).toHaveLength(4);
+    expect(spaltenImZeitraum("monat", "2026-05-18", "2026-06-14")).toHaveLength(2);
+  });
+
+  it("verdichtet ein ganzes Jahr auf zwölf Spalten", () => {
+    // Genau der Fall, der im Wochenraster unübersichtlich wird.
+    expect(spaltenImZeitraum("monat", "2026-01-01", "2026-12-31")).toHaveLength(12);
+    expect(spaltenImZeitraum("woche", "2026-01-01", "2026-12-31").length).toBeGreaterThan(50);
+  });
+});
+
+describe("kopfgruppen", () => {
+  it("fasst Wochenspalten zu Monaten zusammen", () => {
+    const wochen = wochenImZeitraum("2026-05-18", "2026-07-19");
+    expect(kopfgruppen("woche", wochen)).toEqual([
+      { key: "2026-05", name: "Mai 2026", spalten: 2 },
+      // KW 27 beginnt am 29.06. und zählt damit noch zum Juni.
+      { key: "2026-06", name: "Juni 2026", spalten: 5 },
+      { key: "2026-07", name: "Juli 2026", spalten: 2 },
+    ]);
+  });
+
+  it("fasst Monatsspalten zu Jahren zusammen", () => {
+    const monate = monateImZeitraum("2026-11-15", "2027-02-05");
+    expect(kopfgruppen("monat", monate)).toEqual([
+      { key: "2026", name: "2026", spalten: 2 },
+      { key: "2027", name: "2027", spalten: 2 },
+    ]);
+  });
+
+  it("deckt zusammen genau alle Spalten ab", () => {
+    for (const raster of ["woche", "monat"] as const) {
+      const sp = spaltenImZeitraum(raster, "2026-01-01", "2026-12-31");
+      const summe = kopfgruppen(raster, sp).reduce((n, g) => n + g.spalten, 0);
+      expect(summe, raster).toBe(sp.length);
+    }
+  });
+
+  it("liefert nichts bei leerem Raster", () => {
+    expect(kopfgruppen("woche", [])).toEqual([]);
+  });
+});
+
+describe("spalteImBand", () => {
   const wochen = wochenImZeitraum("2026-05-18", "2026-07-19");
   const band = { von: "2026-06-25", bis: "2026-07-19" };
 
-  it("markiert die Wochen des Gesamtzeitraums", () => {
-    // KW 26 beginnt am 22.06. und reicht bis 28.06. – überschneidet sich.
-    expect(wocheImBand(wochen.find((w) => w.kw === 26)!, band)).toBe(true);
-    expect(wocheImBand(wochen.find((w) => w.kw === 29)!, band)).toBe(true);
+  it("markiert die Spalten des Gesamtzeitraums", () => {
+    // KW 26 reicht vom 22.06. bis 28.06. – überschneidet sich.
+    expect(spalteImBand(wochen.find((w) => w.titel === "KW 26")!, band)).toBe(true);
+    expect(spalteImBand(wochen.find((w) => w.titel === "KW 29")!, band)).toBe(true);
   });
 
-  it("lässt Wochen davor und danach frei", () => {
-    expect(wocheImBand(wochen.find((w) => w.kw === 25)!, band)).toBe(false);
-    expect(wocheImBand(wochen.find((w) => w.kw === 21)!, band)).toBe(false);
+  it("lässt Spalten davor und danach frei", () => {
+    expect(spalteImBand(wochen.find((w) => w.titel === "KW 25")!, band)).toBe(false);
+    expect(spalteImBand(wochen.find((w) => w.titel === "KW 21")!, band)).toBe(false);
+  });
+
+  it("funktioniert auch bei Monatsspalten", () => {
+    const monate = monateImZeitraum("2026-05-01", "2026-08-31");
+    expect(spalteImBand(monate[0], band)).toBe(false); // Mai
+    expect(spalteImBand(monate[1], band)).toBe(true); // Juni
+    expect(spalteImBand(monate[3], band)).toBe(false); // August
   });
 
   it("markiert nichts ohne Zeitraum", () => {
-    expect(wocheImBand(wochen[0], null)).toBe(false);
+    expect(spalteImBand(wochen[0], null)).toBe(false);
   });
 });
 
@@ -148,9 +246,18 @@ describe("bandPosition", () => {
 
   it("setzt den Balken auf den richtigen Ausschnitt", () => {
     const pos = bandPosition({ von: "2026-06-25", bis: "2026-07-19" }, wochen)!;
-    // 9 Wochen = 63 Tage; Start am 25.06. ist Tag 38, Ende 19.07. ist Tag 63.
-    expect(pos.links).toBeCloseTo((38 / 63) * 100, 5);
-    expect(pos.breite).toBeCloseTo((25 / 63) * 100, 5);
+    // 9 Wochen; Start am 25.06. liegt 3 Tage in Spalte 6 (Index 5).
+    expect(pos.links).toBeCloseTo(((5 + 3 / 7) / 9) * 100, 5);
+    expect(pos.breite).toBeCloseTo(((9 - (5 + 3 / 7)) / 9) * 100, 5);
+  });
+
+  it("rechnet bei Monatsspalten in Spaltenanteilen, nicht in Tagen", () => {
+    // Monate sind unterschiedlich lang, die Spalten aber gleich breit.
+    // Ein ganzer Monat muss deshalb genau eine Spaltenbreite einnehmen.
+    const monate = monateImZeitraum("2026-01-01", "2026-04-30");
+    const pos = bandPosition({ von: "2026-02-01", bis: "2026-02-28" }, monate)!;
+    expect(pos.links).toBeCloseTo(25, 5);
+    expect(pos.breite).toBeCloseTo(25, 5);
   });
 
   it("bleibt innerhalb des Rasters", () => {
@@ -169,17 +276,26 @@ describe("bandPosition", () => {
   });
 });
 
-describe("rasterDaten", () => {
+describe("spaltenKey", () => {
+  it("bildet ein Datum auf die passende Spalte ab", () => {
+    // Mittwoch -> Montag derselben Woche.
+    expect(spaltenKey("woche", "2026-06-03")).toBe("2026-06-01");
+    expect(spaltenKey("monat", "2026-06-03")).toBe("2026-06");
+  });
+});
+
+describe("zuordnen", () => {
   const wochen = wochenImZeitraum("2026-05-18", "2026-06-14");
 
-  it("sortiert die Maßnahmen nach Kanal und Woche", () => {
-    const raster = rasterDaten(
+  it("sortiert die Maßnahmen nach Kanal und Spalte", () => {
+    const raster = zuordnen(
       [
         k({ id: "a", kanal: "Social Media", weekStart: "2026-06-01" }),
         k({ id: "b", kanal: "Social Media", weekStart: "2026-06-01" }),
         k({ id: "c", kanal: "Newsletter", weekStart: "2026-06-01" }),
         k({ id: "d", kanal: "Social Media", weekStart: "2026-05-18" }),
       ],
+      "woche",
       wochen,
     );
     expect(raster.get("Social Media")!.get("2026-06-01")).toHaveLength(2);
@@ -188,18 +304,34 @@ describe("rasterDaten", () => {
   });
 
   it("ordnet über den Wochen-Montag zu, nicht über ein Datum mitten in der Woche", () => {
-    const raster = rasterDaten([k({ weekStart: "2026-06-03" })], wochen);
+    const raster = zuordnen([k({ weekStart: "2026-06-03" })], "woche", wochen);
     expect(raster.get("Social Media")!.get("2026-06-01")).toHaveLength(1);
   });
 
+  it("bündelt im Monatsraster die Wochen eines Monats", () => {
+    const monate = monateImZeitraum("2026-05-01", "2026-06-30");
+    const raster = zuordnen(
+      [
+        k({ id: "a", weekStart: "2026-06-01" }),
+        k({ id: "b", weekStart: "2026-06-08" }),
+        k({ id: "c", weekStart: "2026-05-18" }),
+      ],
+      "monat",
+      monate,
+    );
+    expect(raster.get("Social Media")!.get("2026-06")).toHaveLength(2);
+    expect(raster.get("Social Media")!.get("2026-05")).toHaveLength(1);
+  });
+
   it("fasst Maßnahmen ohne Kanal zusammen", () => {
-    const raster = rasterDaten([k({ kanal: "  " })], wochen);
+    const raster = zuordnen([k({ kanal: "  " })], "woche", wochen);
     expect(raster.get("Ohne Kanal")!.get("2026-05-18")).toHaveLength(1);
   });
 
   it("lässt Maßnahmen außerhalb des Rasters weg", () => {
-    const raster = rasterDaten(
+    const raster = zuordnen(
       [k({ weekStart: "2027-01-04" }), k({ weekStart: null })],
+      "woche",
       wochen,
     );
     expect(raster.size).toBe(0);
@@ -219,8 +351,7 @@ describe("kanalFarben", () => {
   });
 
   it("zählt doppelte Kanäle nur einmal", () => {
-    const farben = kanalFarben(["PR", "PR", "Newsletter"]);
-    expect(farben.size).toBe(2);
+    expect(kanalFarben(["PR", "PR", "Newsletter"]).size).toBe(2);
   });
 
   it("liefert gültige Farbwerte, auch bei leerem Namen", () => {
