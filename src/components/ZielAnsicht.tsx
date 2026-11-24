@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Kampagne, Status } from "../types";
 import { STATUS_REIHENFOLGE, STATUS_LABELS, STATUS_STYLE } from "../constants";
 import { TabellenAnsicht } from "./TabellenAnsicht";
+import { RoadmapAnsicht } from "./RoadmapAnsicht";
 import { ChevronIcon } from "./Icons";
 import { kwAusDatum, formatDatum } from "../lib/date";
 import type { EpicMeta } from "../data/useEpics";
@@ -32,6 +33,8 @@ interface Gruppe {
 }
 
 type Modus = "laufend" | "abgeschlossen" | "alle";
+/** Listenansicht (Karten) oder Roadmap mit Swimlanes je Kanal. */
+type Darstellung = "liste" | "roadmap";
 
 function spanne(werte: (string | null)[]): { von: string | null; bis: string | null } {
   const da = werte.filter((w): w is string => !!w).sort();
@@ -54,6 +57,8 @@ export function ZielAnsicht({
   onBulkDelete,
 }: Props) {
   const [modus, setModus] = useState<Modus>("laufend");
+  const [darstellung, setDarstellung] = useState<Darstellung>("liste");
+  const [gewaehlt, setGewaehlt] = useState<string | null>(null);
   const [offen, setOffen] = useState<Set<string>>(new Set());
 
   const toggle = (name: string) =>
@@ -121,6 +126,10 @@ export function ZielAnsicht({
 
   const laufendN = alle.filter((g) => !g.abgeschlossen).length;
   const fertigN = alle.filter((g) => g.abgeschlossen).length;
+
+  // In der Roadmap wird genau eine Kampagne gezeigt. Ist die gemerkte Auswahl
+  // durch Filter oder Moduswechsel verschwunden, auf die erste zurückfallen.
+  const aktuelle = sichtbar.find((g) => g.name === gewaehlt) ?? sichtbar[0] ?? null;
 
   const karte = (g: (typeof sichtbar)[number]) => {
     const meta = epics[g.name];
@@ -235,7 +244,43 @@ export function ZielAnsicht({
           {tab("abgeschlossen", "Abgeschlossen", fertigN)}
           {tab("alle", "Alle", alle.length)}
         </div>
-        {sichtbar.length > 1 && (
+
+        {/* Darstellung: Liste oder Roadmap */}
+        <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
+          {(
+            [
+              ["liste", "☰ Liste"],
+              ["roadmap", "📊 Swimlanes"],
+            ] as const
+          ).map(([d, label]) => (
+            <button
+              key={d}
+              onClick={() => setDarstellung(d)}
+              className={`rounded-md px-3 py-1 text-sm font-medium ${
+                darstellung === d ? "bg-marke text-white" : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {darstellung === "roadmap" && sichtbar.length > 0 && (
+          <select
+            value={aktuelle?.name ?? ""}
+            onChange={(e) => setGewaehlt(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-marke focus:outline-none"
+            title="Kampagne für die Roadmap wählen"
+          >
+            {sichtbar.map((g) => (
+              <option key={g.name} value={g.name}>
+                {g.name} ({g.tasks.length})
+              </option>
+            ))}
+          </select>
+        )}
+
+        {darstellung === "liste" && sichtbar.length > 1 && (
           <div className="ml-auto flex gap-2 text-xs">
             <button
               onClick={() => setOffen(new Set(sichtbar.map((g) => g.name)))}
@@ -253,27 +298,50 @@ export function ZielAnsicht({
         )}
       </div>
 
-      {sichtbar.map(karte)}
+      {darstellung === "roadmap" ? (
+        aktuelle ? (
+          <RoadmapAnsicht
+            name={aktuelle.name}
+            tasks={aktuelle.tasks}
+            // Nur der gepflegte Gesamtzeitraum wird als Balken markiert. Der
+            // aus den Maßnahmen abgeleitete Zeitraum würde das ganze Raster
+            // einfärben und damit nichts mehr aussagen.
+            start={epics[aktuelle.name]?.start ?? null}
+            ende={epics[aktuelle.name]?.ende ?? null}
+            onEdit={onEdit}
+          />
+        ) : (
+          <p className="py-10 text-center text-slate-400">Keine Kampagnen für diese Auswahl.</p>
+        )
+      ) : (
+        <>
+          {sichtbar.map(karte)}
 
-      {/* „Ohne Kampagne" nur in laufend/alle */}
-      {ohne.length > 0 && modus !== "abgeschlossen" && (
-        <section className="overflow-hidden rounded-lg border border-dashed border-slate-300 bg-white">
-          <button
-            onClick={() => toggle("__ohne__")}
-            className="flex w-full items-center gap-3 px-3 py-3 text-left hover:bg-slate-50"
-          >
-            <ChevronIcon
-              className={`h-4 w-4 shrink-0 text-slate-400 ${offen.has("__ohne__") ? "rotate-90" : ""}`}
-            />
-            <span className="flex-1 font-semibold text-slate-700">Ohne Kampagne</span>
-            <span className="text-xs text-slate-400">{ohne.length} Einträge</span>
-          </button>
-          {offen.has("__ohne__") && <div className="border-t border-slate-200 p-2">{tabelle(ohne)}</div>}
-        </section>
-      )}
+          {/* „Ohne Kampagne" nur in laufend/alle */}
+          {ohne.length > 0 && modus !== "abgeschlossen" && (
+            <section className="overflow-hidden rounded-lg border border-dashed border-slate-300 bg-white">
+              <button
+                onClick={() => toggle("__ohne__")}
+                className="flex w-full items-center gap-3 px-3 py-3 text-left hover:bg-slate-50"
+              >
+                <ChevronIcon
+                  className={`h-4 w-4 shrink-0 text-slate-400 ${
+                    offen.has("__ohne__") ? "rotate-90" : ""
+                  }`}
+                />
+                <span className="flex-1 font-semibold text-slate-700">Ohne Kampagne</span>
+                <span className="text-xs text-slate-400">{ohne.length} Einträge</span>
+              </button>
+              {offen.has("__ohne__") && (
+                <div className="border-t border-slate-200 p-2">{tabelle(ohne)}</div>
+              )}
+            </section>
+          )}
 
-      {sichtbar.length === 0 && ohne.length === 0 && (
-        <p className="py-10 text-center text-slate-400">Keine Kampagnen für diese Auswahl.</p>
+          {sichtbar.length === 0 && ohne.length === 0 && (
+            <p className="py-10 text-center text-slate-400">Keine Kampagnen für diese Auswahl.</p>
+          )}
+        </>
       )}
     </div>
   );

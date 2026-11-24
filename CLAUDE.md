@@ -29,6 +29,8 @@ wird. Ein fehlgeschlagener Test ist ein Befund, kein Hindernis.
   - `src/lib/namen.test.ts` – Anzeigenamen der Nutzer
   - `src/lib/kampagneRow.test.ts` – Zuordnung App-Felder <-> DB-Spalten
   - `src/lib/excel.test.ts` – Excel-Rundlauf (Export → Import ohne Verlust)
+  - `src/lib/dropdown.test.ts` – Positionierung der Inline-Dropdowns
+  - `src/lib/roadmap.test.ts` – Wochen-/Monatsraster der Roadmap-Ansicht
 - Einzeln laufen lassen: `npx vitest run src/lib/filter.test.ts`
 - Während der Entwicklung: `npm run test:watch`
 
