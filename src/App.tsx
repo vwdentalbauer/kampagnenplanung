@@ -410,7 +410,10 @@ export default function App() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        {/* flex-wrap: auf schmalen Bildschirmen rutschen die Schaltflächen in
+            eine zweite Zeile, statt rechts aus dem Bild zu laufen – sonst ist
+            „Abmelden" auf dem Handy nicht erreichbar. */}
+        <div className="flex flex-wrap items-center justify-end gap-2 text-sm sm:gap-3">
           {/* Mandanten-Umschalter: gut sichtbar, aber dezent */}
           <label className="flex items-center gap-1 rounded-md border border-marke/40 bg-marke/5 px-2 py-1">
             <span className="text-marke-dark">🌐</span>
